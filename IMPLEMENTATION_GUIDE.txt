@@ -1,0 +1,173 @@
+IMPLEMENTATION QUICK REFERENCE
+
+BACKEND SETUP:
+1. Navigate to backend folder
+2. Run: composer install
+3. Copy .env.example to .env
+4. Run: php artisan key:generate
+5. Configure database in .env
+6. Run: php artisan migrate
+7. Run: php artisan db:seed
+8. Run: php artisan serve (runs on http://localhost:8000)
+
+FRONTEND SETUP:
+1. Navigate to frontend folder
+2. Run: npm install
+3. Run: npm run dev (runs on http://localhost:5173, proxies to http://localhost:8000/api)
+
+TESTING THE SYSTEM:
+
+1. Login credentials (from seeder):
+   Email: admin@isms-ewa.local or teacher1@isms-ewa.local
+   Password: password
+
+2. Create a grade for a student:
+   POST /api/students/1/grades
+   {
+     "subject": "Mathematics",
+     "score": 85,
+     "semester": "1",
+     "academic_year": "2024"
+   }
+   - Risk score automatically recalculates
+
+3. Create a violation:
+   POST /api/students/1/violations
+   {
+     "description": "Misbehavior in class",
+     "severity": "moderate",
+     "reported_by": "Teacher Name",
+     "reported_date": "2024-04-30"
+   }
+   - Risk score automatically recalculates
+
+4. Get student with updated risk score:
+   GET /api/students/1
+   - Returns student with risk score info
+
+5. Filter students by risk level:
+   GET /api/students/risk-level?level=high&limit=10
+   - Returns students with high risk
+
+KEY SCORING ALGORITHM:
+- Academic Score (60% weight):
+  * Grade 85+: risk = 10
+  * Grade 75-84: risk = 25
+  * Grade 65-74: risk = 50
+  * Grade 55-64: risk = 70
+  * Grade <55: risk = 100
+
+- Behavioral Score (40% weight):
+  * Minor violation: +5 points
+  * Moderate violation: +15 points
+  * Major violation: +30 points
+  * Severe violation: +50 points
+  * Cumulative effect of multiple violations
+
+- Final Risk Level:
+  * 0-20: LOW (Green)
+  * 21-50: MEDIUM (Yellow)
+  * 51-100: HIGH (Red)
+
+ARCHITECTURE OVERVIEW:
+
+Request Flow:
+1. Frontend sends request to API
+2. Route directs to Controller
+3. Controller validates input
+4. Controller calls Service
+5. Service executes business logic
+6. Service may call Repository (data access)
+7. Service returns result
+8. Controller formats response
+9. Response sent to frontend
+
+Data Flow for Grade/Violation Creation:
+1. GradeController.store() validates input
+2. Calls GradeService.createGrade()
+3. GradeService creates grade in database
+4. GradeService calls ScoringService.updateStudentRiskScore()
+5. ScoringService recalculates all scores
+6. ScoringService updates RiskScore model
+7. Response returned to frontend
+
+ADVANCED FEATURES AVAILABLE:
+
+1. ReportService:
+   - Generate student risk reports
+   - Generate class-level risk reports
+   - Statistics and aggregations
+
+2. Dashboard Statistics:
+   - Total students count
+   - Risk distribution
+   - Average risk score
+   - Real-time calculations
+
+3. CSV Export (frontend):
+   - Export student data
+   - Export risk reports
+   - Uses chartHelpers.exportToCSV()
+
+EXTENDING THE SYSTEM:
+
+Add new violation severity:
+1. Update Violation model validation
+2. Add score mapping in ScoringService.getSeverityScore()
+3. Test with new violation
+
+Add new grade-based logic:
+1. Modify ScoringService.mapGradeToRiskScore()
+2. Update thresholds as needed
+3. Test recalculation
+
+Add email notifications:
+1. Create Notification class
+2. Add to event listeners
+3. Configure mail driver in .env
+
+Add student alerts threshold:
+1. Add alert level to RiskScore model
+2. Trigger alerts when risk_level becomes 'high'
+3. Notify homeroom teacher
+
+DATABASE COMMANDS:
+
+Migrate fresh (DEVELOPMENT ONLY):
+php artisan migrate:fresh --seed
+
+View all migrations:
+php artisan migrate:status
+
+Revert last migration:
+php artisan migrate:rollback
+
+Create new migration:
+php artisan make:migration create_table_name
+
+Seed database:
+php artisan db:seed
+
+Create model with migration:
+php artisan make:model ModelName -m
+
+COMMON ISSUES:
+
+CORS errors:
+- Check HandleCors middleware in Kernel
+- Verify frontend URL in .env SANCTUM_STATEFUL_DOMAINS
+
+401 Unauthorized:
+- Check token in Authorization header
+- Verify token hasn't expired
+- Ensure user is authenticated
+
+Risk score not updating:
+- Check if grade/violation was created via API
+- Verify ScoringService is called in service layer
+- Check database for risk_score record
+
+API returning 422:
+- Check validation rules in controller
+- Verify all required fields are provided
+- Check field data types and formats

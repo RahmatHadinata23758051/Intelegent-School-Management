@@ -1,0 +1,28 @@
+BACKEND SETUP:
+1. cd backend
+2. composer install
+3. cp .env.example .env
+4. php artisan key:generate
+5. Configure database in .env (DB_DATABASE, DB_USERNAME, DB_PASSWORD)
+6. php artisan migrate
+7. php artisan db:seed
+8. php artisan serve
+
+FRONTEND SETUP:
+1. cd frontend
+2. npm install
+3. npm run dev
+
+API ENDPOINTS:
+- POST /api/register - Register new user
+- POST /api/login - Login
+- GET /api/students - List all students
+- GET /api/students/:id - Get student details
+- POST /api/students/:id/grades - Add grade
+- POST /api/students/:id/violations - Record violation
+
+KEY FEATURES:
+- ScoringService: Core risk calculation engine
+- Automatic risk score updates on grade/violation changes
+- Role-based access (admin, teacher, homeroom_teacher)
+- Real-time API with Laravel Sanctum auth
