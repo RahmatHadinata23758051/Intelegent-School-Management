@@ -60,5 +60,6 @@ $app->register(Illuminate\Pagination\PaginationServiceProvider::class);
 $app->register(Illuminate\Queue\QueueServiceProvider::class);
 $app->register(Illuminate\Routing\RoutingServiceProvider::class);
 $app->register(Illuminate\Translation\TranslationServiceProvider::class);
+$app->register(Illuminate\Hashing\HashServiceProvider::class);
 
 return $app;
