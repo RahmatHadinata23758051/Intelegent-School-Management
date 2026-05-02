@@ -2,120 +2,88 @@
 
 namespace App\Services;
 
-use App\Models\Student;
+use App\Models\Grade;
+use App\Models\Violation;
 use App\Models\RiskScore;
+use Carbon\Carbon;
 
 class ScoringService
 {
-    private const ACADEMIC_WEIGHT = 0.6;
-    private const BEHAVIORAL_WEIGHT = 0.4;
-    private const MAX_SCORE = 100;
-
-    public function calculateRiskScore(Student $student): array
+    public function calculateRisk(int $studentId): RiskScore
     {
-        $academicScore = $this->calculateAcademicScore($student);
-        $behavioralScore = $this->calculateBehavioralScore($student);
-
-        $totalScore = ($academicScore * self::ACADEMIC_WEIGHT) + 
-                      ($behavioralScore * self::BEHAVIORAL_WEIGHT);
-
-        $totalScore = min($totalScore, self::MAX_SCORE);
-
+        $academicScore = $this->computeAcademicRisk($studentId);
+        $behavioralScore = $this->computeBehavioralRisk($studentId);
+        
+        $totalScore = $academicScore + $behavioralScore;
         $riskLevel = $this->determineRiskLevel($totalScore);
 
-        return [
-            'total_score' => round($totalScore, 2),
-            'academic_score' => round($academicScore, 2),
-            'behavioral_score' => round($behavioralScore, 2),
-            'risk_level' => $riskLevel,
-        ];
-    }
-
-    private function calculateAcademicScore(Student $student): float
-    {
-        $grades = $student->grades()->latest('created_at')->limit(5)->get();
-
-        if ($grades->isEmpty()) {
-            return 0;
-        }
-
-        $avgGrade = $grades->avg('score');
-
-        return $this->mapGradeToRiskScore($avgGrade);
-    }
-
-    private function mapGradeToRiskScore(float $avgGrade): float
-    {
-        if ($avgGrade >= 85) {
-            return 10;
-        } elseif ($avgGrade >= 75) {
-            return 25;
-        } elseif ($avgGrade >= 65) {
-            return 50;
-        } elseif ($avgGrade >= 55) {
-            return 70;
-        } else {
-            return 100;
-        }
-    }
-
-    private function calculateBehavioralScore(Student $student): float
-    {
-        $violations = $student->violations()->latest('created_at')->limit(10)->get();
-
-        if ($violations->isEmpty()) {
-            return 0;
-        }
-
-        $behavioralScore = 0;
-
-        foreach ($violations as $violation) {
-            $severityScore = $this->getSeverityScore($violation->severity);
-            $behavioralScore += $severityScore;
-        }
-
-        $avgViolationScore = $behavioralScore / count($violations);
-
-        return min($avgViolationScore * count($violations), self::MAX_SCORE);
-    }
-
-    private function getSeverityScore(string $severity): float
-    {
-        return match ($severity) {
-            'minor' => 5,
-            'moderate' => 15,
-            'major' => 30,
-            'severe' => 50,
-            default => 0,
-        };
-    }
-
-    private function determineRiskLevel(float $score): string
-    {
-        if ($score <= 20) {
-            return 'low';
-        } elseif ($score <= 50) {
-            return 'medium';
-        } else {
-            return 'high';
-        }
-    }
-
-    public function updateStudentRiskScore(Student $student): void
-    {
-        $scoreData = $this->calculateRiskScore($student);
-
-        RiskScore::updateOrCreate(
-            ['student_id' => $student->id],
+        return RiskScore::updateOrCreate(
+            ['student_id' => $studentId],
             [
-                'total_score' => $scoreData['total_score'],
-                'academic_score' => $scoreData['academic_score'],
-                'behavioral_score' => $scoreData['behavioral_score'],
-                'risk_level' => $scoreData['risk_level'],
-                'last_updated' => now(),
+                'academic_score' => $academicScore,
+                'behavioral_score' => $behavioralScore,
+                'total_score' => $totalScore,
+                'risk_level' => $riskLevel,
+                'last_updated' => Carbon::now(),
             ]
         );
+    }
 
-        $student->update(['risk_score' => $scoreData['total_score']]);
+    private function computeAcademicRisk(int $studentId): float
+    {
+        $grades = Grade::where('student_id', $studentId)->get();
+
+        if ($grades->isEmpty()) {
+            return 0.0;
+        }
+
+        $averageScore = $grades->avg('score');
+        
+        if ($averageScore < 50) {
+            return 50.0;
+        } elseif ($averageScore < 70) {
+            return 30.0;
+        } elseif ($averageScore < 80) {
+            return 10.0;
+        }
+
+        return 0.0;
+    }
+
+    private function computeBehavioralRisk(int $studentId): float
+    {
+        $violations = Violation::where('student_id', $studentId)->get();
+
+        $risk = 0.0;
+
+        foreach ($violations as $violation) {
+            switch (strtolower($violation->severity)) {
+                case 'high':
+                    $risk += 30.0;
+                    break;
+                case 'medium':
+                    $risk += 15.0;
+                    break;
+                case 'low':
+                    $risk += 5.0;
+                    break;
+                default:
+                    $risk += 5.0;
+                    break;
+            }
+        }
+
+        return min($risk, 100.0);
+    }
+
+    private function determineRiskLevel(float $totalScore): string
+    {
+        if ($totalScore >= 60) {
+            return 'High Risk';
+        } elseif ($totalScore >= 30) {
+            return 'Warning';
+        }
+
+        return 'Safe';
     }
 }
