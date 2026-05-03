@@ -19,7 +19,7 @@ class GradeService
         $grade = Grade::create($data);
 
         $student = $grade->student;
-        $this->scoringService->updateStudentRiskScore($student);
+        $this->scoringService->calculateRisk($student->id);
 
         return $grade;
     }
@@ -29,7 +29,7 @@ class GradeService
         $grade->update($data);
 
         $student = $grade->student;
-        $this->scoringService->updateStudentRiskScore($student);
+        $this->scoringService->calculateRisk($student->id);
 
         return $grade;
     }

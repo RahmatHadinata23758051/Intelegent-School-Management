@@ -19,7 +19,7 @@ class ViolationService
         $violation = Violation::create($data);
 
         $student = $violation->student;
-        $this->scoringService->updateStudentRiskScore($student);
+        $this->scoringService->calculateRisk($student->id);
 
         return $violation;
     }
@@ -29,7 +29,7 @@ class ViolationService
         $violation->update($data);
 
         $student = $violation->student;
-        $this->scoringService->updateStudentRiskScore($student);
+        $this->scoringService->calculateRisk($student->id);
 
         return $violation;
     }
