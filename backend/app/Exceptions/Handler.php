@@ -17,7 +17,7 @@ class Handler extends ExceptionHandler
     {
         if ($request->is('api/*')) {
             if ($exception instanceof \Illuminate\Validation\ValidationException) {
-                return response()->json([
+                return new \Illuminate\Http\JsonResponse([
                     'success' => false,
                     'message' => 'Validation failed',
                     'errors' => $exception->errors(),
@@ -25,30 +25,31 @@ class Handler extends ExceptionHandler
             }
 
             if ($exception instanceof StudentNotFoundException) {
-                return response()->json([
+                return new \Illuminate\Http\JsonResponse([
                     'success' => false,
                     'message' => $exception->getMessage(),
                 ], 404);
             }
 
             if ($exception instanceof InvalidScoreException) {
-                return response()->json([
+                return new \Illuminate\Http\JsonResponse([
                     'success' => false,
                     'message' => $exception->getMessage(),
                 ], 400);
             }
 
             if ($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
-                return response()->json([
+                return new \Illuminate\Http\JsonResponse([
                     'success' => false,
                     'message' => 'Resource not found',
                 ], 404);
             }
 
-            return response()->json([
+            return new \Illuminate\Http\JsonResponse([
                 'success' => false,
                 'message' => 'Internal server error',
                 'debug' => config('app.debug') ? $exception->getMessage() : null,
+                'trace' => config('app.debug') ? $exception->getTraceAsString() : null,
             ], 500);
         }
 

@@ -6,6 +6,18 @@ $app = new Illuminate\Foundation\Application(
 
 /*
 |--------------------------------------------------------------------------
+| Load Environment Variables
+|--------------------------------------------------------------------------
+*/
+
+try {
+    \Dotenv\Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
+} catch (\Exception $e) {
+    //
+}
+
+/*
+|--------------------------------------------------------------------------
 | Create Configuration Repository
 |--------------------------------------------------------------------------
 */
@@ -45,6 +57,7 @@ $app->singleton(
 */
 
 $app->register(Illuminate\Foundation\Providers\FoundationServiceProvider::class);
+$app->register(Illuminate\Cookie\CookieServiceProvider::class);
 $app->register(Illuminate\Encryption\EncryptionServiceProvider::class);
 $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 $app->register(Illuminate\View\ViewServiceProvider::class);
@@ -61,5 +74,7 @@ $app->register(Illuminate\Queue\QueueServiceProvider::class);
 $app->register(Illuminate\Routing\RoutingServiceProvider::class);
 $app->register(Illuminate\Translation\TranslationServiceProvider::class);
 $app->register(Illuminate\Hashing\HashServiceProvider::class);
+$app->register(Laravel\Sanctum\SanctumServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
 
 return $app;

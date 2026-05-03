@@ -27,7 +27,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
+        return new \Illuminate\Http\JsonResponse([
             'success' => true,
             'message' => 'User registered successfully',
             'data' => [
@@ -47,7 +47,7 @@ class AuthController extends Controller
         $user = User::where('email', $validated['email'])->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
-            return response()->json([
+            return new \Illuminate\Http\JsonResponse([
                 'success' => false,
                 'message' => 'Invalid credentials',
             ], 401);
@@ -55,7 +55,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
+        return new \Illuminate\Http\JsonResponse([
             'success' => true,
             'message' => 'Login successful',
             'data' => [
@@ -69,7 +69,7 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
+        return new \Illuminate\Http\JsonResponse([
             'success' => true,
             'message' => 'Logged out successfully',
         ]);
@@ -77,7 +77,7 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        return response()->json([
+        return new \Illuminate\Http\JsonResponse([
             'success' => true,
             'data' => $request->user(),
         ]);
