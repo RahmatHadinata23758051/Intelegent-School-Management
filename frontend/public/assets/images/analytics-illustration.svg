@@ -1,0 +1,57 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891b2;stop-opacity:0.8" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Animated chart bars -->
+  <g id="chart">
+    <!-- Bar 1 -->
+    <rect x="80" y="220" width="40" height="100" fill="url(#grad1)" rx="4" opacity="0.7"/>
+    <!-- Bar 2 -->
+    <rect x="150" y="140" width="40" height="180" fill="url(#grad1)" rx="4" opacity="0.8"/>
+    <!-- Bar 3 -->
+    <rect x="220" y="100" width="40" height="220" fill="url(#grad1)" rx="4" opacity="0.9"/>
+    <!-- Bar 4 -->
+    <rect x="290" y="180" width="40" height="140" fill="url(#grad1)" rx="4" opacity="0.7"/>
+  </g>
+  
+  <!-- Arrow/Growth indicator -->
+  <g opacity="0.6">
+    <line x1="60" y1="280" x2="340" y2="120" stroke="#06b6d4" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="340,120 320,130 330,145" fill="#06b6d4"/>
+  </g>
+  
+  <!-- Students/People icons -->
+  <g transform="translate(120, 280)" opacity="0.5">
+    <!-- Person 1 -->
+    <circle cx="0" cy="0" r="8" fill="#06b6d4"/>
+    <path d="M -8 8 L 8 8 L 6 20 L -6 20" fill="#06b6d4"/>
+    
+    <!-- Person 2 -->
+    <circle cx="35" cy="5" r="8" fill="#0891b2"/>
+    <path d="M 27 13 L 43 13 L 41 25 L 29 25" fill="#0891b2"/>
+    
+    <!-- Person 3 -->
+    <circle cx="70" cy="0" r="8" fill="#06b6d4"/>
+    <path d="M 62 8 L 78 8 L 76 20 L 64 20" fill="#06b6d4"/>
+  </g>
+  
+  <!-- Analytics dots and lines -->
+  <g opacity="0.4">
+    <circle cx="100" cy="80" r="4" fill="#06b6d4"/>
+    <circle cx="180" cy="60" r="4" fill="#0891b2"/>
+    <circle cx="260" cy="100" r="4" fill="#06b6d4"/>
+    <circle cx="320" cy="70" r="4" fill="#0891b2"/>
+    
+    <polyline points="100,80 180,60 260,100 320,70" stroke="#06b6d4" stroke-width="1" fill="none"/>
+  </g>
+  
+  <!-- Warning/Alert indicator -->
+  <g transform="translate(50, 50)" opacity="0.6">
+    <circle cx="15" cy="15" r="15" fill="none" stroke="#06b6d4" stroke-width="2"/>
+    <text x="15" y="20" font-size="18" fill="#06b6d4" text-anchor="middle" font-weight="bold">!</text>
+  </g>
+</svg>
