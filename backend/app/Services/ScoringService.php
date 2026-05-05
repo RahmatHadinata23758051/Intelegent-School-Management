@@ -3,18 +3,26 @@
 namespace App\Services;
 
 use App\Models\Grade;
+use App\Models\Student;
 use App\Models\Violation;
 use App\Models\RiskScore;
 use Carbon\Carbon;
 
 class ScoringService
 {
+    public function updateStudentRiskScore(Student|int $student): RiskScore
+    {
+        $studentId = $student instanceof Student ? $student->getKey() : $student;
+
+        return $this->calculateRisk($studentId);
+    }
+
     public function calculateRisk(int $studentId): RiskScore
     {
         $academicScore = $this->computeAcademicRisk($studentId);
         $behavioralScore = $this->computeBehavioralRisk($studentId);
-        
-        $totalScore = $academicScore + $behavioralScore;
+
+        $totalScore = min($academicScore + $behavioralScore, 100.0);
         $riskLevel = $this->determineRiskLevel($totalScore);
 
         return RiskScore::updateOrCreate(
@@ -29,22 +37,45 @@ class ScoringService
         );
     }
 
+    public function normalizeRiskLevel(?string $riskLevel): string
+    {
+        return match (strtolower(trim((string) $riskLevel))) {
+            'high', 'high risk' => 'high',
+            'medium', 'warning' => 'medium',
+            default => 'low',
+        };
+    }
+
+    public function getRiskLevelAliases(string $riskLevel): array
+    {
+        return match ($this->normalizeRiskLevel($riskLevel)) {
+            'high' => ['high', 'High Risk'],
+            'medium' => ['medium', 'Warning'],
+            default => ['low', 'Safe'],
+        };
+    }
+
     private function computeAcademicRisk(int $studentId): float
     {
-        $grades = Grade::where('student_id', $studentId)->get();
+        $averageScore = Grade::query()
+            ->where('student_id', $studentId)
+            ->avg('score');
 
-        if ($grades->isEmpty()) {
+        if ($averageScore === null) {
             return 0.0;
         }
 
-        $averageScore = $grades->avg('score');
         
-        if ($averageScore < 50) {
-            return 50.0;
-        } elseif ($averageScore < 70) {
+        if ($averageScore < 60) {
+            return 45.0;
+        }
+
+        if ($averageScore < 70) {
             return 30.0;
-        } elseif ($averageScore < 80) {
-            return 10.0;
+        }
+
+        if ($averageScore < 80) {
+            return 15.0;
         }
 
         return 0.0;
@@ -52,26 +83,23 @@ class ScoringService
 
     private function computeBehavioralRisk(int $studentId): float
     {
-        $violations = Violation::where('student_id', $studentId)->get();
-
-        $risk = 0.0;
-
-        foreach ($violations as $violation) {
-            switch (strtolower($violation->severity)) {
-                case 'high':
-                    $risk += 30.0;
-                    break;
-                case 'medium':
-                    $risk += 15.0;
-                    break;
-                case 'low':
-                    $risk += 5.0;
-                    break;
-                default:
-                    $risk += 5.0;
-                    break;
-            }
-        }
+        $risk = (float) Violation::query()
+            ->where('student_id', $studentId)
+            ->selectRaw("
+                COALESCE(SUM(
+                    CASE LOWER(severity)
+                        WHEN 'severe' THEN 40
+                        WHEN 'major' THEN 30
+                        WHEN 'high' THEN 30
+                        WHEN 'moderate' THEN 15
+                        WHEN 'medium' THEN 15
+                        WHEN 'minor' THEN 5
+                        WHEN 'low' THEN 5
+                        ELSE 5
+                    END
+                ), 0) as behavioral_risk
+            ")
+            ->value('behavioral_risk');
 
         return min($risk, 100.0);
     }
@@ -79,11 +107,13 @@ class ScoringService
     private function determineRiskLevel(float $totalScore): string
     {
         if ($totalScore >= 60) {
-            return 'High Risk';
-        } elseif ($totalScore >= 30) {
-            return 'Warning';
+            return 'high';
         }
 
-        return 'Safe';
+        if ($totalScore >= 30) {
+            return 'medium';
+        }
+
+        return 'low';
     }
 }
