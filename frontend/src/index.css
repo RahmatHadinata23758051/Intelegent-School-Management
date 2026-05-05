@@ -2,100 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color: #0f172a;
+  background-color: #f8fafc;
+}
+
+html {
+  background-color: #f8fafc;
+}
+
 body {
-  @apply bg-gray-50;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(circle at top left, rgba(34, 211, 238, 0.08), transparent 28rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 1));
+  color: #0f172a;
+  font-family: "Aptos", "Trebuchet MS", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Buttons */
+#root {
+  min-height: 100vh;
+}
+
 .btn-primary {
-  @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition;
+  @apply inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-100;
 }
 
 .btn-danger {
-  @apply px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition;
+  @apply inline-flex items-center justify-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 focus:outline-none focus:ring-4 focus:ring-rose-100;
 }
 
-/* Badges */
-.badge-low {
-  @apply px-3 py-1 bg-risk-low text-white rounded-full text-sm;
+input,
+button,
+select,
+textarea {
+  font: inherit;
 }
 
-.badge-medium {
-  @apply px-3 py-1 bg-risk-medium text-white rounded-full text-sm;
+button,
+a,
+input,
+select,
+textarea {
+  @apply transition duration-200;
 }
 
-.badge-high {
-  @apply px-3 py-1 bg-risk-high text-white rounded-full text-sm;
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  @apply outline-none ring-4 ring-cyan-100;
 }
 
-/* Modern Scrollbar */
+::selection {
+  background: rgba(34, 211, 238, 0.22);
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  background: #e2e8f0;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-blue-400 rounded-full hover:bg-blue-500;
+  background: #94a3b8;
+  border-radius: 9999px;
 }
 
-/* Glassmorphism effect */
-.glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Smooth animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out;
-}
-
-.animate-slide-in-left {
-  animation: slideInLeft 0.5s ease-out;
-}
-
-/* Focus states */
-input:focus {
-  @apply outline-none;
-}
-
-button:focus {
-  @apply outline-none ring-2 ring-offset-2 ring-blue-400;
-}
-
-/* Smooth transitions */
-* {
-  @apply transition-colors duration-200;
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
