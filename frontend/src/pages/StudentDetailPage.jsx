@@ -1,133 +1,209 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { studentService, gradeService, violationService } from '../services/apiService'
 import { RiskScoreCard } from '../components/RiskComponents'
+import { StatePanel } from '../components/StatePanel'
+import { Card } from '../components/ui/Card'
+import { SectionHeader } from '../components/ui/SectionHeader'
+import { studentService } from '../services/apiService'
+import { extractApiData, getErrorMessage } from '../utils/errors'
+import { formatRiskScore } from '../utils/risk'
+
+const AlertIcon = () => (
+  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.8}
+      d="M12 9v4m0 4h.01M5.94 19h12.12a1 1 0 0 0 .88-1.47L12.88 6.1a1 1 0 0 0-1.76 0L5.06 17.53A1 1 0 0 0 5.94 19Z"
+    />
+  </svg>
+)
 
 export const StudentDetailPage = () => {
   const { id } = useParams()
   const [student, setStudent] = useState(null)
-  const [grades, setGrades] = useState([])
-  const [violations, setViolations] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    fetchStudentData()
+    fetchStudent()
   }, [id])
 
-  const fetchStudentData = async () => {
+  const fetchStudent = async () => {
     try {
       setLoading(true)
-      const [studentRes, gradesRes, violationsRes] = await Promise.all([
-        studentService.getById(id),
-        gradeService.getByStudent(id),
-        violationService.getByStudent(id),
-      ])
-
-      setStudent(studentRes.data.data)
-      setGrades(gradesRes.data.data || [])
-      setViolations(violationsRes.data.data || [])
-    } catch (error) {
-      console.error('Failed to fetch student data:', error)
+      setError('')
+      const response = await studentService.getById(id)
+      setStudent(extractApiData(response))
+    } catch (requestError) {
+      setError(
+        getErrorMessage(
+          requestError,
+          'The selected student record could not be loaded.'
+        )
+      )
     } finally {
       setLoading(false)
     }
   }
 
   if (loading) {
-    return <div className="p-8 text-center">Loading...</div>
+    return (
+      <div className="py-8">
+        <Card className="p-8">
+          <div className="space-y-4 animate-pulse">
+            <div className="h-4 w-28 rounded bg-slate-200" />
+            <div className="h-10 w-64 rounded bg-slate-200" />
+            <div className="h-4 w-48 rounded bg-slate-200" />
+          </div>
+        </Card>
+      </div>
+    )
   }
 
   if (!student) {
-    return <div className="p-8 text-center text-red-600">Student not found</div>
+    return (
+      <div className="py-8">
+        <StatePanel
+          tone="danger"
+          title="Student record unavailable"
+          description={error || 'Student not found.'}
+          actionLabel="Retry"
+          onAction={fetchStudent}
+          icon={<AlertIcon />}
+        />
+      </div>
+    )
   }
 
   const riskScore = student.riskScore
+  const grades = student.grades || []
+  const violations = student.violations || []
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">{student.name}</h1>
-        <p className="text-gray-600">{student.email}</p>
-      </div>
+    <div className="space-y-8 py-8">
+      <SectionHeader
+        eyebrow="Student Detail"
+        title={student.name}
+        description="Review the student's current risk posture, recent grades, and behavioral history to decide the next intervention."
+        actions={
+          <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm shadow-slate-950/5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+              Class assignment
+            </p>
+            <p className="mt-1 text-lg font-semibold text-slate-900">
+              {student.class?.name || 'Unassigned class'}
+            </p>
+            <p className="text-sm text-slate-500">{student.email}</p>
+          </div>
+        }
+      />
 
       {riskScore && (
-        <div className="mb-8">
-          <RiskScoreCard
-            score={riskScore.total_score}
-            riskLevel={riskScore.risk_level}
-          />
-        </div>
+        <RiskScoreCard
+          score={riskScore.total_score}
+          riskLevel={riskScore.risk_level}
+          academicScore={riskScore.academic_score}
+          behavioralScore={riskScore.behavioral_score}
+        />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Academic Performance
-          </h2>
-          {riskScore && (
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Academic Score:</span>
-                <span className="font-semibold text-gray-800">
-                  {riskScore.academic_score?.toFixed(1) || 0}
-                </span>
-              </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
+                Academic Signal
+              </p>
+              <h3 className="mt-2 text-lg font-semibold text-slate-900">
+                Performance snapshot
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                Recent grades feeding the academic portion of the risk score.
+              </p>
             </div>
-          )}
-          <div className="mt-4 border-t pt-4">
-            <h3 className="font-semibold text-gray-700 mb-2">Recent Grades</h3>
-            {grades.length > 0 ? (
-              <ul className="space-y-2">
-                {grades.slice(0, 5).map((grade) => (
-                  <li
-                    key={grade.id}
-                    className="flex justify-between text-sm text-gray-600"
-                  >
-                    <span>{grade.subject}</span>
-                    <span className="font-semibold">{grade.score}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500 text-sm">No grades recorded</p>
-            )}
+            <div className="rounded-xl bg-slate-100 px-4 py-3 text-right">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                Academic score
+              </p>
+              <p className="mt-1 text-2xl font-semibold text-slate-900">
+                {formatRiskScore(riskScore?.academic_score)}
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Behavioral Records
-          </h2>
-          {riskScore && (
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Behavioral Score:</span>
-                <span className="font-semibold text-gray-800">
-                  {riskScore.behavioral_score?.toFixed(1) || 0}
-                </span>
-              </div>
-            </div>
-          )}
-          <div className="mt-4 border-t pt-4">
-            <h3 className="font-semibold text-gray-700 mb-2">
-              Recent Violations
-            </h3>
-            {violations.length > 0 ? (
-              <ul className="space-y-3">
-                {violations.slice(0, 5).map((violation) => (
-                  <li key={violation.id} className="text-sm border-l-4 border-red-400 pl-3">
-                    <p className="font-semibold text-gray-700">
-                      {violation.severity?.toUpperCase()}
+          <div className="mt-6 space-y-3">
+            {grades.length > 0 ? (
+              grades.slice(0, 5).map((grade) => (
+                <div
+                  key={grade.id}
+                  className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+                >
+                  <div>
+                    <p className="font-medium text-slate-900">{grade.subject}</p>
+                    <p className="text-sm text-slate-500">
+                      Semester {grade.semester} / {grade.academic_year}
                     </p>
-                    <p className="text-gray-600">{violation.description}</p>
-                  </li>
-                ))}
-              </ul>
+                  </div>
+                  <p className="text-lg font-semibold text-slate-900">{grade.score}</p>
+                </div>
+              ))
             ) : (
-              <p className="text-gray-500 text-sm">No violations recorded</p>
+              <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
+                No grades recorded for this student yet.
+              </div>
             )}
           </div>
-        </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
+                Behavioral Signal
+              </p>
+              <h3 className="mt-2 text-lg font-semibold text-slate-900">
+                Incident history
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                Behavioral events contributing to the warning score.
+              </p>
+            </div>
+            <div className="rounded-xl bg-slate-100 px-4 py-3 text-right">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                Behavioral score
+              </p>
+              <p className="mt-1 text-2xl font-semibold text-slate-900">
+                {formatRiskScore(riskScore?.behavioral_score)}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 space-y-3">
+            {violations.length > 0 ? (
+              violations.slice(0, 5).map((violation) => (
+                <div
+                  key={violation.id}
+                  className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="font-medium text-slate-900">{violation.description}</p>
+                    <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-rose-700">
+                      {violation.severity}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-slate-500">
+                    Reported by {violation.reported_by} on {violation.reported_date}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
+                No behavioral violations recorded for this student.
+              </div>
+            )}
+          </div>
+        </Card>
       </div>
     </div>
   )

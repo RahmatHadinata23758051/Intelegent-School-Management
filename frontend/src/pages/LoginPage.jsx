@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '../services/apiService'
+import { getErrorMessage } from '../utils/errors'
 
 export const LoginPage = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('')
@@ -19,7 +20,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
       onLoginSuccess(response.data.data.user, response.data.data.token)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed')
+      setError(getErrorMessage(err, 'Login failed'))
     } finally {
       setLoading(false)
     }
@@ -160,7 +161,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
+                        placeholder="password"
                         className="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
                         required
                       />
