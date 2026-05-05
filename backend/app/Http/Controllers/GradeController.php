@@ -27,6 +27,21 @@ class GradeController extends Controller
         ]);
     }
 
+    public function show(Student $student, Grade $grade): JsonResponse
+    {
+        if ($grade->student_id !== $student->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Grade does not belong to this student',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $grade,
+        ]);
+    }
+
     public function store(Request $request, Student $student): JsonResponse
     {
         $validated = $request->validate([

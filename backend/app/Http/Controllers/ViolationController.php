@@ -27,6 +27,21 @@ class ViolationController extends Controller
         ]);
     }
 
+    public function show(Student $student, Violation $violation): JsonResponse
+    {
+        if ($violation->student_id !== $student->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Violation does not belong to this student',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $violation,
+        ]);
+    }
+
     public function store(Request $request, Student $student): JsonResponse
     {
         $validated = $request->validate([

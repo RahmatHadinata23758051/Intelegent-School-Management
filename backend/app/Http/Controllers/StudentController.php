@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Http\Traits\ApiResponse;
 use App\Services\StudentService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
+    use ApiResponse;
+
     private StudentService $studentService;
 
     public function __construct(StudentService $studentService)
@@ -18,22 +21,16 @@ class StudentController extends Controller
 
     public function index(): JsonResponse
     {
-        $students = Student::with('riskScore', 'class')->get();
+        $students = $this->studentService->getAllStudents();
 
-        return response()->json([
-            'success' => true,
-            'data' => $students,
-        ]);
+        return $this->success($students);
     }
 
     public function show(Student $student): JsonResponse
     {
         $student = $this->studentService->getStudentWithRiskInfo($student);
 
-        return response()->json([
-            'success' => true,
-            'data' => $student,
-        ]);
+        return $this->success($student);
     }
 
     public function store(Request $request): JsonResponse
@@ -47,11 +44,7 @@ class StudentController extends Controller
 
         $student = $this->studentService->createStudent($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Student created successfully',
-            'data' => $student,
-        ], 201);
+        return $this->success($student, 'Student created successfully', 201);
     }
 
     public function update(Request $request, Student $student): JsonResponse
@@ -64,33 +57,30 @@ class StudentController extends Controller
 
         $student = $this->studentService->updateStudent($student, $validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Student updated successfully',
-            'data' => $student,
-        ]);
+        return $this->success($student, 'Student updated successfully');
     }
 
     public function destroy(Student $student): JsonResponse
     {
-        $student->delete();
+        $this->studentService->deleteStudent($student);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Student deleted successfully',
-        ]);
+        return $this->success(null, 'Student deleted successfully');
     }
 
     public function getByRiskLevel(Request $request): JsonResponse
     {
         $riskLevel = $request->query('level', 'high');
-        $limit = $request->query('limit', 20);
+        $limit = (int) $request->query('limit', 20);
 
         $students = $this->studentService->getStudentsByRiskLevel($riskLevel, $limit);
 
-        return response()->json([
-            'success' => true,
-            'data' => $students,
-        ]);
+        return $this->success($students);
+    }
+
+    public function statistics(): JsonResponse
+    {
+        $statistics = $this->studentService->getStudentStatistics();
+
+        return $this->success($statistics);
     }
 }
