@@ -17,7 +17,7 @@ class ReportService
                 'email' => $student->email,
                 'student_id' => $student->student_id,
                 'risk_score' => $student->riskScore ? $student->riskScore->total_score : 0,
-                'risk_level' => $student->riskScore ? $student->riskScore->risk_level : 'low',
+                'risk_level' => $this->normalizeRiskLevel($student->riskScore?->risk_level),
                 'total_grades' => $student->grades->count(),
                 'total_violations' => $student->violations->count(),
                 'average_grade' => $student->grades->avg('score') ?? 0,
@@ -34,15 +34,15 @@ class ReportService
         }
 
         $highRiskCount = $class->students
-            ->filter(fn($s) => $s->riskScore?->risk_level === 'high')
+            ->filter(fn($s) => $this->normalizeRiskLevel($s->riskScore?->risk_level) === 'high')
             ->count();
 
         $mediumRiskCount = $class->students
-            ->filter(fn($s) => $s->riskScore?->risk_level === 'medium')
+            ->filter(fn($s) => $this->normalizeRiskLevel($s->riskScore?->risk_level) === 'medium')
             ->count();
 
         $lowRiskCount = $class->students
-            ->filter(fn($s) => $s->riskScore?->risk_level === 'low')
+            ->filter(fn($s) => $this->normalizeRiskLevel($s->riskScore?->risk_level) === 'low')
             ->count();
 
         return [
@@ -54,5 +54,14 @@ class ReportService
             'low_risk_students' => $lowRiskCount,
             'average_risk_score' => $class->students->avg(fn($s) => $s->riskScore?->total_score) ?? 0,
         ];
+    }
+
+    private function normalizeRiskLevel(?string $riskLevel): string
+    {
+        return match (strtolower(trim((string) $riskLevel))) {
+            'high', 'high risk' => 'high',
+            'medium', 'warning' => 'medium',
+            default => 'low',
+        };
     }
 }

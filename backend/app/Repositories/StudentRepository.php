@@ -6,6 +6,15 @@ use App\Models\Student;
 
 class StudentRepository
 {
+    private function getRiskLevelAliases(string $riskLevel): array
+    {
+        return match (strtolower(trim($riskLevel))) {
+            'high', 'high risk' => ['high', 'High Risk'],
+            'medium', 'warning' => ['medium', 'Warning'],
+            default => ['low', 'Safe'],
+        };
+    }
+
     public function findById(int $id): ?Student
     {
         return Student::with('riskScore', 'grades', 'violations', 'class')->find($id);
@@ -13,8 +22,10 @@ class StudentRepository
 
     public function findByRiskLevel(string $riskLevel, int $limit = 20)
     {
-        return Student::whereHas('riskScore', function ($query) use ($riskLevel) {
-            $query->where('risk_level', $riskLevel);
+        $riskLevels = $this->getRiskLevelAliases($riskLevel);
+
+        return Student::whereHas('riskScore', function ($query) use ($riskLevels) {
+            $query->whereIn('risk_level', $riskLevels);
         })
             ->with('riskScore', 'class')
             ->limit($limit)
