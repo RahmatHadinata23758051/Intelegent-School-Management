@@ -9,6 +9,7 @@ export const authService = {
 
 export const studentService = {
   getAll: () => axiosInstance.get('/students'),
+  getStatistics: () => axiosInstance.get('/students/statistics'),
   getById: (id) => axiosInstance.get(`/students/${id}`),
   create: (data) => axiosInstance.post('/students', data),
   update: (id, data) => axiosInstance.put(`/students/${id}`, data),
