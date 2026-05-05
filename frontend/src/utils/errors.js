@@ -32,7 +32,7 @@ export const errorHandler = {
   handle: (error) => {
     if (error.response) {
       const { status, data } = error.response
-      const message = data?.message || 'An error occurred'
+      const message = data?.message || data?.error || 'An error occurred'
 
       switch (status) {
         case 401:
@@ -50,4 +50,14 @@ export const errorHandler = {
       return new APIError(error.message)
     }
   },
+}
+
+export const extractApiData = (response) => response?.data?.data ?? null
+
+export const getErrorMessage = (error, fallback = 'Something went wrong') => {
+  if (!error) {
+    return fallback
+  }
+
+  return error.message || error.response?.data?.message || fallback
 }

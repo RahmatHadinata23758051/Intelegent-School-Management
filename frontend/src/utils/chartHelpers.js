@@ -1,3 +1,5 @@
+import { normalizeRiskLevel } from './risk'
+
 export const chartHelpers = {
   formatChartData: (students) => {
     const riskLevels = { low: 0, medium: 0, high: 0 }
@@ -6,7 +8,7 @@ export const chartHelpers = {
 
     students.forEach((student) => {
       if (student.riskScore) {
-        riskLevels[student.riskScore.risk_level]++
+        riskLevels[normalizeRiskLevel(student.riskScore.risk_level)]++
         academicScores.push(student.riskScore.academic_score)
         behavioralScores.push(student.riskScore.behavioral_score)
       }

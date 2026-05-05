@@ -1,3 +1,5 @@
+import { normalizeRiskLevel } from './risk'
+
 export const formatDate = (date) => {
   return new Date(date).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -7,7 +9,7 @@ export const formatDate = (date) => {
 }
 
 export const getRiskColor = (riskLevel) => {
-  switch (riskLevel) {
+  switch (normalizeRiskLevel(riskLevel)) {
     case 'low':
       return '#10b981'
     case 'medium':
@@ -20,7 +22,7 @@ export const getRiskColor = (riskLevel) => {
 }
 
 export const getScoreBgClass = (riskLevel) => {
-  switch (riskLevel) {
+  switch (normalizeRiskLevel(riskLevel)) {
     case 'low':
       return 'bg-risk-low'
     case 'medium':
