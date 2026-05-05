@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { studentService } from '../services/apiService'
+import { getErrorMessage } from '../utils/errors'
 
 export const AddStudentPage = () => {
   const [formData, setFormData] = useState({
@@ -29,7 +30,7 @@ export const AddStudentPage = () => {
       await studentService.create(formData)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create student')
+      setError(getErrorMessage(err, 'Failed to create student'))
     } finally {
       setLoading(false)
     }

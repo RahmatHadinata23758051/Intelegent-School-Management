@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { classService, studentService } from '../services/apiService'
+import { classService } from '../services/apiService'
 
 export const ClassesPage = () => {
   const [classes, setClasses] = useState([])
