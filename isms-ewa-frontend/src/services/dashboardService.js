@@ -13,8 +13,8 @@ export const dashboardService = {
   getStatistics: async () => {
     try {
       const response = await api.get('/dashboard/statistics');
-      // Backend returns data directly in response.data
-      return response.data;
+      // Backend returns { success, message, data: {...} }
+      return response.data.data;
     } catch (error) {
       throw error.response?.data || error;
     }
