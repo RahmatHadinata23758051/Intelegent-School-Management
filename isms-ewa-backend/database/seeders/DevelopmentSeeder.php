@@ -7,6 +7,7 @@ use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Violation;
+use App\Services\ScoringService;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -66,6 +67,7 @@ class DevelopmentSeeder extends Seeder
         );
 
         // Create students for class 1
+        // Student 1: SAFE - High grades, no violations
         $student1 = Student::firstOrCreate(
             ['student_id' => 'STU001'],
             [
@@ -78,6 +80,7 @@ class DevelopmentSeeder extends Seeder
             ]
         );
 
+        // Student 2: SAFE - Very high grades, no violations
         $student2 = Student::firstOrCreate(
             ['student_id' => 'STU002'],
             [
@@ -90,6 +93,7 @@ class DevelopmentSeeder extends Seeder
             ]
         );
 
+        // Student 3: HIGH_RISK - Low grades, multiple violations
         $student3 = Student::firstOrCreate(
             ['student_id' => 'STU003'],
             [
@@ -103,6 +107,7 @@ class DevelopmentSeeder extends Seeder
         );
 
         // Create students for class 2
+        // Student 4: WARNING - Medium grades, minor violations
         $student4 = Student::firstOrCreate(
             ['student_id' => 'STU004'],
             [
@@ -115,6 +120,7 @@ class DevelopmentSeeder extends Seeder
             ]
         );
 
+        // Student 5: HIGH_RISK - Low grades, severe violation
         $student5 = Student::firstOrCreate(
             ['student_id' => 'STU005'],
             [
@@ -128,6 +134,7 @@ class DevelopmentSeeder extends Seeder
         );
 
         // Create grades for students
+        // Student 1: Average 86.75 (SAFE)
         Grade::firstOrCreate(
             ['student_id' => $student1->id, 'subject' => 'Matematika', 'semester' => '1', 'academic_year' => '2024/2025'],
             ['score' => 85.5]
@@ -138,6 +145,7 @@ class DevelopmentSeeder extends Seeder
             ['score' => 88.0]
         );
 
+        // Student 2: Average 91.25 (SAFE)
         Grade::firstOrCreate(
             ['student_id' => $student2->id, 'subject' => 'Matematika', 'semester' => '1', 'academic_year' => '2024/2025'],
             ['score' => 92.0]
@@ -148,22 +156,41 @@ class DevelopmentSeeder extends Seeder
             ['score' => 90.5]
         );
 
+        // Student 3: Average 50 (HIGH_RISK)
         Grade::firstOrCreate(
             ['student_id' => $student3->id, 'subject' => 'Matematika', 'semester' => '1', 'academic_year' => '2024/2025'],
+            ['score' => 45.0]
+        );
+
+        Grade::firstOrCreate(
+            ['student_id' => $student3->id, 'subject' => 'Bahasa Indonesia', 'semester' => '1', 'academic_year' => '2024/2025'],
+            ['score' => 55.0]
+        );
+
+        // Student 4: Average 75 (WARNING)
+        Grade::firstOrCreate(
+            ['student_id' => $student4->id, 'subject' => 'Matematika', 'semester' => '1', 'academic_year' => '2024/2025'],
             ['score' => 75.0]
         );
 
         Grade::firstOrCreate(
-            ['student_id' => $student4->id, 'subject' => 'Matematika', 'semester' => '1', 'academic_year' => '2024/2025'],
-            ['score' => 88.5]
+            ['student_id' => $student4->id, 'subject' => 'Bahasa Indonesia', 'semester' => '1', 'academic_year' => '2024/2025'],
+            ['score' => 75.0]
+        );
+
+        // Student 5: Average 50 (HIGH_RISK)
+        Grade::firstOrCreate(
+            ['student_id' => $student5->id, 'subject' => 'Matematika', 'semester' => '1', 'academic_year' => '2024/2025'],
+            ['score' => 50.0]
         );
 
         Grade::firstOrCreate(
             ['student_id' => $student5->id, 'subject' => 'Bahasa Indonesia', 'semester' => '1', 'academic_year' => '2024/2025'],
-            ['score' => 82.0]
+            ['score' => 50.0]
         );
 
         // Create violations for students
+        // Student 1: 1 minor violation (SAFE)
         Violation::firstOrCreate(
             ['student_id' => $student1->id, 'description' => 'Terlambat masuk kelas', 'reported_date' => '2024-01-15'],
             [
@@ -172,6 +199,7 @@ class DevelopmentSeeder extends Seeder
             ]
         );
 
+        // Student 3: Multiple violations (HIGH_RISK)
         Violation::firstOrCreate(
             ['student_id' => $student3->id, 'description' => 'Tidak mengerjakan PR', 'reported_date' => '2024-01-18'],
             [
@@ -188,6 +216,16 @@ class DevelopmentSeeder extends Seeder
             ]
         );
 
+        // Student 4: 1 minor violation (WARNING)
+        Violation::firstOrCreate(
+            ['student_id' => $student4->id, 'description' => 'Terlambat masuk kelas', 'reported_date' => '2024-01-19'],
+            [
+                'severity' => 'minor',
+                'reported_by' => $teacher->id,
+            ]
+        );
+
+        // Student 5: 1 severe violation (HIGH_RISK)
         Violation::firstOrCreate(
             ['student_id' => $student5->id, 'description' => 'Menyontek saat ujian', 'reported_date' => '2024-01-22'],
             [
@@ -195,5 +233,11 @@ class DevelopmentSeeder extends Seeder
                 'reported_by' => $teacher->id,
             ]
         );
+
+        // Calculate risk scores for all students
+        $scoringService = app(ScoringService::class);
+        foreach (Student::all() as $student) {
+            $scoringService->updateStudentRiskScore($student);
+        }
     }
 }

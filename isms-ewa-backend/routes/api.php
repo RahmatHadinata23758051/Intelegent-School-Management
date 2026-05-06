@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\SchoolClassController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\GradeController;
 use App\Http\Controllers\Api\ViolationController;
+use App\Http\Controllers\Api\RiskScoreController;
+use App\Http\Controllers\Api\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +35,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Students CRUD
     Route::apiResource('students', StudentController::class);
 
+    // Risk Score endpoints
+    Route::post('students/{student}/recalculate-risk', [RiskScoreController::class, 'recalculate']);
+    Route::get('students/risk-level/{riskLevel}', [RiskScoreController::class, 'filterByRiskLevel']);
+
     // Grades nested under Students
     Route::prefix('students/{student}')->group(function () {
         Route::get('grades', [GradeController::class, 'index']);
@@ -50,4 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('violations/{violation}', [ViolationController::class, 'update']);
         Route::delete('violations/{violation}', [ViolationController::class, 'destroy']);
     });
+
+    // Dashboard
+    Route::get('dashboard/statistics', [DashboardController::class, 'statistics']);
 });
