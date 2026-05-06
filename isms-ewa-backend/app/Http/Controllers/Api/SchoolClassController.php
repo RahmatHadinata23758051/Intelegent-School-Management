@@ -18,6 +18,8 @@ class SchoolClassController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', SchoolClass::class);
+
         $classes = SchoolClass::with('homeroomTeacher')
             ->withCount('students')
             ->paginate(15);
@@ -34,6 +36,8 @@ class SchoolClassController extends Controller
      */
     public function store(StoreSchoolClassRequest $request)
     {
+        $this->authorize('create', SchoolClass::class);
+
         $class = SchoolClass::create($request->validated());
 
         return $this->createdResponse(
@@ -47,6 +51,8 @@ class SchoolClassController extends Controller
      */
     public function show(SchoolClass $schoolClass)
     {
+        $this->authorize('view', $schoolClass);
+
         $schoolClass->load('homeroomTeacher');
         $schoolClass->loadCount('students');
 
@@ -61,6 +67,8 @@ class SchoolClassController extends Controller
      */
     public function update(UpdateSchoolClassRequest $request, SchoolClass $schoolClass)
     {
+        $this->authorize('update', $schoolClass);
+
         $schoolClass->update($request->validated());
 
         return $this->successResponse(
@@ -74,6 +82,8 @@ class SchoolClassController extends Controller
      */
     public function destroy(SchoolClass $schoolClass)
     {
+        $this->authorize('delete', $schoolClass);
+
         $schoolClass->delete();
 
         return $this->successResponse(

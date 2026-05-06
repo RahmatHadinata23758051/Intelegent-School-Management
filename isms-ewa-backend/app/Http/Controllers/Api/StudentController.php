@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\StoreStudentRequest;
 use App\Http\Requests\Student\UpdateStudentRequest;
@@ -18,7 +19,18 @@ class StudentController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Student::class);
+
         $query = Student::with('schoolClass', 'riskScore');
+
+        // Scope data berdasarkan role
+        $user = auth()->user();
+        if ($user->role === UserRole::HOMEROOM_TEACHER) {
+            // Homeroom teacher hanya melihat siswa di kelas yang dia wali
+            $query->whereHas('schoolClass', function ($q) use ($user) {
+                $q->where('homeroom_teacher_id', $user->id);
+            });
+        }
 
         // Filter by school_class_id
         if (request()->has('school_class_id')) {
@@ -49,6 +61,8 @@ class StudentController extends Controller
      */
     public function store(StoreStudentRequest $request)
     {
+        $this->authorize('create', Student::class);
+
         $student = Student::create($request->validated());
 
         return $this->createdResponse(
@@ -62,6 +76,8 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
+        $this->authorize('view', $student);
+
         $student->load('schoolClass', 'grades', 'violations', 'riskScore');
 
         return $this->successResponse(
@@ -75,6 +91,8 @@ class StudentController extends Controller
      */
     public function update(UpdateStudentRequest $request, Student $student)
     {
+        $this->authorize('update', $student);
+
         $student->update($request->validated());
 
         return $this->successResponse(
@@ -88,6 +106,8 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
+        $this->authorize('delete', $student);
+
         $student->delete();
 
         return $this->successResponse(

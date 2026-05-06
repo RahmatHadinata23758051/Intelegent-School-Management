@@ -19,6 +19,8 @@ class ViolationController extends Controller
      */
     public function index(Student $student)
     {
+        $this->authorize('viewAny', [Violation::class, $student]);
+
         $violations = $student->violations()->paginate(15);
 
         return response()->json([
@@ -33,6 +35,8 @@ class ViolationController extends Controller
      */
     public function store(StoreViolationRequest $request, Student $student)
     {
+        $this->authorize('create', [Violation::class, $student]);
+
         $violation = $student->violations()->create($request->validated());
 
         return $this->createdResponse(
@@ -50,6 +54,8 @@ class ViolationController extends Controller
         if ($violation->student_id !== $student->id) {
             return $this->notFoundResponse('Pelanggaran tidak ditemukan.');
         }
+
+        $this->authorize('view', $violation);
 
         $violation->load('student', 'reporter');
 
@@ -69,6 +75,8 @@ class ViolationController extends Controller
             return $this->notFoundResponse('Pelanggaran tidak ditemukan.');
         }
 
+        $this->authorize('update', $violation);
+
         $violation->update($request->validated());
 
         return $this->successResponse(
@@ -86,6 +94,8 @@ class ViolationController extends Controller
         if ($violation->student_id !== $student->id) {
             return $this->notFoundResponse('Pelanggaran tidak ditemukan.');
         }
+
+        $this->authorize('delete', $violation);
 
         $violation->delete();
 

@@ -19,6 +19,8 @@ class GradeController extends Controller
      */
     public function index(Student $student)
     {
+        $this->authorize('viewAny', [Grade::class, $student]);
+
         $grades = $student->grades()->paginate(15);
 
         return response()->json([
@@ -33,6 +35,8 @@ class GradeController extends Controller
      */
     public function store(StoreGradeRequest $request, Student $student)
     {
+        $this->authorize('create', [Grade::class, $student]);
+
         $grade = $student->grades()->create($request->validated());
 
         return $this->createdResponse(
@@ -50,6 +54,8 @@ class GradeController extends Controller
         if ($grade->student_id !== $student->id) {
             return $this->notFoundResponse('Nilai tidak ditemukan.');
         }
+
+        $this->authorize('view', $grade);
 
         $grade->load('student');
 
@@ -69,6 +75,8 @@ class GradeController extends Controller
             return $this->notFoundResponse('Nilai tidak ditemukan.');
         }
 
+        $this->authorize('update', $grade);
+
         $grade->update($request->validated());
 
         return $this->successResponse(
@@ -86,6 +94,8 @@ class GradeController extends Controller
         if ($grade->student_id !== $student->id) {
             return $this->notFoundResponse('Nilai tidak ditemukan.');
         }
+
+        $this->authorize('delete', $grade);
 
         $grade->delete();
 

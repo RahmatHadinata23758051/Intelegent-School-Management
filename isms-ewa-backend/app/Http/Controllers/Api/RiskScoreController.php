@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RiskScoreResource;
 use App\Http\Resources\StudentResource;
@@ -26,6 +27,8 @@ class RiskScoreController extends Controller
      */
     public function recalculate(Student $student)
     {
+        $this->authorize('recalculate', [RiskScore::class, $student]);
+
         $riskScore = $this->scoringService->updateStudentRiskScore($student);
 
         return $this->successResponse(
@@ -49,11 +52,21 @@ class RiskScoreController extends Controller
             );
         }
 
-        $students = Student::with('schoolClass', 'riskScore')
-            ->whereHas('riskScore', function ($query) use ($riskLevel) {
-                $query->where('risk_level', $riskLevel);
-            })
-            ->paginate(15);
+        $query = Student::with('schoolClass', 'riskScore')
+            ->whereHas('riskScore', function ($q) use ($riskLevel) {
+                $q->where('risk_level', $riskLevel);
+            });
+
+        // Scope data berdasarkan role
+        $user = auth()->user();
+        if ($user->role === UserRole::HOMEROOM_TEACHER) {
+            // Homeroom teacher hanya melihat siswa di kelas yang dia wali
+            $query->whereHas('schoolClass', function ($q) use ($user) {
+                $q->where('homeroom_teacher_id', $user->id);
+            });
+        }
+
+        $students = $query->paginate(15);
 
         return response()->json([
             'success' => true,

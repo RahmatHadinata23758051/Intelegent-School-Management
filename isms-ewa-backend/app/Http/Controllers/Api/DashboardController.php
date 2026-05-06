@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\StudentResource;
 use App\Http\Resources\ViolationResource;
@@ -21,36 +22,98 @@ class DashboardController extends Controller
      */
     public function statistics()
     {
-        $totalStudents = Student::count();
-        $totalClasses = SchoolClass::count();
-        $totalGrades = Grade::count();
-        $totalViolations = Violation::count();
+        $this->authorize('viewStatistics', 'dashboard');
 
-        // Risk distribution
-        $riskDistribution = [
-            'safe' => RiskScore::where('risk_level', 'safe')->count(),
-            'warning' => RiskScore::where('risk_level', 'warning')->count(),
-            'high_risk' => RiskScore::where('risk_level', 'high_risk')->count(),
-        ];
+        $user = auth()->user();
 
-        // Average scores
-        $averageTotalScore = RiskScore::avg('total_score') ?? 0;
-        $averageAcademicScore = RiskScore::avg('academic_score') ?? 0;
-        $averageBehavioralScore = RiskScore::avg('behavioral_score') ?? 0;
+        // Scope data berdasarkan role
+        if ($user->role === UserRole::HOMEROOM_TEACHER) {
+            // Homeroom teacher hanya melihat data kelas yang dia wali
+            $homeroomClasses = $user->homeroomClasses()->pluck('id');
 
-        // High risk students (max 5)
-        $highRiskStudents = Student::with('schoolClass', 'riskScore')
-            ->whereHas('riskScore', function ($query) {
-                $query->where('risk_level', 'high_risk');
-            })
-            ->limit(5)
-            ->get();
+            $totalStudents = Student::whereIn('school_class_id', $homeroomClasses)->count();
+            $totalClasses = $homeroomClasses->count();
+            $totalGrades = Grade::whereHas('student', function ($q) use ($homeroomClasses) {
+                $q->whereIn('school_class_id', $homeroomClasses);
+            })->count();
+            $totalViolations = Violation::whereHas('student', function ($q) use ($homeroomClasses) {
+                $q->whereIn('school_class_id', $homeroomClasses);
+            })->count();
 
-        // Recent violations (max 5)
-        $recentViolations = Violation::with('student', 'reporter')
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+            // Risk distribution
+            $riskDistribution = [
+                'safe' => RiskScore::whereHas('student', function ($q) use ($homeroomClasses) {
+                    $q->whereIn('school_class_id', $homeroomClasses);
+                })->where('risk_level', 'safe')->count(),
+                'warning' => RiskScore::whereHas('student', function ($q) use ($homeroomClasses) {
+                    $q->whereIn('school_class_id', $homeroomClasses);
+                })->where('risk_level', 'warning')->count(),
+                'high_risk' => RiskScore::whereHas('student', function ($q) use ($homeroomClasses) {
+                    $q->whereIn('school_class_id', $homeroomClasses);
+                })->where('risk_level', 'high_risk')->count(),
+            ];
+
+            // Average scores
+            $averageTotalScore = RiskScore::whereHas('student', function ($q) use ($homeroomClasses) {
+                $q->whereIn('school_class_id', $homeroomClasses);
+            })->avg('total_score') ?? 0;
+            $averageAcademicScore = RiskScore::whereHas('student', function ($q) use ($homeroomClasses) {
+                $q->whereIn('school_class_id', $homeroomClasses);
+            })->avg('academic_score') ?? 0;
+            $averageBehavioralScore = RiskScore::whereHas('student', function ($q) use ($homeroomClasses) {
+                $q->whereIn('school_class_id', $homeroomClasses);
+            })->avg('behavioral_score') ?? 0;
+
+            // High risk students (max 5)
+            $highRiskStudents = Student::with('schoolClass', 'riskScore')
+                ->whereIn('school_class_id', $homeroomClasses)
+                ->whereHas('riskScore', function ($query) {
+                    $query->where('risk_level', 'high_risk');
+                })
+                ->limit(5)
+                ->get();
+
+            // Recent violations (max 5)
+            $recentViolations = Violation::with('student', 'reporter')
+                ->whereHas('student', function ($q) use ($homeroomClasses) {
+                    $q->whereIn('school_class_id', $homeroomClasses);
+                })
+                ->orderBy('created_at', 'desc')
+                ->limit(5)
+                ->get();
+        } else {
+            // Admin dan teacher melihat data global
+            $totalStudents = Student::count();
+            $totalClasses = SchoolClass::count();
+            $totalGrades = Grade::count();
+            $totalViolations = Violation::count();
+
+            // Risk distribution
+            $riskDistribution = [
+                'safe' => RiskScore::where('risk_level', 'safe')->count(),
+                'warning' => RiskScore::where('risk_level', 'warning')->count(),
+                'high_risk' => RiskScore::where('risk_level', 'high_risk')->count(),
+            ];
+
+            // Average scores
+            $averageTotalScore = RiskScore::avg('total_score') ?? 0;
+            $averageAcademicScore = RiskScore::avg('academic_score') ?? 0;
+            $averageBehavioralScore = RiskScore::avg('behavioral_score') ?? 0;
+
+            // High risk students (max 5)
+            $highRiskStudents = Student::with('schoolClass', 'riskScore')
+                ->whereHas('riskScore', function ($query) {
+                    $query->where('risk_level', 'high_risk');
+                })
+                ->limit(5)
+                ->get();
+
+            // Recent violations (max 5)
+            $recentViolations = Violation::with('student', 'reporter')
+                ->orderBy('created_at', 'desc')
+                ->limit(5)
+                ->get();
+        }
 
         $statistics = [
             'total_students' => $totalStudents,
