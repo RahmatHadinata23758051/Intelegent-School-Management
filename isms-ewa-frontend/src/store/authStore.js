@@ -96,7 +96,8 @@ export const useAuthStore = create((set, get) => ({
 
     try {
       const response = await authAPI.me();
-      const user = response.data.data;
+      // /api/auth/me returns user directly in response.data, not wrapped
+      const user = response.data;
 
       set({
         user,

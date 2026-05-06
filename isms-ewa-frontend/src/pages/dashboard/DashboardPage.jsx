@@ -22,20 +22,26 @@ import { ROUTES } from '../../constants/routes';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-  const { data: statistics, loading, error, refetch } = useDashboardStats();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { data: statistics, loading, error, refetch } = useDashboardStats(isAuthenticated && !authLoading);
   const [partialError, setPartialError] = useState(null);
+
+  console.log('[DashboardPage] Rendering, isAuthenticated:', isAuthenticated, 'authLoading:', authLoading, 'loading:', loading, 'statistics:', statistics);
 
   // Redirect if not authenticated
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
+      console.log('[DashboardPage] Not authenticated, redirecting to login');
       navigate(ROUTES.LOGIN);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, authLoading, navigate]);
 
-  if (loading) {
+  if (authLoading || loading) {
+    console.log('[DashboardPage] Still loading... authLoading:', authLoading, 'loading:', loading);
     return <LoadingScreen message="Loading dashboard..." />;
   }
+
+  console.log('[DashboardPage] Rendering dashboard with data:', statistics);
 
   return (
     <AppLayout currentPage="dashboard">
