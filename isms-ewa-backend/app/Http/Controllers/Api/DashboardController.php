@@ -22,7 +22,13 @@ class DashboardController extends Controller
      */
     public function statistics()
     {
-        $this->authorize('viewStatistics', 'dashboard');
+        // Check authorization using gate
+        if (!auth()->user() || !auth()->user()->can('view-dashboard')) {
+            return $this->errorResponse(
+                'Akses ditolak. Anda tidak memiliki izin untuk melihat dashboard.',
+                403
+            );
+        }
 
         $user = auth()->user();
 
