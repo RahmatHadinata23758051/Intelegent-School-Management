@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import clsx from 'clsx';
 import {
   Users,
   AlertTriangle,
@@ -265,6 +266,3 @@ export const DashboardPage = () => {
     </AppLayout>
   );
 };
-
-// Import clsx for conditional classes
-import clsx from 'clsx';
