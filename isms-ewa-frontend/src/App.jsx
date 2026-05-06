@@ -3,7 +3,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuth } from './hooks/useAuth';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
+import { StudentsPage } from './pages/students/StudentsPage';
+import { StudentDetailPage } from './pages/students/StudentDetailPage';
+import { ClassesPage } from './pages/classes/ClassesPage';
+import { ClassDetailPage } from './pages/classes/ClassDetailPage';
 import { LoadingScreen } from './components/common/LoadingScreen';
+import { ROUTES } from './constants/routes';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, isAuthenticated, isLoading }) => {
@@ -11,7 +16,7 @@ const ProtectedRoute = ({ children, isAuthenticated, isLoading }) => {
     return <LoadingScreen message="Checking authentication..." />;
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  return isAuthenticated ? children : <Navigate to={ROUTES.LOGIN} replace />;
 };
 
 function App() {
@@ -30,14 +35,50 @@ function App() {
     <Router>
       <Routes>
         {/* Login Route */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
         {/* Dashboard Route - Protected */}
         <Route
-          path="/dashboard"
+          path={ROUTES.DASHBOARD}
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Students Routes - Protected */}
+        <Route
+          path={ROUTES.STUDENTS}
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+              <StudentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.STUDENT_DETAIL}
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+              <StudentDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Classes Routes - Protected */}
+        <Route
+          path={ROUTES.CLASSES}
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+              <ClassesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.CLASS_DETAIL}
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+              <ClassDetailPage />
             </ProtectedRoute>
           }
         />
@@ -47,9 +88,9 @@ function App() {
           path="/"
           element={
             isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
+              <Navigate to={ROUTES.DASHBOARD} replace />
             ) : (
-              <Navigate to="/login" replace />
+              <Navigate to={ROUTES.LOGIN} replace />
             )
           }
         />
