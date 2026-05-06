@@ -199,7 +199,7 @@ export const DashboardPage = () => {
                       <p className="text-xs text-slate-500">{student.student_id}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-rose-600">{student.risk_score?.total_score?.toFixed(2) || 0}</p>
+                      <p className="text-lg font-bold text-rose-600">{parseFloat(student.risk_score?.total_score || 0).toFixed(2)}</p>
                       <RiskBadge level="high_risk" />
                     </div>
                   </div>
