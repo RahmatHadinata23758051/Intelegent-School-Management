@@ -253,13 +253,13 @@ Rencana implementasi ini membangun fondasi backend Laravel 10 untuk sistem ISMS-
     - Kredensial default untuk pengujian (email dan password plaintext)
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7_
 
-- [-] 17. Git commit dan push
+- [x] 17. Git commit dan push
   - Stage semua file yang relevan (kecuali `.env`, `database/database.sqlite`, `vendor/`, `node_modules/`)
   - Pastikan `.gitignore` sudah mengecualikan file sensitif dan generated files
   - Buat commit dengan pesan yang deskriptif, contoh: `feat: implement Phase 1 - Laravel backend foundation`
   - Push ke branch baru (jangan langsung ke `main`/`master`), contoh: `git push -u origin feat/phase-1-foundation`
 
-- [~] 18. Checkpoint akhir — Verifikasi keseluruhan Phase 1
+- [x] 18. Checkpoint akhir — Verifikasi keseluruhan Phase 1
   - Pastikan semua tests pass, tanyakan kepada user jika ada pertanyaan.
 
 ---
