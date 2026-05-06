@@ -78,6 +78,7 @@ export const LoginForm = ({ onSubmit, loading = false, error = null }) => {
         onChange={handleChange}
         error={validationErrors.email}
         icon={Mail}
+        autoComplete="email"
       />
 
       {/* Password Input */}
@@ -90,12 +91,14 @@ export const LoginForm = ({ onSubmit, loading = false, error = null }) => {
         onChange={handleChange}
         error={validationErrors.password}
         icon={LockKeyhole}
+        autoComplete="current-password"
       />
 
       {/* Remember & Forgot */}
       <div className="flex items-center justify-between text-sm">
-        <label className="flex items-center gap-2 cursor-pointer">
+        <label htmlFor="remember-me" className="flex items-center gap-2 cursor-pointer">
           <input
+            id="remember-me"
             type="checkbox"
             className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
           />

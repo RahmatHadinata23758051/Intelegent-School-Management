@@ -6,23 +6,29 @@ export const Input = ({
   icon: Icon,
   type = 'text',
   className,
+  id,
+  autoComplete,
   ...props
 }) => {
+  const inputId = id || props.name;
+
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-slate-700 mb-2">
+        <label htmlFor={inputId} className="block text-sm font-medium text-slate-700 mb-2">
           {label}
         </label>
       )}
       <div className="relative">
         {Icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
             <Icon size={20} />
           </div>
         )}
         <input
+          id={inputId}
           type={type}
+          autoComplete={autoComplete}
           className={clsx(
             'input-base',
             Icon && 'pl-10',
