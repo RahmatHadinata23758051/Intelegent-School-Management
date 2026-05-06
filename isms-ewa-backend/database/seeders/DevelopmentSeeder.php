@@ -107,7 +107,7 @@ class DevelopmentSeeder extends Seeder
         );
 
         // Create students for class 2
-        // Student 4: WARNING - Medium grades, minor violations
+        // Student 4: WARNING - Medium grades, moderate violations
         $student4 = Student::firstOrCreate(
             ['student_id' => 'STU004'],
             [
@@ -167,15 +167,15 @@ class DevelopmentSeeder extends Seeder
             ['score' => 55.0]
         );
 
-        // Student 4: Average 75 (WARNING)
+        // Student 4: Average 70 (WARNING)
         Grade::firstOrCreate(
             ['student_id' => $student4->id, 'subject' => 'Matematika', 'semester' => '1', 'academic_year' => '2024/2025'],
-            ['score' => 75.0]
+            ['score' => 70.0]
         );
 
         Grade::firstOrCreate(
             ['student_id' => $student4->id, 'subject' => 'Bahasa Indonesia', 'semester' => '1', 'academic_year' => '2024/2025'],
-            ['score' => 75.0]
+            ['score' => 70.0]
         );
 
         // Student 5: Average 50 (HIGH_RISK)
@@ -216,11 +216,11 @@ class DevelopmentSeeder extends Seeder
             ]
         );
 
-        // Student 4: 1 minor violation (WARNING)
+        // Student 4: 1 moderate violation (WARNING)
         Violation::firstOrCreate(
-            ['student_id' => $student4->id, 'description' => 'Terlambat masuk kelas', 'reported_date' => '2024-01-19'],
+            ['student_id' => $student4->id, 'description' => 'Tidak mengerjakan PR', 'reported_date' => '2024-01-19'],
             [
-                'severity' => 'minor',
+                'severity' => 'moderate',
                 'reported_by' => $teacher->id,
             ]
         );
