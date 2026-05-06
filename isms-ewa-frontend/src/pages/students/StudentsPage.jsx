@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users } from 'lucide-react';
+import { Plus, Users, Search } from 'lucide-react';
+import clsx from 'clsx';
 import { useStudents } from '../../hooks/useStudents';
 import { useClasses } from '../../hooks/useClasses';
+import { AppLayout } from '../../components/layout/AppLayout';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { SearchInput } from '../../components/common/SearchInput';
@@ -59,12 +61,12 @@ export const StudentsPage = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <AppLayout currentPage="students">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Students</h1>
-          <p className="text-slate-500 mt-1">Manage and monitor student information</p>
+          <h2 className="text-3xl font-bold text-slate-900">Students</h2>
+          <p className="text-slate-500 mt-1">Manage and monitor student information and risk levels</p>
         </div>
         <Button variant="primary" size="lg" className="flex items-center gap-2">
           <Plus size={20} />
@@ -72,8 +74,8 @@ export const StudentsPage = () => {
         </Button>
       </div>
 
-      {/* Filters */}
-      <Card>
+      {/* Filters Card */}
+      <Card className="mb-8">
         <Card.Body>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <SearchInput
@@ -123,31 +125,31 @@ export const StudentsPage = () => {
       {!studentsError && (
         <>
           {studentsData?.data && studentsData.data.length > 0 ? (
-            <Card>
+            <Card className="mb-8">
               <Card.Body className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-slate-200">
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Name</th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Student ID</th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Class</th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Risk Level</th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Email</th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Action</th>
+                      <tr className="border-b border-slate-200 bg-slate-50">
+                        <th className="table-header">Name</th>
+                        <th className="table-header">Student ID</th>
+                        <th className="table-header">Class</th>
+                        <th className="table-header">Risk Level</th>
+                        <th className="table-header">Email</th>
+                        <th className="table-header">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {studentsData.data.map((student) => (
-                        <tr key={student.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                          <td className="px-6 py-4 text-sm font-medium text-slate-900">{student.name}</td>
-                          <td className="px-6 py-4 text-sm text-slate-600">{student.student_id}</td>
-                          <td className="px-6 py-4 text-sm text-slate-600">{student.school_class?.name || '-'}</td>
-                          <td className="px-6 py-4 text-sm">
+                        <tr key={student.id} className="table-row">
+                          <td className="table-cell font-semibold text-slate-900">{student.name}</td>
+                          <td className="table-cell text-slate-600">{student.student_id}</td>
+                          <td className="table-cell text-slate-600">{student.school_class?.name || '-'}</td>
+                          <td className="table-cell">
                             <RiskBadge level={student.risk_score?.risk_level || 'safe'} />
                           </td>
-                          <td className="px-6 py-4 text-sm text-slate-600">{student.email}</td>
-                          <td className="px-6 py-4 text-sm">
+                          <td className="table-cell text-slate-600">{student.email}</td>
+                          <td className="table-cell">
                             <Button
                               variant="outline"
                               size="sm"
@@ -183,6 +185,6 @@ export const StudentsPage = () => {
           )}
         </>
       )}
-    </div>
+    </AppLayout>
   );
 };
