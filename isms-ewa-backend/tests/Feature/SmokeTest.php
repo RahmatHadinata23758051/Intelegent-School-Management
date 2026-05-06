@@ -19,11 +19,11 @@ class SmokeTest extends TestCase
     }
 
     /**
-     * Test verifikasi konfigurasi DB_CONNECTION adalah sqlite
+     * Test verifikasi konfigurasi DB_CONNECTION adalah pgsql (PostgreSQL)
      */
-    public function test_database_connection_is_sqlite()
+    public function test_database_connection_is_pgsql()
     {
-        $this->assertEquals('sqlite', config('database.default'));
+        $this->assertEquals('pgsql', config('database.default'));
     }
 
     /**
