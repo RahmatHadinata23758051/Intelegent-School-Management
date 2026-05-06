@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('grade_level', 50);
-            $table->foreignId('homeroom_teacher_id')->constrained('users');
+            $table->foreignId('homeroom_teacher_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
     }

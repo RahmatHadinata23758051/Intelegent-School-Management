@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\SchoolClassController;
+use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\GradeController;
+use App\Http\Controllers\Api\ViolationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,4 +26,28 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
+
+    // School Classes CRUD
+    Route::apiResource('school-classes', SchoolClassController::class);
+
+    // Students CRUD
+    Route::apiResource('students', StudentController::class);
+
+    // Grades nested under Students
+    Route::prefix('students/{student}')->group(function () {
+        Route::get('grades', [GradeController::class, 'index']);
+        Route::post('grades', [GradeController::class, 'store']);
+        Route::get('grades/{grade}', [GradeController::class, 'show']);
+        Route::put('grades/{grade}', [GradeController::class, 'update']);
+        Route::delete('grades/{grade}', [GradeController::class, 'destroy']);
+    });
+
+    // Violations nested under Students
+    Route::prefix('students/{student}')->group(function () {
+        Route::get('violations', [ViolationController::class, 'index']);
+        Route::post('violations', [ViolationController::class, 'store']);
+        Route::get('violations/{violation}', [ViolationController::class, 'show']);
+        Route::put('violations/{violation}', [ViolationController::class, 'update']);
+        Route::delete('violations/{violation}', [ViolationController::class, 'destroy']);
+    });
 });
