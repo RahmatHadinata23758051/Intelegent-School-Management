@@ -13,7 +13,11 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        \App\Models\SchoolClass::class => \App\Policies\SchoolClassPolicy::class,
+        \App\Models\Student::class => \App\Policies\StudentPolicy::class,
+        \App\Models\Grade::class => \App\Policies\GradePolicy::class,
+        \App\Models\Violation::class => \App\Policies\ViolationPolicy::class,
+        \App\Models\RiskScore::class => \App\Policies\RiskScorePolicy::class,
     ];
 
     /**
@@ -23,6 +27,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        // Register dashboard policy gate
+        \Illuminate\Support\Facades\Gate::define('view-dashboard', function (\App\Models\User $user) {
+            return (new \App\Policies\DashboardPolicy())->viewStatistics($user);
+        });
     }
 }
