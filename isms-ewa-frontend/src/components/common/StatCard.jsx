@@ -11,11 +11,31 @@ export const StatCard = ({
   className,
 }) => {
   const colorClasses = {
-    blue: 'bg-blue-50 text-blue-600',
-    emerald: 'bg-emerald-50 text-emerald-600',
-    amber: 'bg-amber-50 text-amber-600',
-    rose: 'bg-rose-50 text-rose-600',
-    indigo: 'bg-indigo-50 text-indigo-600',
+    blue: {
+      badge: 'bg-blue-100 text-blue-600',
+      accent: 'text-blue-600',
+      border: 'border-blue-200',
+    },
+    emerald: {
+      badge: 'bg-emerald-100 text-emerald-600',
+      accent: 'text-emerald-600',
+      border: 'border-emerald-200',
+    },
+    amber: {
+      badge: 'bg-amber-100 text-amber-600',
+      accent: 'text-amber-600',
+      border: 'border-amber-200',
+    },
+    rose: {
+      badge: 'bg-rose-100 text-rose-600',
+      accent: 'text-rose-600',
+      border: 'border-rose-200',
+    },
+    indigo: {
+      badge: 'bg-indigo-100 text-indigo-600',
+      accent: 'text-indigo-600',
+      border: 'border-indigo-200',
+    },
   };
 
   const trendClasses = {
@@ -24,23 +44,25 @@ export const StatCard = ({
     neutral: 'text-slate-600',
   };
 
+  const colors = colorClasses[color] || colorClasses.blue;
+
   return (
-    <div className={clsx('stat-card', className)}>
+    <div className={clsx('stat-card border-l-4', colors.border, className)}>
       {/* Icon Badge */}
       {Icon && (
-        <div className={clsx('icon-badge', colorClasses[color])}>
+        <div className={clsx('icon-badge', colors.badge)}>
           <Icon size={24} />
         </div>
       )}
 
       {/* Title */}
-      <h3 className="text-sm font-medium text-slate-600">{title}</h3>
+      <h3 className="text-xs font-semibold text-slate-600 uppercase tracking-wider">{title}</h3>
 
       {/* Value */}
-      <div className="flex items-baseline gap-2">
-        <p className="text-3xl font-bold text-slate-900">{value}</p>
+      <div className="flex items-baseline gap-2 mt-2">
+        <p className={clsx('text-4xl font-bold', colors.accent)}>{value}</p>
         {trend && (
-          <span className={clsx('text-sm font-medium', trendClasses[trendDirection])}>
+          <span className={clsx('text-xs font-semibold', trendClasses[trendDirection])}>
             {trendDirection === 'up' ? '↑' : '↓'} {trend}
           </span>
         )}
@@ -48,7 +70,7 @@ export const StatCard = ({
 
       {/* Description */}
       {description && (
-        <p className="text-xs text-slate-500">{description}</p>
+        <p className="text-xs text-slate-500 mt-2">{description}</p>
       )}
     </div>
   );

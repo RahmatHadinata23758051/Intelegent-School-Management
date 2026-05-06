@@ -34,8 +34,12 @@ export const Alert = ({
   return (
     <div
       className={clsx(
-        'rounded-lg border p-4 flex gap-3',
+        'rounded-xl border-l-4 p-4 flex gap-4 shadow-sm animate-slide-in',
         variants[type],
+        type === 'error' && 'border-l-rose-600',
+        type === 'success' && 'border-l-emerald-600',
+        type === 'warning' && 'border-l-amber-600',
+        type === 'info' && 'border-l-blue-600',
         className
       )}
     >
