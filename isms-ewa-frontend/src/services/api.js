@@ -2,8 +2,6 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
-console.log('[api] API_BASE_URL:', API_BASE_URL);
-
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -17,10 +15,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token');
-    console.log('[api] Request interceptor - token:', token ? 'present' : 'missing');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('[api] Added Authorization header');
     }
     return config;
   },
@@ -31,15 +27,10 @@ api.interceptors.request.use(
 
 // Response interceptor - handle errors
 api.interceptors.response.use(
-  (response) => {
-    console.log('[api] Response received:', response.status, response.config.url);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('[api] Response error:', error.response?.status, error.response?.data);
     // Handle 401 - Unauthorized
     if (error.response?.status === 401) {
-      console.log('[api] 401 Unauthorized - clearing auth');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       window.location.href = '/login';

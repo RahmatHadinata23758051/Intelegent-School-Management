@@ -26,22 +26,16 @@ export const DashboardPage = () => {
   const { data: statistics, loading, error, refetch } = useDashboardStats(isAuthenticated && !authLoading);
   const [partialError, setPartialError] = useState(null);
 
-  console.log('[DashboardPage] Rendering, isAuthenticated:', isAuthenticated, 'authLoading:', authLoading, 'loading:', loading, 'statistics:', statistics);
-
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      console.log('[DashboardPage] Not authenticated, redirecting to login');
       navigate(ROUTES.LOGIN);
     }
   }, [isAuthenticated, authLoading, navigate]);
 
   if (authLoading || loading) {
-    console.log('[DashboardPage] Still loading... authLoading:', authLoading, 'loading:', loading);
     return <LoadingScreen message="Loading dashboard..." />;
   }
-
-  console.log('[DashboardPage] Rendering dashboard with data:', statistics);
 
   return (
     <AppLayout currentPage="dashboard">
