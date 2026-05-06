@@ -139,7 +139,7 @@ class SmokeTest extends TestCase
         $this->seed(\Database\Seeders\UserSeeder::class);
 
         $this->assertDatabaseHas('users', [
-            'email' => 'admin@isms.test',
+            'email' => 'admin@isms-ewa.local',
             'role' => 'admin',
         ]);
     }
@@ -152,7 +152,7 @@ class SmokeTest extends TestCase
         // Run seeder
         $this->seed(\Database\Seeders\UserSeeder::class);
 
-        $user = \App\Models\User::where('email', 'admin@isms.test')->first();
+        $user = \App\Models\User::where('email', 'admin@isms-ewa.local')->first();
 
         $this->assertNotNull($user);
         $this->assertNotEquals('password', $user->password);

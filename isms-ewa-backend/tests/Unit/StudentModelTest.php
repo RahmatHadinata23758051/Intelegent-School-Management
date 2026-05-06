@@ -37,7 +37,7 @@ class StudentModelTest extends TestCase
             'name' => 'Student Name',
             'email' => 'student@example.com',
             'student_id' => 'STU001',
-            'class_id' => $class->id,
+            'school_class_id' => $class->id,
         ]);
 
         $this->assertEquals($class->id, $student->schoolClass->id);
@@ -66,7 +66,7 @@ class StudentModelTest extends TestCase
             'name' => 'Student Name',
             'email' => 'student@example.com',
             'student_id' => 'STU001',
-            'class_id' => $class->id,
+            'school_class_id' => $class->id,
         ]);
 
         Grade::create([
@@ -111,13 +111,13 @@ class StudentModelTest extends TestCase
             'name' => 'Student Name',
             'email' => 'student@example.com',
             'student_id' => 'STU001',
-            'class_id' => $class->id,
+            'school_class_id' => $class->id,
         ]);
 
         Violation::create([
             'student_id' => $student->id,
             'description' => 'Terlambat masuk kelas',
-            'severity' => 'low',
+            'severity' => 'minor',
             'reported_by' => $teacher->id,
             'reported_date' => now()->toDateString(),
         ]);
@@ -148,7 +148,7 @@ class StudentModelTest extends TestCase
             'name' => 'Student Name',
             'email' => 'student@example.com',
             'student_id' => 'STU001',
-            'class_id' => $class->id,
+            'school_class_id' => $class->id,
         ]);
 
         $riskScore = RiskScore::create([
@@ -156,7 +156,7 @@ class StudentModelTest extends TestCase
             'total_score' => 65.50,
             'academic_score' => 70.00,
             'behavioral_score' => 60.00,
-            'risk_level' => 'medium',
+            'risk_level' => 'warning',
             'last_updated' => now(),
         ]);
 

@@ -13,7 +13,7 @@ class Student extends Model
         'name',
         'email',
         'student_id',
-        'class_id',
+        'school_class_id',
     ];
 
     /**
@@ -21,7 +21,7 @@ class Student extends Model
      */
     public function schoolClass()
     {
-        return $this->belongsTo(SchoolClass::class, 'class_id');
+        return $this->belongsTo(SchoolClass::class, 'school_class_id');
     }
 
     /**

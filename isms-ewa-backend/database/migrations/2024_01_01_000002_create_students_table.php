@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('student_id', 50)->unique();
-            $table->foreignId('class_id')->constrained('school_classes');
+            $table->foreignId('school_class_id')->constrained('school_classes');
             $table->timestamps();
         });
     }
