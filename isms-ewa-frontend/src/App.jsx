@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { LoginPage } from './pages/auth/LoginPage';
@@ -20,12 +19,7 @@ const ProtectedRoute = ({ children, isAuthenticated, isLoading }) => {
 };
 
 function App() {
-  const { isAuthenticated, isLoading, initializeAuth } = useAuth();
-
-  // Initialize auth on app mount
-  useEffect(() => {
-    initializeAuth();
-  }, [initializeAuth]);
+  const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return <LoadingScreen message="Loading..." />;
