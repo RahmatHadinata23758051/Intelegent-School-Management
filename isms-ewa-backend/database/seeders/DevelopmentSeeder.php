@@ -49,6 +49,16 @@ class DevelopmentSeeder extends Seeder
             ]
         );
 
+        // Create second homeroom teacher user
+        $homeroomTeacher2 = User::firstOrCreate(
+            ['email' => 'homeroom2@isms-ewa.local'],
+            [
+                'name' => 'Wali Kelas X IPA 2',
+                'password' => Hash::make('password'),
+                'role' => 'homeroom_teacher',
+            ]
+        );
+
         // Create school classes
         $class1 = SchoolClass::firstOrCreate(
             ['name' => 'X IPA 1'],
@@ -62,7 +72,7 @@ class DevelopmentSeeder extends Seeder
             ['name' => 'X IPA 2'],
             [
                 'grade_level' => 'X',
-                'homeroom_teacher_id' => $homeroomTeacher->id,
+                'homeroom_teacher_id' => $homeroomTeacher2->id,
             ]
         );
 
