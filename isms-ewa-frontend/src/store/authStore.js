@@ -29,7 +29,8 @@ export const useAuthStore = create((set, get) => ({
 
     try {
       const response = await authAPI.login(email, password);
-      const { token, user } = response.data.data;
+      // Backend returns { token, user } directly in response.data
+      const { token, user } = response.data;
 
       // Store in localStorage
       localStorage.setItem('auth_token', token);
@@ -48,6 +49,7 @@ export const useAuthStore = create((set, get) => ({
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
+        'Login failed. Please try again.';
         'Login failed. Please try again.';
 
       set({
