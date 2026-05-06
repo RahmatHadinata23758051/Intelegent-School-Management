@@ -9,22 +9,24 @@ import {
   LogOut,
   Menu,
   X,
+  TrendingUp,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { dashboardAPI } from '../../services/api';
+import { useDashboardStats } from '../../hooks/useDashboardStats';
 import { StatCard } from '../../components/common/StatCard';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { LoadingScreen } from '../../components/common/LoadingScreen';
+import { ErrorState } from '../../components/common/ErrorState';
 import { IconBadge } from '../../components/common/IconBadge';
+import { RiskBadge } from '../../components/common/RiskBadge';
+import { ROUTES } from '../../constants/routes';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [statistics, setStatistics] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: statistics, loading, error, refetch } = useDashboardStats();
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -32,27 +34,6 @@ export const DashboardPage = () => {
       navigate('/login');
     }
   }, [isAuthenticated, navigate]);
-
-  // Fetch dashboard statistics
-  useEffect(() => {
-    const fetchStatistics = async () => {
-      try {
-        setLoading(true);
-        const response = await dashboardAPI.getStatistics();
-        setStatistics(response.data.data);
-        setError(null);
-      } catch (err) {
-        console.error('Failed to fetch statistics:', err);
-        setError('Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (isAuthenticated) {
-      fetchStatistics();
-    }
-  }, [isAuthenticated]);
 
   const handleLogout = async () => {
     await logout();
@@ -94,15 +75,18 @@ export const DashboardPage = () => {
           {/* Navigation */}
           <nav className="flex-1 px-3 py-6 space-y-2">
             {[
-              { icon: BarChart3, label: 'Dashboard', active: true },
-              { icon: Users, label: 'Students' },
-              { icon: BookOpen, label: 'Classes' },
-              { icon: AlertTriangle, label: 'Risk Monitoring' },
+              { icon: BarChart3, label: 'Dashboard', route: ROUTES.DASHBOARD, active: true },
+              { icon: Users, label: 'Students', route: ROUTES.STUDENTS },
+              { icon: BookOpen, label: 'Classes', route: ROUTES.CLASSES },
+              { icon: AlertTriangle, label: 'Risk Monitoring', route: null, disabled: true },
             ].map((item, idx) => (
               <button
                 key={idx}
+                onClick={() => item.route && navigate(item.route)}
+                disabled={item.disabled}
                 className={clsx(
                   'w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
+                  item.disabled && 'opacity-50 cursor-not-allowed',
                   item.active
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-slate-600 hover:bg-slate-100'
@@ -158,104 +142,150 @@ export const DashboardPage = () => {
         {/* Content */}
         <div className="p-8">
           {error && (
-            <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-lg">
-              <p className="text-sm text-rose-600">{error}</p>
-            </div>
+            <ErrorState
+              title="Failed to load dashboard"
+              message={error}
+              onRetry={refetch}
+            />
           )}
 
-          {/* Statistics Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <StatCard
-              title="Total Students"
-              value={statistics?.total_students || 0}
-              description="Active students in system"
-              icon={Users}
-              color="blue"
-            />
-            <StatCard
-              title="Active Classes"
-              value={statistics?.total_classes || 0}
-              description="Classes with students"
-              icon={BookOpen}
-              color="indigo"
-            />
-            <StatCard
-              title="Risk Monitoring"
-              value={statistics?.risk_distribution?.warning || 0}
-              description="Students requiring attention"
-              icon={AlertTriangle}
-              color="amber"
-            />
-            <StatCard
-              title="High Risk"
-              value={statistics?.risk_distribution?.high_risk || 0}
-              description="Critical intervention needed"
-              icon={AlertTriangle}
-              color="rose"
-            />
-          </div>
-
-          {/* Risk Monitoring Card */}
-          <Card className="mb-8">
-            <Card.Header>
-              <div className="flex items-center gap-3">
-                <IconBadge icon={AlertTriangle} color="amber" />
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-900">Risk Monitoring</h3>
-                  <p className="text-sm text-slate-500">Real-time student performance tracking</p>
-                </div>
+          {!error && (
+            <>
+              {/* Statistics Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <StatCard
+                  title="Total Students"
+                  value={statistics?.total_students || 0}
+                  description="Active students in system"
+                  icon={Users}
+                  color="blue"
+                />
+                <StatCard
+                  title="Total Classes"
+                  value={statistics?.total_classes || 0}
+                  description="Classes with students"
+                  icon={BookOpen}
+                  color="indigo"
+                />
+                <StatCard
+                  title="Total Grades"
+                  value={statistics?.total_grades || 0}
+                  description="Recorded grades"
+                  icon={TrendingUp}
+                  color="emerald"
+                />
+                <StatCard
+                  title="Total Violations"
+                  value={statistics?.total_violations || 0}
+                  description="Recorded violations"
+                  icon={AlertTriangle}
+                  color="rose"
+                />
               </div>
-            </Card.Header>
-            <Card.Body>
-              <div className="space-y-4">
-                {/* Risk levels breakdown */}
-                {[
-                  { label: 'Safe', value: statistics?.risk_distribution?.safe || 0, color: 'emerald' },
-                  { label: 'Warning', value: statistics?.risk_distribution?.warning || 0, color: 'amber' },
-                  { label: 'High Risk', value: statistics?.risk_distribution?.high_risk || 0, color: 'rose' },
-                ].map((item, idx) => (
-                  <div key={idx}>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-slate-600">{item.label}</span>
-                      <span className={clsx(
-                        'text-sm font-bold',
-                        item.color === 'emerald' && 'text-emerald-600',
-                        item.color === 'amber' && 'text-amber-600',
-                        item.color === 'rose' && 'text-rose-600'
-                      )}>
-                        {item.value}
-                      </span>
-                    </div>
-                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                      <div
-                        className={clsx(
-                          'h-full rounded-full',
-                          item.color === 'emerald' && 'bg-emerald-500',
-                          item.color === 'amber' && 'bg-amber-500',
-                          item.color === 'rose' && 'bg-rose-500'
-                        )}
-                        style={{
-                          width: `${(item.value / (statistics?.total_students || 1)) * 100}%`,
-                        }}
-                      />
+
+              {/* Risk Distribution */}
+              <Card className="mb-8">
+                <Card.Header>
+                  <div className="flex items-center gap-3">
+                    <IconBadge icon={AlertTriangle} color="amber" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900">Risk Distribution</h3>
+                      <p className="text-sm text-slate-500">Student risk level breakdown</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </Card.Body>
-          </Card>
+                </Card.Header>
+                <Card.Body>
+                  <div className="space-y-4">
+                    {[
+                      { label: 'Safe', value: statistics?.risk_distribution?.safe || 0, color: 'emerald' },
+                      { label: 'Warning', value: statistics?.risk_distribution?.warning || 0, color: 'amber' },
+                      { label: 'High Risk', value: statistics?.risk_distribution?.high_risk || 0, color: 'rose' },
+                    ].map((item, idx) => (
+                      <div key={idx}>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium text-slate-600">{item.label}</span>
+                          <span className={clsx(
+                            'text-sm font-bold',
+                            item.color === 'emerald' && 'text-emerald-600',
+                            item.color === 'amber' && 'text-amber-600',
+                            item.color === 'rose' && 'text-rose-600'
+                          )}>
+                            {item.value}
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                          <div
+                            className={clsx(
+                              'h-full rounded-full',
+                              item.color === 'emerald' && 'bg-emerald-500',
+                              item.color === 'amber' && 'bg-amber-500',
+                              item.color === 'rose' && 'bg-rose-500'
+                            )}
+                            style={{
+                              width: `${(item.value / (statistics?.total_students || 1)) * 100}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card.Body>
+              </Card>
 
-          {/* Recent Activity Placeholder */}
-          <Card>
-            <Card.Header>
-              <h3 className="text-lg font-semibold text-slate-900">Recent Activity</h3>
-            </Card.Header>
-            <Card.Body>
-              <div className="text-center py-8">
-                <p className="text-slate-500">No recent activity yet</p>
-              </div>
-            </Card.Body>
-          </Card>
+              {/* High Risk Students */}
+              <Card className="mb-8">
+                <Card.Header>
+                  <h3 className="text-lg font-semibold text-slate-900">High Risk Students</h3>
+                </Card.Header>
+                <Card.Body>
+                  {statistics?.high_risk_students && statistics.high_risk_students.length > 0 ? (
+                    <div className="space-y-3">
+                      {statistics.high_risk_students.slice(0, 5).map((student) => (
+                        <div key={student.id} className="flex items-center justify-between p-3 bg-rose-50 rounded-lg hover:bg-rose-100 transition-colors cursor-pointer"
+                          onClick={() => navigate(`/students/${student.id}`)}
+                        >
+                          <div>
+                            <p className="font-medium text-slate-900">{student.name}</p>
+                            <p className="text-sm text-slate-500">{student.student_id}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-rose-600">{student.risk_score?.total_score?.toFixed(2) || 0}</p>
+                            <RiskBadge level="high_risk" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 text-center py-4">No high risk students</p>
+                  )}
+                </Card.Body>
+              </Card>
+
+              {/* Recent Violations */}
+              <Card>
+                <Card.Header>
+                  <h3 className="text-lg font-semibold text-slate-900">Recent Violations</h3>
+                </Card.Header>
+                <Card.Body>
+                  {statistics?.recent_violations && statistics.recent_violations.length > 0 ? (
+                    <div className="space-y-3">
+                      {statistics.recent_violations.slice(0, 5).map((violation) => (
+                        <div key={violation.id} className="flex items-start justify-between p-3 bg-slate-50 rounded-lg">
+                          <div>
+                            <p className="font-medium text-slate-900">{violation.student?.name || 'Student'}</p>
+                            <p className="text-sm text-slate-500">{violation.description || 'Violation'}</p>
+                          </div>
+                          <p className="text-xs text-slate-500">{violation.created_at || 'Date'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 text-center py-4">No recent violations</p>
+                  )}
+                </Card.Body>
+              </Card>
+            </>
+          )}
         </div>
       </main>
     </div>
