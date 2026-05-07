@@ -11,6 +11,9 @@ import { Alert } from '../../components/common/Alert';
 import { LoadingScreen } from '../../components/common/LoadingScreen';
 import { ErrorState } from '../../components/common/ErrorState';
 import { RiskBadge } from '../../components/common/RiskBadge';
+import { GradesPanel } from '../../components/grades/GradesPanel';
+import { ViolationsPanel } from '../../components/violations/ViolationsPanel';
+import { formatScore } from '../../utils/formatters';
 import { ROUTES } from '../../constants/routes';
 
 export const StudentDetailPage = () => {
@@ -19,13 +22,32 @@ export const StudentDetailPage = () => {
   const { data: student, loading, error, refetch } = useStudentDetail(id);
   const [recalculating, setRecalculating] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [riskUpdateMessage, setRiskUpdateMessage] = useState('');
+
+  /**
+   * Handle mutation success (create/update/delete grade atau violation)
+   * Refresh risk score dan tampilkan feedback
+   */
+  const handleMutationSuccess = async (action, data) => {
+    try {
+      // Refresh student detail untuk update risk score
+      await refetch();
+      
+      // Tampilkan feedback
+      const actionLabel = action === 'create' ? 'ditambahkan' : action === 'update' ? 'diperbarui' : 'dihapus';
+      setRiskUpdateMessage(`Data berhasil ${actionLabel}. Skor risiko telah diperhitungkan ulang.`);
+      setTimeout(() => setRiskUpdateMessage(''), 4000);
+    } catch (err) {
+      console.error('Error refreshing student data:', err);
+    }
+  };
 
   const handleRecalculateRisk = async () => {
     try {
       setRecalculating(true);
       setSuccessMessage('');
       await studentService.recalculateRisk(id);
-      setSuccessMessage('Risk score recalculated successfully');
+      setSuccessMessage('Skor risiko berhasil diperhitungkan ulang');
       refetch();
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
@@ -81,7 +103,12 @@ export const StudentDetailPage = () => {
 
       {/* Success Message */}
       {successMessage && (
-        <Alert type="success" title="Success" message={successMessage} />
+        <Alert type="success" title="Sukses" message={successMessage} />
+      )}
+
+      {/* Risk Update Message */}
+      {riskUpdateMessage && (
+        <Alert type="success" title="Data Diperbarui" message={riskUpdateMessage} />
       )}
 
       {/* Student Profile Header */}
@@ -149,7 +176,7 @@ export const StudentDetailPage = () => {
                 <p className="text-sm font-semibold text-slate-700">Academic Score</p>
                 <TrendingUp size={20} className="text-blue-600" />
               </div>
-              <p className="text-4xl font-bold text-blue-600">{riskScore.academic_score?.toFixed(2) || 0}</p>
+              <p className="text-4xl font-bold text-blue-600">{formatScore(riskScore.academic_score)}</p>
               <p className="text-xs text-slate-600 mt-3">Based on grades performance</p>
             </div>
 
@@ -159,7 +186,7 @@ export const StudentDetailPage = () => {
                 <p className="text-sm font-semibold text-slate-700">Behavioral Score</p>
                 <AlertCircle size={20} className="text-amber-600" />
               </div>
-              <p className="text-4xl font-bold text-amber-600">{riskScore.behavioral_score?.toFixed(2) || 0}</p>
+              <p className="text-4xl font-bold text-amber-600">{formatScore(riskScore.behavioral_score)}</p>
               <p className="text-xs text-slate-600 mt-3">Based on violations</p>
             </div>
 
@@ -169,7 +196,7 @@ export const StudentDetailPage = () => {
                 <p className="text-sm font-semibold text-slate-700">Total Score</p>
                 <div className="w-6 h-6 bg-slate-300 rounded-full" />
               </div>
-              <p className="text-4xl font-bold text-slate-900">{riskScore.total_score?.toFixed(2) || 0}</p>
+              <p className="text-4xl font-bold text-slate-900">{formatScore(riskScore.total_score)}</p>
               <p className="text-xs text-slate-600 mt-3">Combined risk score</p>
             </div>
           </div>
@@ -178,71 +205,19 @@ export const StudentDetailPage = () => {
 
       {/* Grades & Violations Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Grades */}
-        <Card>
-          <Card.Header>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <BookOpen size={20} className="text-blue-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900">Recent Grades</h3>
-            </div>
-          </Card.Header>
-          <Card.Body>
-            {student.grades && student.grades.length > 0 ? (
-              <div className="space-y-3">
-                {student.grades.slice(0, 5).map((grade) => (
-                  <div key={grade.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
-                    <div>
-                      <p className="font-semibold text-slate-900">{grade.subject || 'Subject'}</p>
-                      <p className="text-xs text-slate-500 mt-1">{grade.semester || 'Semester'}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-blue-600">{grade.score}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <BookOpen size={32} className="text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500 font-medium">No grades recorded</p>
-              </div>
-            )}
-          </Card.Body>
-        </Card>
+        {/* Grades Panel */}
+        <GradesPanel
+          studentId={id}
+          onMutationSuccess={handleMutationSuccess}
+          canManage={true}
+        />
 
-        {/* Recent Violations */}
-        <Card>
-          <Card.Header>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center">
-                <AlertCircle size={20} className="text-rose-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900">Recent Violations</h3>
-            </div>
-          </Card.Header>
-          <Card.Body>
-            {student.violations && student.violations.length > 0 ? (
-              <div className="space-y-3">
-                {student.violations.slice(0, 5).map((violation) => (
-                  <div key={violation.id} className="flex items-start justify-between p-4 bg-rose-50 rounded-lg border border-rose-200 hover:border-rose-300 transition-colors">
-                    <div className="flex-1">
-                      <p className="font-semibold text-slate-900">{violation.description || 'Violation'}</p>
-                      <p className="text-xs text-slate-500 mt-1">{violation.created_at || 'Date'}</p>
-                    </div>
-                    <AlertCircle size={20} className="text-rose-600 flex-shrink-0 ml-3" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <AlertCircle size={32} className="text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500 font-medium">No violations recorded</p>
-              </div>
-            )}
-          </Card.Body>
-        </Card>
+        {/* Violations Panel */}
+        <ViolationsPanel
+          studentId={id}
+          onMutationSuccess={handleMutationSuccess}
+          canManage={true}
+        />
       </div>
     </AppLayout>
   );
