@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Calendar, Edit2, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Plus, Calendar, Edit2, Trash2, CheckCircle2, AlertCircle, TrendingUp, Archive, MoreVertical } from 'lucide-react';
 import { useAcademicYears } from '../../hooks/useAcademicYears';
 import { useAuth } from '../../hooks/useAuth';
 import { academicYearService } from '../../services/academicYearService';
@@ -16,6 +16,7 @@ import { Modal } from '../../components/common/Modal';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Badge } from '../../components/common/Badge';
 import { AcademicYearForm } from '../../components/academic/AcademicYearForm';
+import { SummaryItem, StatusPill, SelectControl, DesignSearchInput } from '../../components/design-system';
 
 export const AcademicYearsPage = () => {
   const { user } = useAuth();
@@ -210,36 +211,68 @@ export const AcademicYearsPage = () => {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      {/* Header with Action Button */}
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900">Tahun Ajaran</h2>
-          <p className="text-slate-500 mt-1">Kelola tahun ajaran dan periode akademik</p>
+          <h2 className="text-[24px] font-semibold leading-8 tracking-[-0.02em] text-slate-950">
+            Tahun Ajaran
+          </h2>
+          <p className="mt-1 text-[14px] font-normal leading-6 text-slate-500">
+            Kelola tahun ajaran dan periode akademik.
+          </p>
         </div>
         {canManage && (
-          <Button
-            variant="primary"
-            size="lg"
-            className="flex items-center gap-2"
+          <button
             onClick={handleAddAcademicYear}
+            className="inline-flex h-11 items-center gap-2 rounded-lg bg-blue-600 px-5 text-[14px] font-medium text-white transition hover:bg-blue-700"
           >
-            <Plus size={20} />
+            <Plus size={18} />
             Tambah Tahun Ajaran
-          </Button>
+          </button>
         )}
       </div>
 
-      {/* Search Card */}
-      <Card className="mb-8">
-        <Card.Body>
-          <SearchInput
-            value={search}
-            onChange={handleSearch}
-            onClear={handleClearSearch}
-            placeholder="Cari tahun ajaran..."
-          />
-        </Card.Body>
+      {/* Summary Cards - 3 column grid */}
+      <Card className="mb-6 grid grid-cols-3 divide-x divide-slate-200 p-6">
+        <SummaryItem 
+          icon={Calendar} 
+          label="Total Tahun Ajaran" 
+          value={academicYearsData?.meta?.total || '0'} 
+          meta="Semua tahun ajaran terdaftar" 
+          tone="blue" 
+        />
+        <SummaryItem 
+          icon={TrendingUp} 
+          label="Aktif" 
+          value={academicYearsData?.data?.filter(ay => ay.is_active).length || '0'} 
+          meta="Tahun ajaran sedang berjalan" 
+          tone="green" 
+        />
+        <SummaryItem 
+          icon={Archive} 
+          label="Arsip" 
+          value={academicYearsData?.data?.filter(ay => !ay.is_active).length || '0'} 
+          meta="Tahun ajaran telah diarsipkan" 
+          tone="orange" 
+        />
       </Card>
+
+      {/* Search and Filter Controls */}
+      <div className="mb-4 grid grid-cols-12 gap-4">
+        <div className="col-span-5">
+          <DesignSearchInput
+            placeholder="Cari tahun ajaran..."
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
+        <div className="col-span-3 col-start-8">
+          <SelectControl value="Semua Status" />
+        </div>
+        <div className="col-span-2">
+          <SelectControl value="Urutkan: Terbaru" icon={TrendingUp} />
+        </div>
+      </div>
 
       {/* Error State */}
       {error && (
@@ -255,88 +288,98 @@ export const AcademicYearsPage = () => {
         <>
           {academicYearsData?.data && academicYearsData.data.length > 0 ? (
             <>
-              <Card className="mb-8">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200">
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Tahun Ajaran</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Tanggal Mulai</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Tanggal Akhir</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Status</th>
-                        {canManage && <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Aksi</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {academicYearsData.data.map((ay) => (
-                        <tr key={ay.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
-                          <td className="px-6 py-4">
-                            <p className="font-semibold text-slate-900">{ay.year}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-slate-600">{new Date(ay.start_date).toLocaleDateString('id-ID')}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-slate-600">{new Date(ay.end_date).toLocaleDateString('id-ID')}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            {ay.is_active ? (
-                              <Badge variant="success" className="flex items-center gap-1 w-fit">
-                                <CheckCircle2 size={14} />
-                                Aktif
-                              </Badge>
-                            ) : (
-                              <Badge variant="secondary">Tidak Aktif</Badge>
-                            )}
-                          </td>
-                          {canManage && (
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2">
-                                {!ay.is_active && (
-                                  <button
-                                    onClick={() => handleActivateAcademicYear(ay)}
-                                    className="p-2 hover:bg-green-100 rounded-lg transition-colors text-green-600"
-                                    title="Aktifkan tahun ajaran"
-                                  >
-                                    <CheckCircle2 size={16} />
-                                  </button>
-                                )}
+              <Card className="mb-8 overflow-hidden">
+                <table className="w-full border-collapse text-left">
+                  <thead className="border-b border-slate-200 text-[13px] font-medium text-slate-500">
+                    <tr>
+                      <th className="px-6 py-4">Tahun Ajaran</th>
+                      <th className="px-6 py-4">Periode</th>
+                      <th className="px-6 py-4">Semester</th>
+                      <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4">Dibuat Oleh</th>
+                      {canManage && <th className="px-6 py-4 text-right">Aksi</th>}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 text-[14px] text-slate-700">
+                    {academicYearsData.data.map((ay) => (
+                      <tr key={ay.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-4">
+                            <div className="grid h-9 w-9 place-items-center rounded-lg bg-blue-50 text-blue-600">
+                              <Calendar size={18} />
+                            </div>
+                            <span className="text-[17px] font-medium tracking-[-0.01em] text-slate-950">
+                              {ay.year}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {new Date(ay.start_date).toLocaleDateString('id-ID')} – {new Date(ay.end_date).toLocaleDateString('id-ID')}
+                        </td>
+                        <td className="px-6 py-4">
+                          {ay.semesters?.length || 0} semester
+                        </td>
+                        <td className="px-6 py-4">
+                          <StatusPill status={ay.is_active ? 'Aktif' : 'Arsip'} />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div>Admin ISMS-EWA</div>
+                          <div className="text-[13px] text-slate-500">
+                            {new Date(ay.created_at).toLocaleDateString('id-ID')}
+                          </div>
+                        </td>
+                        {canManage && (
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {!ay.is_active && (
                                 <button
-                                  onClick={() => handleEditAcademicYear(ay)}
-                                  className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-blue-600"
-                                  title="Edit tahun ajaran"
+                                  onClick={() => handleActivateAcademicYear(ay)}
+                                  className="rounded-lg p-2 text-green-600 transition hover:bg-green-100"
+                                  title="Aktifkan tahun ajaran"
                                 >
-                                  <Edit2 size={16} />
+                                  <CheckCircle2 size={16} />
                                 </button>
-                                {!ay.is_active && (
-                                  <button
-                                    onClick={() => handleDeleteAcademicYear(ay)}
-                                    className="p-2 hover:bg-rose-100 rounded-lg transition-colors text-rose-600"
-                                    title="Hapus tahun ajaran"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                )}
-                              </div>
-                            </td>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                              )}
+                              <button
+                                onClick={() => handleEditAcademicYear(ay)}
+                                className="rounded-lg p-2 text-blue-600 transition hover:bg-blue-100"
+                                title="Edit tahun ajaran"
+                              >
+                                <Edit2 size={16} />
+                              </button>
+                              {!ay.is_active && (
+                                <button
+                                  onClick={() => handleDeleteAcademicYear(ay)}
+                                  className="rounded-lg p-2 text-rose-600 transition hover:bg-rose-100"
+                                  title="Hapus tahun ajaran"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                              <button className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100">
+                                <MoreVertical size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {/* Table Footer with Pagination */}
+                <div className="flex h-16 items-center justify-between border-t border-slate-200 px-6">
+                  <div className="text-[13px] leading-5 text-slate-500">
+                    Menampilkan {academicYearsData.data.length} dari {academicYearsData?.meta?.total || 0} data
+                  </div>
+                  {academicYearsData?.meta && (
+                    <Pagination
+                      currentPage={academicYearsData.meta.current_page}
+                      totalPages={academicYearsData.meta.last_page}
+                      onPageChange={goToPage}
+                    />
+                  )}
                 </div>
               </Card>
-
-              {/* Pagination */}
-              {academicYearsData?.meta && (
-                <div className="flex justify-center">
-                  <Pagination
-                    currentPage={academicYearsData.meta.current_page}
-                    totalPages={academicYearsData.meta.last_page}
-                    onPageChange={goToPage}
-                  />
-                </div>
-              )}
             </>
           ) : (
             <EmptyState
