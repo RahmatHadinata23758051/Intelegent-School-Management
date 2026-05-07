@@ -17,6 +17,17 @@ import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../common/Button';
 import { ROUTES } from '../../constants/routes';
 
+/**
+ * AppLayout - Professional application shell
+ * 
+ * Design System:
+ * - Sidebar: #06182B (dark navy), 256px width
+ * - Header: #FAFBFD (off-white), 80px height
+ * - Main: #F7F9FC (light background)
+ * - Typography: Inter, 14px body, 24px headings
+ * - Spacing: 8pt grid (8, 16, 24, 32, 40, 48)
+ * - Border radius: 8px (inputs), 12px (cards)
+ */
 export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth();
@@ -79,50 +90,54 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-[#F7F9FC] font-[Inter,Geist,system-ui,-apple-system,BlinkMacSystemFont,'Segoe_UI',sans-serif] text-[#102033]">
+      {/* Sidebar - Professional dark navy */}
       <aside
         className={clsx(
-          'fixed left-0 top-0 h-screen bg-slate-900 transition-all duration-300 z-40 flex flex-col',
+          'fixed inset-y-0 left-0 z-20 flex flex-col border-r border-slate-800 bg-[#06182B] text-slate-200 transition-all duration-300',
           sidebarOpen ? 'w-64' : 'w-20'
         )}
       >
-        {/* Logo Section */}
-        <div className="h-20 flex items-center justify-between px-4 border-b border-slate-800">
+        {/* Logo Section - 80px height, 24px padding */}
+        <div className="flex h-20 items-center justify-between border-b border-slate-800 px-6">
           {sidebarOpen && (
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg">
-                <BarChart3 size={24} className="text-white" />
+              <div className="grid h-10 w-10 place-items-center rounded-lg bg-blue-600 text-white">
+                <BarChart3 size={22} strokeWidth={2} />
               </div>
               <div>
-                <div className="font-bold text-white text-lg">ISMS-EWA</div>
-                <div className="text-xs text-slate-400">Dashboard</div>
+                <div className="text-[17px] font-semibold tracking-[-0.01em] text-slate-50">
+                  ISMS-EWA
+                </div>
+                <div className="text-[12px] leading-5 text-slate-400">
+                  Dashboard
+                </div>
               </div>
             </div>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white"
+            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+        {/* Navigation - 8pt grid spacing */}
+        <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
           {navItems.map((item) => {
             if (item.isSection && item.children) {
               const isExpanded = expandedSections[item.id];
               return (
-                <div key={item.id}>
+                <div key={item.id} className="space-y-2">
                   <button
                     onClick={() => toggleSection(item.id)}
                     disabled={item.disabled}
                     className={clsx(
-                      'w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-colors text-sm font-medium',
+                      'flex w-full items-center justify-between px-3 text-[13px] font-medium transition',
                       item.disabled
-                        ? 'opacity-50 cursor-not-allowed text-slate-500'
-                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                        ? 'cursor-not-allowed opacity-50 text-slate-500'
+                        : 'text-slate-100 hover:text-white'
                     )}
                   >
                     <span>{item.label}</span>
@@ -135,19 +150,19 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
                     />
                   </button>
                   {isExpanded && (
-                    <div className="ml-2 mt-1 space-y-1 border-l border-slate-700 pl-3">
+                    <div className="space-y-1 border-l border-slate-700 pl-2">
                       {item.children.map((child) => (
                         <button
                           key={child.id}
                           onClick={() => child.route && navigate(child.route)}
                           className={clsx(
-                            'w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm',
+                            'flex h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-[14px] font-medium transition',
                             currentPage === child.id || currentPage === child.route?.split('/')[2]
                               ? 'bg-blue-600 text-white'
-                              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                              : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
                           )}
                         >
-                          <child.icon size={18} />
+                          <child.icon size={19} strokeWidth={2} />
                           <span>{child.label}</span>
                         </button>
                       ))}
@@ -163,70 +178,81 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
                 onClick={() => item.route && navigate(item.route)}
                 disabled={item.disabled}
                 className={clsx(
-                  'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium',
+                  'flex h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-[14px] font-medium transition',
                   currentPage === item.id
                     ? 'bg-blue-600 text-white'
                     : item.disabled
-                    ? 'opacity-50 cursor-not-allowed text-slate-500'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    ? 'cursor-not-allowed opacity-50 text-slate-500'
+                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
                 )}
               >
-                <item.icon size={20} />
+                <item.icon size={19} strokeWidth={2} />
                 {sidebarOpen && <span>{item.label}</span>}
               </button>
             );
           })}
         </nav>
 
-        {/* User Profile Section */}
-        <div className="p-4 border-t border-slate-800 space-y-3">
+        {/* User Profile Section - 24px padding */}
+        <div className="space-y-4 px-4 pb-6">
           {sidebarOpen && (
-            <div className="p-3 bg-slate-800 rounded-lg">
-              <p className="text-xs font-medium text-slate-400">Logged in as</p>
-              <p className="text-sm font-semibold text-white truncate mt-1">{user?.name}</p>
-              <p className="text-xs text-slate-400 capitalize mt-1">{user?.role}</p>
+            <div className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-800/55 p-4">
+              <div className="grid h-10 w-10 place-items-center rounded-full bg-blue-600 text-[15px] font-medium text-white">
+                {user?.name?.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[14px] font-medium text-white">
+                  {user?.name}
+                </div>
+                <div className="text-[13px] leading-5 text-slate-400 capitalize">
+                  {user?.role}
+                </div>
+              </div>
+              <ChevronDown size={16} className="text-slate-400" />
             </div>
           )}
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={handleLogout}
-            className="w-full justify-start text-slate-300 hover:text-white hover:bg-slate-800"
+            className="flex items-center gap-3 px-3 text-[14px] font-medium text-slate-400 transition hover:text-white"
           >
             <LogOut size={18} />
             {sidebarOpen && <span>Logout</span>}
-          </Button>
+          </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className={clsx('transition-all duration-300', sidebarOpen ? 'ml-64' : 'ml-20')}>
-        {/* Top Bar */}
-        <div className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-30">
+      <main className={clsx('min-h-screen transition-all duration-300', sidebarOpen ? 'ml-64' : 'ml-20')}>
+        {/* Top Bar - 80px height, sticky */}
+        <header className="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-slate-200 bg-[#FAFBFD]/95 px-9 backdrop-blur">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{pageTitle[currentPage] || 'Dashboard'}</h1>
-            <p className="text-sm text-slate-500 mt-1">Welcome back, {user?.name}!</p>
+            <h1 className="text-[24px] font-semibold leading-8 tracking-[-0.02em] text-slate-950">
+              {pageTitle[currentPage] || 'Dashboard'}
+            </h1>
+            <p className="mt-1 text-[14px] font-normal leading-6 text-slate-500">
+              Welcome back, {user?.name}!
+            </p>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-100 transition-colors"
+                className="flex items-center gap-3 rounded-lg px-4 py-2 transition hover:bg-slate-100"
               >
                 <div className="text-right">
-                  <p className="text-sm font-medium text-slate-900">{user?.name}</p>
-                  <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+                  <p className="text-[14px] font-medium text-slate-950">{user?.name}</p>
+                  <p className="text-[12px] leading-5 text-slate-500 capitalize">{user?.role}</p>
                 </div>
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
+                <div className="grid h-10 w-10 place-items-center rounded-full bg-blue-600 text-[15px] font-medium text-white">
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
-                <ChevronDown size={16} className="text-slate-400" />
+                <ChevronDown size={16} className="text-slate-500" />
               </button>
 
               {/* User Menu Dropdown */}
               {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50">
-                  <div className="px-4 py-2 border-b border-slate-100">
+                <div className="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-slate-200 bg-white py-2 shadow-lg">
+                  <div className="border-b border-slate-100 px-4 py-2">
                     <p className="text-sm font-medium text-slate-900">{user?.name}</p>
                     <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
                   </div>
@@ -235,7 +261,7 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
                       handleLogout();
                       setUserMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                    className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
                   >
                     <LogOut size={16} />
                     Logout
@@ -244,12 +270,12 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
               )}
             </div>
           </div>
-        </div>
+        </header>
 
-        {/* Page Content */}
-        <div className="p-8">
+        {/* Page Content - 32px padding (8pt grid) */}
+        <section className="px-9 py-8">
           {children}
-        </div>
+        </section>
       </main>
     </div>
   );
