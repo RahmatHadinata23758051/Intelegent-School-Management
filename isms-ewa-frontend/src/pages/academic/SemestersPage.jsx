@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, BookOpen, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
+import { Plus, BookOpen, Edit2, Trash2, CheckCircle2, Calendar, Users, TrendingUp, MoreVertical } from 'lucide-react';
 import { useSemesters } from '../../hooks/useSemesters';
 import { useAcademicYears } from '../../hooks/useAcademicYears';
 import { useAuth } from '../../hooks/useAuth';
@@ -18,6 +18,7 @@ import { Modal } from '../../components/common/Modal';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Badge } from '../../components/common/Badge';
 import { SemesterForm } from '../../components/academic/SemesterForm';
+import { SummarySmall, StatusPill, SelectControl, DesignSearchInput } from '../../components/design-system';
 
 export const SemestersPage = () => {
   const { user } = useAuth();
@@ -223,50 +224,68 @@ export const SemestersPage = () => {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      {/* Header with Action Button */}
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900">Semester</h2>
-          <p className="text-slate-500 mt-1">Kelola semester dalam tahun ajaran</p>
+          <h2 className="text-[24px] font-semibold leading-8 tracking-[-0.02em] text-slate-950">
+            Semester
+          </h2>
+          <p className="mt-1 text-[14px] font-normal leading-6 text-slate-500">
+            Kelola semester dalam tahun ajaran.
+          </p>
         </div>
         {canManage && (
-          <Button
-            variant="primary"
-            size="lg"
-            className="flex items-center gap-2"
+          <button
             onClick={handleAddSemester}
+            className="inline-flex h-11 items-center gap-2 rounded-lg bg-blue-600 px-5 text-[14px] font-medium text-white transition hover:bg-blue-700"
           >
-            <Plus size={20} />
+            <Plus size={18} />
             Tambah Semester
-          </Button>
+          </button>
         )}
       </div>
 
-      {/* Search and Filter Card */}
-      <Card className="mb-8">
-        <Card.Body>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <SearchInput
-              value={search}
-              onChange={handleSearch}
-              onClear={handleClearSearch}
-              placeholder="Cari semester..."
-            />
-            <SelectFilter
-              label="Filter Tahun Ajaran"
-              value={selectedAcademicYear}
-              onChange={handleFilterByAcademicYear}
-              options={
-                academicYearsData?.data?.map((ay) => ({
-                  value: ay.id.toString(),
-                  label: ay.year,
-                })) || []
-              }
-              placeholder="Semua Tahun Ajaran"
-            />
-          </div>
-        </Card.Body>
+      {/* Search and Filter Controls */}
+      <Card className="mb-6 grid grid-cols-3 gap-4 p-4">
+        <div className="col-span-1">
+          <DesignSearchInput
+            placeholder="Cari semester..."
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
+        <div className="col-span-1">
+          <SelectControl label="Filter Tahun Ajaran" value="Semua Tahun Ajaran" />
+        </div>
+        <div className="col-span-1">
+          <SelectControl label="Filter Status" value="Semua Status" />
+        </div>
       </Card>
+
+      {/* Summary Cards - 3 column grid */}
+      <div className="mb-6 grid grid-cols-3 gap-4">
+        <SummarySmall 
+          icon={BookOpen} 
+          label="Semester Aktif" 
+          value={semestersData?.data?.filter(s => s.is_active).length || '0'} 
+          meta={semestersData?.data?.find(s => s.is_active)?.academic_year?.year || 'N/A'} 
+          tone="blue" 
+        />
+        <SummarySmall 
+          icon={TrendingUp} 
+          label="Semester Berjalan" 
+          value={semestersData?.data?.filter(s => s.is_active).length || '0'} 
+          meta={semestersData?.data?.find(s => s.is_active) ? `Ganjil ${semestersData.data.find(s => s.is_active).academic_year?.year}` : 'N/A'} 
+          tone="green" 
+        />
+        <SummarySmall 
+          icon={Users} 
+          label="Total Kelas Terkait" 
+          value={semestersData?.data?.reduce((sum, s) => sum + (s.classes_count || 0), 0) || '0'} 
+          meta="Di semua semester" 
+          tone="purple" 
+        />
+      </div>
 
       {/* Error State */}
       {error && (
@@ -282,92 +301,116 @@ export const SemestersPage = () => {
         <>
           {semestersData?.data && semestersData.data.length > 0 ? (
             <>
-              <Card className="mb-8">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200">
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Tahun Ajaran</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Semester</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Tanggal Mulai</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Tanggal Akhir</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Status</th>
-                        {canManage && <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Aksi</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {semestersData.data.map((sem) => (
-                        <tr key={sem.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
-                          <td className="px-6 py-4">
-                            <p className="font-semibold text-slate-900">{sem.academic_year?.year}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-slate-600">Semester {sem.semester_number}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-slate-600">{new Date(sem.start_date).toLocaleDateString('id-ID')}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-slate-600">{new Date(sem.end_date).toLocaleDateString('id-ID')}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            {sem.is_active ? (
-                              <Badge variant="success" className="flex items-center gap-1 w-fit">
-                                <CheckCircle2 size={14} />
-                                Aktif
-                              </Badge>
-                            ) : (
-                              <Badge variant="secondary">Tidak Aktif</Badge>
-                            )}
-                          </td>
-                          {canManage && (
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2">
-                                {!sem.is_active && (
-                                  <button
-                                    onClick={() => handleActivateSemester(sem)}
-                                    className="p-2 hover:bg-green-100 rounded-lg transition-colors text-green-600"
-                                    title="Aktifkan semester"
-                                  >
-                                    <CheckCircle2 size={16} />
-                                  </button>
-                                )}
-                                <button
-                                  onClick={() => handleEditSemester(sem)}
-                                  className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-blue-600"
-                                  title="Edit semester"
-                                >
-                                  <Edit2 size={16} />
-                                </button>
-                                {!sem.is_active && (
-                                  <button
-                                    onClick={() => handleDeleteSemester(sem)}
-                                    className="p-2 hover:bg-rose-100 rounded-lg transition-colors text-rose-600"
-                                    title="Hapus semester"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                )}
+              <Card className="mb-8 overflow-hidden">
+                <div className="border-b border-slate-200 p-5">
+                  <h2 className="text-[16px] font-medium leading-6 text-slate-950">
+                    Daftar Semester
+                  </h2>
+                </div>
+                <table className="w-full border-collapse text-left">
+                  <thead className="border-b border-slate-200 text-[13px] font-medium text-slate-500">
+                    <tr>
+                      <th className="px-5 py-4">Semester</th>
+                      <th className="px-5 py-4">Tahun Ajaran</th>
+                      <th className="px-5 py-4">Periode</th>
+                      <th className="px-5 py-4">Status</th>
+                      <th className="px-5 py-4">Kelas Terkait</th>
+                      <th className="px-5 py-4">Terakhir Diperbarui</th>
+                      {canManage && <th className="px-5 py-4 text-right">Aksi</th>}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 text-[14px] text-slate-700">
+                    {semestersData.data.map((sem, index) => (
+                      <tr key={sem.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-4">
+                            <div className={`grid h-10 w-10 place-items-center rounded-full ${
+                              index === 0 ? 'bg-emerald-50 text-emerald-600' : 
+                              index === 2 ? 'bg-amber-50 text-amber-600' : 
+                              'bg-blue-50 text-blue-600'
+                            }`}>
+                              <Calendar size={18} />
+                            </div>
+                            <div>
+                              <div className="font-medium text-slate-950">
+                                Ganjil {sem.academic_year?.year}
                               </div>
-                            </td>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                              <div className="text-[13px] text-slate-500">
+                                Semester {sem.semester_number}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-5 py-4">
+                          {sem.academic_year?.year}
+                        </td>
+                        <td className="whitespace-pre-line px-5 py-4 leading-6">
+                          {new Date(sem.start_date).toLocaleDateString('id-ID')} – {new Date(sem.end_date).toLocaleDateString('id-ID')}
+                        </td>
+                        <td className="px-5 py-4">
+                          <StatusPill status={sem.is_active ? 'Berjalan' : 'Selesai'} />
+                        </td>
+                        <td className="px-5 py-4">
+                          {sem.classes_count || 0}
+                        </td>
+                        <td className="whitespace-pre-line px-5 py-4 leading-6">
+                          <div>Admin ISMS-EWA</div>
+                          <div className="text-[13px] text-slate-500">
+                            {new Date(sem.updated_at).toLocaleDateString('id-ID')}
+                          </div>
+                        </td>
+                        {canManage && (
+                          <td className="px-5 py-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {!sem.is_active && (
+                                <button
+                                  onClick={() => handleActivateSemester(sem)}
+                                  className="rounded-lg p-2 text-green-600 transition hover:bg-green-100"
+                                  title="Aktifkan semester"
+                                >
+                                  <CheckCircle2 size={16} />
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleEditSemester(sem)}
+                                className="rounded-lg p-2 text-blue-600 transition hover:bg-blue-100"
+                                title="Edit semester"
+                              >
+                                <Edit2 size={16} />
+                              </button>
+                              {!sem.is_active && (
+                                <button
+                                  onClick={() => handleDeleteSemester(sem)}
+                                  className="rounded-lg p-2 text-rose-600 transition hover:bg-rose-100"
+                                  title="Hapus semester"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                              <button className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100">
+                                <MoreVertical size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {/* Table Footer with Pagination */}
+                <div className="flex h-16 items-center justify-between border-t border-slate-200 px-6">
+                  <div className="text-[13px] leading-5 text-slate-500">
+                    Menampilkan {semestersData.data.length} dari {semestersData?.meta?.total || 0} data
+                  </div>
+                  {semestersData?.meta && (
+                    <Pagination
+                      currentPage={semestersData.meta.current_page}
+                      totalPages={semestersData.meta.last_page}
+                      onPageChange={goToPage}
+                    />
+                  )}
                 </div>
               </Card>
-
-              {/* Pagination */}
-              {semestersData?.meta && (
-                <div className="flex justify-center">
-                  <Pagination
-                    currentPage={semestersData.meta.current_page}
-                    totalPages={semestersData.meta.last_page}
-                    onPageChange={goToPage}
-                  />
-                </div>
-              )}
             </>
           ) : (
             <EmptyState
