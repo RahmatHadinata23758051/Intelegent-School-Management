@@ -38,24 +38,16 @@ export const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      console.log('[AUTH] Login attempt:', { email, apiUrl: import.meta.env.VITE_API_BASE_URL });
-      
       const response = await authAPI.login(email, password);
-      console.log('[AUTH] Login response:', response);
-      
-      // Backend returns { token, user } directly in response.data
       const { token, user } = response.data;
 
       if (!token || !user) {
-        console.error('[AUTH] Missing token or user:', { token: !!token, user: !!user });
-        throw new Error('Invalid response: missing token or user data');
+        throw new Error('Invalid response: missing token or user');
       }
 
       // Store in localStorage
       localStorage.setItem('auth_token', token);
       localStorage.setItem('user', JSON.stringify(user));
-
-      console.log('[AUTH] Login successful:', { userId: user.id, role: user.role });
 
       set({
         token,
@@ -67,18 +59,8 @@ export const useAuthStore = create((set, get) => ({
 
       return { success: true, user };
     } catch (error) {
-      console.error('[AUTH] Login error:', {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-        url: error.config?.url,
-        method: error.config?.method,
-      });
-
       const errorMessage =
         error.response?.data?.message ||
-        error.response?.data?.error ||
         error.message ||
         'Login failed. Please try again.';
 

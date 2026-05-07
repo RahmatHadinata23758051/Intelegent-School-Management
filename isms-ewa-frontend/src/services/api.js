@@ -39,12 +39,12 @@ api.interceptors.response.use(
       message: error.message,
     });
 
-    // Handle 401 - Unauthorized
-    if (error.response?.status === 401) {
+    // Handle 401 - Unauthorized (but not for login endpoint)
+    if (error.response?.status === 401 && error.config?.url !== '/auth/login') {
       console.warn('[API] Unauthorized (401) - clearing auth');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Don't redirect here, let the app handle it
     }
 
     // Handle 403 - Forbidden

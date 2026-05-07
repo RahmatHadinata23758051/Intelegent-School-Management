@@ -14,12 +14,33 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Admin user
         User::firstOrCreate(
             ['email' => 'admin@isms-ewa.local'],
             [
                 'name' => 'Admin ISMS-EWA',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
+            ]
+        );
+
+        // Teacher user
+        User::firstOrCreate(
+            ['email' => 'teacher@isms-ewa.local'],
+            [
+                'name' => 'Teacher ISMS-EWA',
+                'password' => Hash::make('password'),
+                'role' => 'teacher',
+            ]
+        );
+
+        // Homeroom teacher user
+        User::firstOrCreate(
+            ['email' => 'homeroom@isms-ewa.local'],
+            [
+                'name' => 'Homeroom Teacher ISMS-EWA',
+                'password' => Hash::make('password'),
+                'role' => 'homeroom',
             ]
         );
     }
