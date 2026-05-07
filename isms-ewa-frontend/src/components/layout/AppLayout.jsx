@@ -6,6 +6,7 @@ import {
   Users,
   AlertTriangle,
   BookOpen,
+  Calendar,
   LogOut,
   Menu,
   X,
@@ -30,6 +31,8 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
     { id: 'dashboard', icon: BarChart3, label: 'Dashboard', route: ROUTES.DASHBOARD },
     { id: 'students', icon: Users, label: 'Students', route: ROUTES.STUDENTS },
     { id: 'classes', icon: BookOpen, label: 'Classes', route: ROUTES.CLASSES },
+    { id: 'academic-years', icon: Calendar, label: 'Tahun Ajaran', route: ROUTES.ACADEMIC_YEARS },
+    { id: 'semesters', icon: BookOpen, label: 'Semester', route: ROUTES.SEMESTERS },
     { id: 'risk', icon: AlertTriangle, label: 'Risk Monitoring', route: null, disabled: true },
   ];
 
@@ -39,6 +42,8 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
     classes: 'Classes',
     'student-detail': 'Student Details',
     'class-detail': 'Class Details',
+    'academic-years': 'Tahun Ajaran',
+    'semesters': 'Semester',
   };
 
   return (

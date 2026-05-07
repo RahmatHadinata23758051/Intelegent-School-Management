@@ -17,6 +17,10 @@ export const ROUTES = {
   // Classes
   CLASSES: '/classes',
   CLASS_DETAIL: '/classes/:id',
+  
+  // Academic
+  ACADEMIC_YEARS: '/academic-years',
+  SEMESTERS: '/semesters',
 };
 
 /**
