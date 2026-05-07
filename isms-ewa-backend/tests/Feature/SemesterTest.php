@@ -68,12 +68,13 @@ class SemesterTest extends TestCase
      */
     public function test_admin_can_list_semesters()
     {
-        Semester::factory()->count(3)->create(['academic_year_id' => $this->academicYear->id]);
+        Semester::factory()->semesterOne()->create(['academic_year_id' => $this->academicYear->id]);
+        Semester::factory()->semesterTwo()->create(['academic_year_id' => $this->academicYear->id]);
 
         $response = $this->actingAs($this->admin)->getJson('/api/semesters');
 
         $response->assertStatus(200);
-        $response->assertJsonCount(3, 'data');
+        $response->assertJsonCount(2, 'data');
     }
 
     /**
@@ -81,7 +82,8 @@ class SemesterTest extends TestCase
      */
     public function test_teacher_can_list_semesters()
     {
-        Semester::factory()->count(3)->create(['academic_year_id' => $this->academicYear->id]);
+        Semester::factory()->semesterOne()->create(['academic_year_id' => $this->academicYear->id]);
+        Semester::factory()->semesterTwo()->create(['academic_year_id' => $this->academicYear->id]);
 
         $response = $this->actingAs($this->teacher)->getJson('/api/semesters');
 
@@ -224,11 +226,11 @@ class SemesterTest extends TestCase
      */
     public function test_get_active_semester()
     {
-        $activeSemester = Semester::factory()->create([
+        $activeSemester = Semester::factory()->semesterOne()->create([
             'academic_year_id' => $this->academicYear->id,
             'is_active' => true,
         ]);
-        Semester::factory()->create([
+        Semester::factory()->semesterTwo()->create([
             'academic_year_id' => $this->academicYear->id,
             'is_active' => false,
         ]);
@@ -259,7 +261,8 @@ class SemesterTest extends TestCase
      */
     public function test_get_semesters_by_academic_year()
     {
-        Semester::factory()->count(2)->create(['academic_year_id' => $this->academicYear->id]);
+        Semester::factory()->semesterOne()->create(['academic_year_id' => $this->academicYear->id]);
+        Semester::factory()->semesterTwo()->create(['academic_year_id' => $this->academicYear->id]);
         $otherYear = AcademicYear::factory()->create();
         Semester::factory()->create(['academic_year_id' => $otherYear->id]);
 

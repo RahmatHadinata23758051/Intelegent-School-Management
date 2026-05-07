@@ -108,6 +108,7 @@ class AcademicYearController extends Controller
         if (!$this->academicPeriodService->canDeleteAcademicYear($academicYear)) {
             return $this->errorResponse(
                 'Tidak bisa menghapus tahun ajaran yang sedang aktif.',
+                null,
                 422
             );
         }
@@ -145,6 +146,7 @@ class AcademicYearController extends Controller
         if (!$academicYear) {
             return $this->errorResponse(
                 'Tidak ada tahun ajaran yang aktif.',
+                null,
                 404
             );
         }

@@ -32,15 +32,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
 
     // Academic Years CRUD
+    Route::get('academic-years/active/current', [AcademicYearController::class, 'getActive']);
     Route::apiResource('academic-years', AcademicYearController::class);
     Route::post('academic-years/{academic_year}/activate', [AcademicYearController::class, 'activate']);
-    Route::get('academic-years/active/current', [AcademicYearController::class, 'getActive']);
 
     // Semesters CRUD
-    Route::apiResource('semesters', SemesterController::class);
-    Route::post('semesters/{semester}/activate', [SemesterController::class, 'activate']);
     Route::get('semesters/active/current', [SemesterController::class, 'getActive']);
     Route::get('semesters/by-academic-year', [SemesterController::class, 'getByAcademicYear']);
+    Route::apiResource('semesters', SemesterController::class);
+    Route::post('semesters/{semester}/activate', [SemesterController::class, 'activate']);
 
     // School Classes CRUD
     Route::apiResource('school-classes', SchoolClassController::class);

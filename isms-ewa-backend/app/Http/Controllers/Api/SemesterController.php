@@ -107,6 +107,7 @@ class SemesterController extends Controller
         if (!$this->academicPeriodService->canDeleteSemester($semester)) {
             return $this->errorResponse(
                 'Tidak bisa menghapus semester yang sedang aktif.',
+                null,
                 422
             );
         }
@@ -144,6 +145,7 @@ class SemesterController extends Controller
         if (!$semester) {
             return $this->errorResponse(
                 'Tidak ada semester yang aktif.',
+                null,
                 404
             );
         }

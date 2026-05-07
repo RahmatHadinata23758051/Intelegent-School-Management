@@ -48,10 +48,19 @@ class Handler extends ExceptionHandler
         // Handle validation exceptions
         $this->renderable(function (\Illuminate\Validation\ValidationException $e, $request) {
             if ($request->expectsJson()) {
+                $errors = $e->errors();
+                $firstError = '';
+                
+                // Get the first error message
+                if (!empty($errors)) {
+                    $firstErrorArray = reset($errors);
+                    $firstError = is_array($firstErrorArray) ? reset($firstErrorArray) : $firstErrorArray;
+                }
+                
                 return response()->json([
                     'success' => false,
-                    'message' => 'Validasi gagal.',
-                    'errors' => $e->errors(),
+                    'message' => $firstError ?: 'Validasi gagal.',
+                    'errors' => $errors,
                 ], 422);
             }
         });

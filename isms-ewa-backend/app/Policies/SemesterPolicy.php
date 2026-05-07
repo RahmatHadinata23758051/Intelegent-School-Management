@@ -58,12 +58,7 @@ class SemesterPolicy
     public function delete(User $user, Semester $semester): bool
     {
         // Hanya admin yang bisa delete semester
-        // Tidak bisa delete semester yang sedang active
-        if ($user->role !== UserRole::ADMIN) {
-            return false;
-        }
-
-        return !$semester->is_active;
+        return $user->role === UserRole::ADMIN;
     }
 
     /**

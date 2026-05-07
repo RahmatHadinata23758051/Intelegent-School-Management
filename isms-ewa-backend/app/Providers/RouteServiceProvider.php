@@ -26,6 +26,10 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
 
+        // Explicit route model bindings
+        Route::model('academic_year', \App\Models\AcademicYear::class);
+        Route::model('semester', \App\Models\Semester::class);
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

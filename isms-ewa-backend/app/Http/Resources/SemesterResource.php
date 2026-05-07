@@ -20,7 +20,7 @@ class SemesterResource extends JsonResource
             'semester_number' => $this->semester_number,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
-            'is_active' => $this->is_active,
+            'is_active' => (bool) $this->is_active,
             'academic_year' => new AcademicYearResource($this->whenLoaded('academicYear')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

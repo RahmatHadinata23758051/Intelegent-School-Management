@@ -28,4 +28,28 @@ class SemesterFactory extends Factory
             'is_active' => false,
         ];
     }
+
+    /**
+     * State for semester 1
+     */
+    public function semesterOne()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'semester_number' => 1,
+            ];
+        });
+    }
+
+    /**
+     * State for semester 2
+     */
+    public function semesterTwo()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'semester_number' => 2,
+            ];
+        });
+    }
 }

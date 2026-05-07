@@ -58,12 +58,7 @@ class AcademicYearPolicy
     public function delete(User $user, AcademicYear $academicYear): bool
     {
         // Hanya admin yang bisa delete tahun ajaran
-        // Tidak bisa delete tahun ajaran yang sedang active
-        if ($user->role !== UserRole::ADMIN) {
-            return false;
-        }
-
-        return !$academicYear->is_active;
+        return $user->role === UserRole::ADMIN;
     }
 
     /**
