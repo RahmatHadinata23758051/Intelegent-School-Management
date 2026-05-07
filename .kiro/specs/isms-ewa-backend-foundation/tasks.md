@@ -27,7 +27,7 @@ Rencana implementasi ini membangun fondasi backend Laravel 10 untuk sistem ISMS-
   - Pastikan middleware `auth:sanctum` tersedia untuk digunakan di routes
   - _Requirements: 2.1_
 
-- [~] 3. Buat database migrations untuk semua tabel inti
+- [ ] 3. Buat database migrations untuk semua tabel inti
   - [x] 3.1 Buat migration untuk tabel `users`
     - Modifikasi migration `users` bawaan Laravel (atau buat baru jika belum ada) dengan kolom: `id`, `name`, `string('email')->unique()`, `password`, `string('role', 50)`, `timestamps`
     - _Requirements: 3.1_
@@ -57,7 +57,7 @@ Rencana implementasi ini membangun fondasi backend Laravel 10 untuk sistem ISMS-
     - Verifikasi `php artisan migrate:fresh` juga berjalan tanpa error
     - _Requirements: 3.7, 3.8, 3.9_
 
-- [~] 4. Buat Eloquent Models untuk semua entitas
+- [ ] 4. Buat Eloquent Models untuk semua entitas
   - [x] 4.1 Buat atau modifikasi Model `User`
     - Pastikan `app/Models/User.php` memiliki `$fillable = ['name', 'email', 'password', 'role']`
     - Pastikan `$hidden = ['password', 'remember_token']`
@@ -136,7 +136,7 @@ Rencana implementasi ini membangun fondasi backend Laravel 10 untuk sistem ISMS-
 - [x] 11. Checkpoint — Verifikasi autentikasi end-to-end
   - Pastikan semua tests pass, tanyakan kepada user jika ada pertanyaan.
 
-- [~] 12. Tulis feature tests untuk AuthController
+- [ ] 12. Tulis feature tests untuk AuthController
   - [x] 12.1 Buat `AuthControllerTest` untuk skenario login valid
     - Buat `tests/Feature/AuthControllerTest.php`
     - Test: login dengan email dan password valid mengembalikan HTTP 200 dengan field `token` dan `user`
@@ -182,7 +182,7 @@ Rencana implementasi ini membangun fondasi backend Laravel 10 untuk sistem ISMS-
     - Setiap iterasi: buat user → login → panggil `/me` → verifikasi `id`, `name`, `email`, `role` cocok dengan user yang login, dan field `password` tidak ada dalam respons
     - **Validates: Requirements 2.5, 4.1**
 
-- [~] 13. Tulis tests untuk validasi dan model
+- [ ] 13. Tulis tests untuk validasi dan model
   - [x] 13.1 Buat `LoginRequestTest` untuk validasi input
     - Buat `tests/Feature/LoginRequestTest.php`
     - Test: request dengan email tidak valid (bukan format email) ditolak dengan HTTP 422

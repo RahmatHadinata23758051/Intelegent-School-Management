@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, BookOpen, Users, User } from 'lucide-react';
+import { Plus, BookOpen, Users, User, Edit2, Trash2 } from 'lucide-react';
 import { useClasses } from '../../hooks/useClasses';
 import { useAuth } from '../../hooks/useAuth';
+import { classService } from '../../services/classService';
 import { AppLayout } from '../../components/layout/AppLayout';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
@@ -11,12 +12,31 @@ import { Pagination } from '../../components/common/Pagination';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ErrorState } from '../../components/common/ErrorState';
 import { LoadingScreen } from '../../components/common/LoadingScreen';
+import { Alert } from '../../components/common/Alert';
+import { Modal } from '../../components/common/Modal';
+import { ConfirmDialog } from '../../components/common/ConfirmDialog';
+import { ClassForm } from '../../components/classes/ClassForm';
 import { getClassDetailRoute } from '../../constants/routes';
 
 export const ClassesPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [search, setSearch] = useState('');
+
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [editingClass, setEditingClass] = useState(null);
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState(null);
+
+  // Delete confirmation state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingClass, setDeletingClass] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Feedback state
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const { data: classesData, loading, error, params, updateParams, goToPage, refetch } = useClasses();
 
@@ -30,6 +50,99 @@ export const ClassesPage = () => {
     updateParams({ search: '' });
   };
 
+  /**
+   * Handle add class
+   */
+  const handleAddClass = () => {
+    setEditingClass(null);
+    setFormError(null);
+    setShowModal(true);
+  };
+
+  /**
+   * Handle edit class
+   */
+  const handleEditClass = (cls) => {
+    setEditingClass(cls);
+    setFormError(null);
+    setShowModal(true);
+  };
+
+  /**
+   * Handle form submit (create or update)
+   */
+  const handleSubmitForm = async (formData) => {
+    try {
+      setFormLoading(true);
+      setFormError(null);
+
+      if (editingClass) {
+        // Update
+        await classService.updateClass(editingClass.id, formData);
+        setSuccessMessage('Kelas berhasil diperbarui');
+      } else {
+        // Create
+        await classService.createClass(formData);
+        setSuccessMessage('Kelas berhasil ditambahkan');
+      }
+
+      // Close modal and refresh list
+      setShowModal(false);
+      setEditingClass(null);
+      await refetch();
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      const errorMsg = err.message || 'Terjadi kesalahan saat menyimpan kelas';
+      setFormError(errorMsg);
+      console.error('Form error:', err);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  /**
+   * Handle delete class
+   */
+  const handleDeleteClass = (cls) => {
+    setDeletingClass(cls);
+    setShowDeleteConfirm(true);
+  };
+
+  /**
+   * Handle confirm delete
+   */
+  const handleConfirmDelete = async () => {
+    try {
+      setDeleteLoading(true);
+      await classService.deleteClass(deletingClass.id);
+      setSuccessMessage('Kelas berhasil dihapus');
+      setShowDeleteConfirm(false);
+      setDeletingClass(null);
+      await refetch();
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      const errorMsg = err.message || 'Terjadi kesalahan saat menghapus kelas';
+      setErrorMessage(errorMsg);
+      console.error('Delete error:', err);
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  /**
+   * Handle close modal
+   */
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditingClass(null);
+    setFormError(null);
+  };
+
   const canCreateClass = user?.role === 'admin';
 
   if (loading) {
@@ -38,6 +151,30 @@ export const ClassesPage = () => {
 
   return (
     <AppLayout currentPage="classes">
+      {/* Success Message */}
+      {successMessage && (
+        <div className="mb-6">
+          <Alert
+            type="success"
+            title="Sukses"
+            message={successMessage}
+            onClose={() => setSuccessMessage('')}
+          />
+        </div>
+      )}
+
+      {/* Error Message */}
+      {errorMessage && (
+        <div className="mb-6">
+          <Alert
+            type="error"
+            title="Kesalahan"
+            message={errorMessage}
+            onClose={() => setErrorMessage('')}
+          />
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -45,7 +182,12 @@ export const ClassesPage = () => {
           <p className="text-slate-500 mt-1">Manage school classes and homeroom teachers</p>
         </div>
         {canCreateClass && (
-          <Button variant="primary" size="lg" className="flex items-center gap-2">
+          <Button
+            variant="primary"
+            size="lg"
+            className="flex items-center gap-2"
+            onClick={handleAddClass}
+          >
             <Plus size={20} />
             Add Class
           </Button>
@@ -117,18 +259,44 @@ export const ClassesPage = () => {
                         </div>
                       </div>
 
-                      {/* Action Button */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(getClassDetailRoute(cls.id));
-                        }}
-                      >
-                        View Details
-                      </Button>
+                      {/* Action Buttons */}
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(getClassDetailRoute(cls.id));
+                          }}
+                        >
+                          View Details
+                        </Button>
+                        {canCreateClass && (
+                          <>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditClass(cls);
+                              }}
+                              className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-blue-600"
+                              title="Edit class"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClass(cls);
+                              }}
+                              className="p-2 hover:bg-rose-100 rounded-lg transition-colors text-rose-600"
+                              title="Delete class"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </Card.Body>
                   </Card>
                 ))}
@@ -154,6 +322,34 @@ export const ClassesPage = () => {
           )}
         </>
       )}
+
+      {/* Class Form Modal */}
+      <Modal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        title={editingClass ? 'Edit Class' : 'Add Class'}
+        size="lg"
+      >
+        <ClassForm
+          initialData={editingClass}
+          onSubmit={handleSubmitForm}
+          loading={formLoading}
+          error={formError}
+        />
+      </Modal>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Class"
+        message={`Are you sure you want to delete ${deletingClass?.name}? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        loading={deleteLoading}
+      />
     </AppLayout>
   );
 };
