@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\GradeController;
 use App\Http\Controllers\Api\ViolationController;
 use App\Http\Controllers\Api\RiskScoreController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\AcademicYearController;
+use App\Http\Controllers\Api\SemesterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +30,17 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
+
+    // Academic Years CRUD
+    Route::apiResource('academic-years', AcademicYearController::class);
+    Route::post('academic-years/{academic_year}/activate', [AcademicYearController::class, 'activate']);
+    Route::get('academic-years/active/current', [AcademicYearController::class, 'getActive']);
+
+    // Semesters CRUD
+    Route::apiResource('semesters', SemesterController::class);
+    Route::post('semesters/{semester}/activate', [SemesterController::class, 'activate']);
+    Route::get('semesters/active/current', [SemesterController::class, 'getActive']);
+    Route::get('semesters/by-academic-year', [SemesterController::class, 'getByAcademicYear']);
 
     // School Classes CRUD
     Route::apiResource('school-classes', SchoolClassController::class);
