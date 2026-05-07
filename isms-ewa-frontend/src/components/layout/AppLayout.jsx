@@ -11,6 +11,7 @@ import {
   Menu,
   X,
   ChevronDown,
+  Settings,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../common/Button';
@@ -21,19 +22,48 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
   const { user, logout, isAuthenticated } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    'academic-setup': true,
+    'student-management': false,
+  });
 
   const handleLogout = async () => {
     await logout();
     navigate(ROUTES.LOGIN);
   };
 
+  const toggleSection = (sectionId) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionId]: !prev[sectionId],
+    }));
+  };
+
   const navItems = [
     { id: 'dashboard', icon: BarChart3, label: 'Dashboard', route: ROUTES.DASHBOARD },
-    { id: 'students', icon: Users, label: 'Students', route: ROUTES.STUDENTS },
-    { id: 'classes', icon: BookOpen, label: 'Classes', route: ROUTES.CLASSES },
-    { id: 'academic-years', icon: Calendar, label: 'Tahun Ajaran', route: ROUTES.ACADEMIC_YEARS },
-    { id: 'semesters', icon: BookOpen, label: 'Semester', route: ROUTES.SEMESTERS },
-    { id: 'risk', icon: AlertTriangle, label: 'Risk Monitoring', route: null, disabled: true },
+    { 
+      id: 'academic-setup', 
+      label: 'Academic Setup', 
+      disabled: false, 
+      isSection: true,
+      children: [
+        { id: 'tahun-ajaran', icon: Calendar, label: 'Tahun Ajaran', route: ROUTES.ACADEMIC_YEARS },
+        { id: 'semester', icon: BookOpen, label: 'Semester', route: ROUTES.SEMESTERS },
+      ]
+    },
+    { 
+      id: 'student-management', 
+      label: 'Student Management', 
+      disabled: false, 
+      isSection: true,
+      children: [
+        { id: 'students', icon: Users, label: 'Students', route: ROUTES.STUDENTS },
+        { id: 'classes', icon: BookOpen, label: 'Classes', route: ROUTES.CLASSES },
+      ]
+    },
+    { id: 'staff-directory', icon: Users, label: 'Staff Directory', route: null, disabled: true },
+    { id: 'financials', icon: AlertTriangle, label: 'Financials', route: null, disabled: true },
+    { id: 'system-settings', icon: Settings, label: 'System Settings', route: null, disabled: true },
   ];
 
   const pageTitle = {
@@ -42,7 +72,9 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
     classes: 'Classes',
     'student-detail': 'Student Details',
     'class-detail': 'Class Details',
+    'tahun-ajaran': 'Tahun Ajaran',
     'academic-years': 'Tahun Ajaran',
+    'semester': 'Semester',
     'semesters': 'Semester',
   };
 
@@ -51,7 +83,7 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
       {/* Sidebar */}
       <aside
         className={clsx(
-          'fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-950 to-slate-900 transition-all duration-300 z-40 flex flex-col',
+          'fixed left-0 top-0 h-screen bg-slate-900 transition-all duration-300 z-40 flex flex-col',
           sidebarOpen ? 'w-64' : 'w-20'
         )}
       >
@@ -59,7 +91,7 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
         <div className="h-20 flex items-center justify-between px-4 border-b border-slate-800">
           {sidebarOpen && (
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg">
                 <BarChart3 size={24} className="text-white" />
               </div>
               <div>
@@ -77,28 +109,79 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-2 overflow-y-auto">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => item.route && navigate(item.route)}
-              disabled={item.disabled}
-              className={clsx(
-                'sidebar-nav-item w-full justify-start',
-                currentPage === item.id && 'active',
-                item.disabled && 'opacity-50 cursor-not-allowed'
-              )}
-            >
-              <item.icon size={20} />
-              {sidebarOpen && <span>{item.label}</span>}
-            </button>
-          ))}
+        <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+          {navItems.map((item) => {
+            if (item.isSection && item.children) {
+              const isExpanded = expandedSections[item.id];
+              return (
+                <div key={item.id}>
+                  <button
+                    onClick={() => toggleSection(item.id)}
+                    disabled={item.disabled}
+                    className={clsx(
+                      'w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-colors text-sm font-medium',
+                      item.disabled
+                        ? 'opacity-50 cursor-not-allowed text-slate-500'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    )}
+                  >
+                    <span>{item.label}</span>
+                    <ChevronDown
+                      size={16}
+                      className={clsx(
+                        'transition-transform',
+                        isExpanded ? 'rotate-180' : ''
+                      )}
+                    />
+                  </button>
+                  {isExpanded && (
+                    <div className="ml-2 mt-1 space-y-1 border-l border-slate-700 pl-3">
+                      {item.children.map((child) => (
+                        <button
+                          key={child.id}
+                          onClick={() => child.route && navigate(child.route)}
+                          className={clsx(
+                            'w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm',
+                            currentPage === child.id || currentPage === child.route?.split('/')[2]
+                              ? 'bg-blue-600 text-white'
+                              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                          )}
+                        >
+                          <child.icon size={18} />
+                          <span>{child.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => item.route && navigate(item.route)}
+                disabled={item.disabled}
+                className={clsx(
+                  'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium',
+                  currentPage === item.id
+                    ? 'bg-blue-600 text-white'
+                    : item.disabled
+                    ? 'opacity-50 cursor-not-allowed text-slate-500'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                )}
+              >
+                <item.icon size={20} />
+                {sidebarOpen && <span>{item.label}</span>}
+              </button>
+            );
+          })}
         </nav>
 
         {/* User Profile Section */}
         <div className="p-4 border-t border-slate-800 space-y-3">
           {sidebarOpen && (
-            <div className="p-3 bg-slate-800/50 rounded-lg">
+            <div className="p-3 bg-slate-800 rounded-lg">
               <p className="text-xs font-medium text-slate-400">Logged in as</p>
               <p className="text-sm font-semibold text-white truncate mt-1">{user?.name}</p>
               <p className="text-xs text-slate-400 capitalize mt-1">{user?.role}</p>
@@ -134,7 +217,7 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
                   <p className="text-sm font-medium text-slate-900">{user?.name}</p>
                   <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
                 </div>
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
                 <ChevronDown size={16} className="text-slate-400" />
