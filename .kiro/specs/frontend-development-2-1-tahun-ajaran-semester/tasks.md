@@ -99,8 +99,8 @@
 - [x] 11.1 Run npm run build untuk verify frontend build
 - [x] 11.2 Check untuk console errors dan warnings
 - [x] 11.3 Update development-2-1-tahun-ajaran-semester.md dengan frontend implementation details
-- [ ] 11.4 Create git commit dengan message: "feat: implement frontend Development 2.1"
-- [ ] 11.5 Push ke main branch
+- [x] 11.4 Create git commit dengan message: "feat: implement frontend Development 2.1"
+- [x] 11.5 Push ke main branch
 
 ---
 

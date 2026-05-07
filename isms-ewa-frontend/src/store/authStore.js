@@ -50,7 +50,6 @@ export const useAuthStore = create((set, get) => ({
         error.response?.data?.message ||
         error.message ||
         'Login failed. Please try again.';
-        'Login failed. Please try again.';
 
       set({
         isLoading: false,
