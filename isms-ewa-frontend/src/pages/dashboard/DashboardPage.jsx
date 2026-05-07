@@ -7,6 +7,11 @@ import {
   BookOpen,
   TrendingUp,
   ArrowRight,
+  Calendar,
+  Download,
+  ChevronDown,
+  ChevronRight,
+  FileText,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useDashboardStats } from '../../hooks/useDashboardStats';
@@ -18,6 +23,7 @@ import { LoadingScreen } from '../../components/common/LoadingScreen';
 import { ErrorState } from '../../components/common/ErrorState';
 import { IconBadge } from '../../components/common/IconBadge';
 import { RiskBadge } from '../../components/common/RiskBadge';
+import { KpiCard, StatusPill, SelectControl } from '../../components/design-system';
 import { ROUTES } from '../../constants/routes';
 
 export const DashboardPage = () => {
@@ -39,217 +45,207 @@ export const DashboardPage = () => {
 
   return (
     <AppLayout currentPage="dashboard">
-      {/* Hero Section */}
-      <div className="mb-8 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl p-8 text-white shadow-lg">
-        <h2 className="text-3xl font-bold mb-2">Welcome to ISMS-EWA</h2>
-        <p className="text-blue-100">Monitor student performance and risk levels in real-time</p>
+      {/* Top Controls - Academic Year & Export */}
+      <div className="mb-6 flex justify-end gap-3">
+        <button className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-[#FAFBFD] px-4 text-[14px] font-medium text-slate-700 transition hover:bg-slate-50">
+          <Calendar size={17} />
+          Tahun Ajaran 2024/2025
+          <ChevronDown size={16} />
+        </button>
+        <button className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-[#FAFBFD] px-4 text-[14px] font-medium text-slate-700 transition hover:bg-slate-50">
+          <Download size={17} />
+          Export Laporan
+        </button>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard
-          title="Total Students"
-          value={statistics?.total_students || 0}
-          description="Active students in system"
+      {/* KPI Cards Grid - 4 columns */}
+      <div className="mb-4 grid grid-cols-4 gap-4">
+        <KpiCard
           icon={Users}
-          color="blue"
+          title="Total Siswa"
+          meta="Aktif"
+          value={statistics?.total_students || '0'}
+          change="▲ 5,2% dari bulan lalu"
+          tone="blue"
         />
-        <StatCard
-          title="Total Classes"
-          value={statistics?.total_classes || 0}
-          description="Classes with students"
+        <KpiCard
           icon={BookOpen}
-          color="indigo"
+          title="Total Kelas"
+          meta="Aktif"
+          value={statistics?.total_classes || '0'}
+          change="▲ 2 kelas dari bulan lalu"
+          tone="purple"
         />
-        <StatCard
-          title="Total Grades"
-          value={statistics?.total_grades || 0}
-          description="Recorded grades"
+        <KpiCard
           icon={TrendingUp}
-          color="emerald"
+          title="Total Nilai"
+          meta="Tercatat"
+          value={statistics?.total_grades || '0'}
+          change="▲ 8,7% dari bulan lalu"
+          tone="green"
         />
-        <StatCard
-          title="Total Violations"
-          value={statistics?.total_violations || 0}
-          description="Recorded violations"
+        <KpiCard
           icon={AlertTriangle}
-          color="rose"
+          title="Total Pelanggaran"
+          meta="Tercatat"
+          value={statistics?.total_violations || '0'}
+          change="▲ 12 dari bulan lalu"
+          tone="rose"
         />
       </div>
 
-      {/* Risk Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <Card.Body className="text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-emerald-100 rounded-xl mb-4">
-              <Users size={28} className="text-emerald-600" />
+      {/* Risk Distribution & Student Attention - 2 column grid */}
+      <div className="mt-4 grid grid-cols-2 gap-4">
+        {/* Risk Distribution */}
+        <Card className="overflow-hidden">
+          <div className="flex items-start justify-between p-6">
+            <div>
+              <h2 className="text-[16px] font-medium leading-6 text-slate-950">Distribusi Risiko</h2>
+              <p className="mt-1 text-[13px] leading-5 text-slate-500">Ringkasan tingkat risiko siswa saat ini.</p>
             </div>
-            <p className="text-sm font-medium text-slate-600 mb-1">Safe Students</p>
-            <p className="text-3xl font-bold text-emerald-600">{statistics?.risk_distribution?.safe || 0}</p>
-          </Card.Body>
+            <button className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 px-3 text-[13px] font-medium text-slate-600 transition hover:bg-slate-50">
+              Semua Kelas
+              <ChevronDown size={15} />
+            </button>
+          </div>
+          <div className="px-6 pb-6">
+            {/* Risk Bar */}
+            <div className="flex h-3 overflow-hidden rounded-full bg-slate-100">
+              <div className="bg-emerald-500" style={{ width: '61%' }} />
+              <div className="bg-amber-400" style={{ width: '25%' }} />
+              <div className="bg-rose-500" style={{ width: '10%' }} />
+              <div className="bg-red-700" style={{ width: '4%' }} />
+            </div>
+
+            {/* Risk Legend */}
+            <div className="mt-6 grid grid-cols-4 divide-x divide-slate-200">
+              {[
+                { label: 'Aman', value: statistics?.risk_distribution?.safe || 0, dot: 'bg-emerald-500' },
+                { label: 'Waspada', value: statistics?.risk_distribution?.warning || 0, dot: 'bg-amber-400' },
+                { label: 'Risiko Tinggi', value: statistics?.risk_distribution?.high_risk || 0, dot: 'bg-rose-500' },
+                { label: 'Kritis', value: 44, dot: 'bg-red-700' },
+              ].map((item) => (
+                <div key={item.label} className="px-5 first:pl-0">
+                  <div className="flex items-center gap-2 text-[13px] font-medium text-slate-700">
+                    <span className={clsx('h-2.5 w-2.5 rounded-full', item.dot)} />
+                    {item.label}
+                  </div>
+                  <div className="mt-4 text-[24px] font-medium leading-7 tracking-[-0.02em] text-slate-950">
+                    {item.value}
+                  </div>
+                  <div className="mt-1 text-[13px] leading-5 text-slate-500">
+                    {((item.value / (statistics?.total_students || 1)) * 100).toFixed(0)}%
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex h-14 items-center justify-between border-t border-slate-200 px-6 text-[14px] font-medium text-blue-600 transition hover:bg-slate-50 cursor-pointer">
+            Lihat analitik risiko secara lengkap
+            <ChevronRight size={17} />
+          </div>
         </Card>
-        <Card>
-          <Card.Body className="text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-amber-100 rounded-xl mb-4">
-              <AlertTriangle size={28} className="text-amber-600" />
-            </div>
-            <p className="text-sm font-medium text-slate-600 mb-1">Warning Students</p>
-            <p className="text-3xl font-bold text-amber-600">{statistics?.risk_distribution?.warning || 0}</p>
-          </Card.Body>
-        </Card>
-        <Card>
-          <Card.Body className="text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-rose-100 rounded-xl mb-4">
-              <AlertTriangle size={28} className="text-rose-600" />
-            </div>
-            <p className="text-sm font-medium text-slate-600 mb-1">High Risk Students</p>
-            <p className="text-3xl font-bold text-rose-600">{statistics?.risk_distribution?.high_risk || 0}</p>
-          </Card.Body>
+
+        {/* Students Needing Attention */}
+        <Card className="p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-[16px] font-medium leading-6 text-slate-950">Siswa yang Perlu Perhatian</h2>
+            <button className="text-[13px] font-medium text-blue-600 transition hover:text-blue-700">
+              Lihat Semua
+            </button>
+          </div>
+          <div className="divide-y divide-slate-200">
+            {statistics?.high_risk_students && statistics.high_risk_students.length > 0 ? (
+              statistics.high_risk_students.slice(0, 4).map((student) => (
+                <div key={student.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+                  <div className={clsx(
+                    'grid h-10 w-10 place-items-center rounded-full text-[13px] font-medium',
+                    student.risk_score?.total_score > 70 ? 'bg-rose-50 text-rose-600' :
+                    student.risk_score?.total_score > 50 ? 'bg-orange-50 text-orange-600' :
+                    'bg-amber-50 text-amber-700'
+                  )}>
+                    {student.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[14px] font-medium leading-5 text-slate-950">{student.name}</div>
+                    <div className="text-[13px] leading-5 text-slate-500">{student.class_name || 'Kelas'}</div>
+                  </div>
+                  <StatusPill status={student.risk_score?.total_score > 70 ? 'Kritis' : 'Risiko Tinggi'} />
+                  <div className="w-20 text-[13px] leading-5 text-slate-500">
+                    Pelanggaran
+                    <div className="font-medium text-slate-800">{student.violations_count || 0}</div>
+                  </div>
+                  <ChevronRight size={17} className="text-slate-400" />
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-slate-500 font-medium">Tidak ada siswa berisiko tinggi</p>
+              </div>
+            )}
+          </div>
         </Card>
       </div>
 
-      {/* Risk Distribution */}
-      <Card className="mb-8">
-        <Card.Header>
-          <div className="flex items-center gap-3">
-            <IconBadge icon={AlertTriangle} color="amber" />
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900">Risk Distribution</h3>
-              <p className="text-sm text-slate-500">Student risk level breakdown</p>
-            </div>
+      {/* Activity & Quick Actions - 2 column grid */}
+      <div className="mt-4 grid grid-cols-2 gap-4">
+        {/* Recent Activity */}
+        <Card className="overflow-hidden">
+          <div className="p-6 pb-2">
+            <h2 className="text-[16px] font-medium leading-6 text-slate-950">Aktivitas Terbaru</h2>
           </div>
-        </Card.Header>
-        <Card.Body>
-          <div className="space-y-6">
-            {[
-              { label: 'Safe', value: statistics?.risk_distribution?.safe || 0, color: 'emerald' },
-              { label: 'Warning', value: statistics?.risk_distribution?.warning || 0, color: 'amber' },
-              { label: 'High Risk', value: statistics?.risk_distribution?.high_risk || 0, color: 'rose' },
-            ].map((item, idx) => (
-              <div key={idx}>
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-sm font-semibold text-slate-700">{item.label}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={clsx(
-                      'text-lg font-bold',
-                      item.color === 'emerald' && 'text-emerald-600',
-                      item.color === 'amber' && 'text-amber-600',
-                      item.color === 'rose' && 'text-rose-600'
-                    )}>
-                      {item.value}
-                    </span>
-                    <span className="text-xs text-slate-500">
-                      ({((item.value / (statistics?.total_students || 1)) * 100).toFixed(1)}%)
-                    </span>
+          <div className="px-6 pb-4">
+            {statistics?.recent_violations && statistics.recent_violations.length > 0 ? (
+              statistics.recent_violations.slice(0, 4).map((activity) => (
+                <div key={activity.id} className="flex items-center gap-4 border-b border-dashed border-slate-200 py-3 last:border-0">
+                  <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-100 text-blue-600">
+                    <AlertTriangle size={16} />
                   </div>
-                </div>
-                <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
-                  <div
-                    className={clsx(
-                      'h-full rounded-full transition-all duration-500',
-                      item.color === 'emerald' && 'bg-emerald-500',
-                      item.color === 'amber' && 'bg-amber-500',
-                      item.color === 'rose' && 'bg-rose-500'
-                    )}
-                    style={{
-                      width: `${(item.value / (statistics?.total_students || 1)) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card.Body>
-      </Card>
-
-      {/* High Risk Students & Recent Violations */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* High Risk Students */}
-        <Card>
-          <Card.Header>
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-900">High Risk Students</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate(ROUTES.STUDENTS)}
-                className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
-              >
-                View All <ArrowRight size={16} />
-              </Button>
-            </div>
-          </Card.Header>
-          <Card.Body>
-            {statistics?.high_risk_students && statistics.high_risk_students.length > 0 ? (
-              <div className="space-y-3">
-                {statistics.high_risk_students.slice(0, 5).map((student) => (
-                  <div
-                    key={student.id}
-                    className="flex items-center justify-between p-4 bg-rose-50 rounded-lg hover:bg-rose-100 transition-colors cursor-pointer border border-rose-200"
-                    onClick={() => navigate(`/students/${student.id}`)}
-                  >
-                    <div className="flex-1">
-                      <p className="font-semibold text-slate-900">{student.name}</p>
-                      <p className="text-xs text-slate-500">{student.student_id}</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium leading-5 text-slate-900">
+                      Pelanggaran baru dicatat untuk {activity.student?.name}
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-rose-600">{parseFloat(student.risk_score?.total_score || 0).toFixed(2)}</p>
-                      <RiskBadge level="high_risk" />
-                    </div>
+                    <div className="text-[12px] leading-5 text-slate-500">{activity.student?.class_name}</div>
                   </div>
-                ))}
-              </div>
+                  <div className="text-[12px] text-slate-500">Baru saja</div>
+                </div>
+              ))
             ) : (
-              <div className="text-center py-8">
-                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Users size={24} className="text-emerald-600" />
-                </div>
-                <p className="text-slate-500 font-medium">No high risk students</p>
-                <p className="text-xs text-slate-400 mt-1">All students are performing well</p>
+              <div className="text-center py-4">
+                <p className="text-slate-500 text-sm">Tidak ada aktivitas terbaru</p>
               </div>
             )}
-          </Card.Body>
+          </div>
+          <div className="flex h-12 items-center justify-end gap-2 border-t border-slate-200 px-6 text-[13px] font-medium text-blue-600 transition hover:bg-slate-50 cursor-pointer">
+            Lihat semua aktivitas
+            <ChevronRight size={16} />
+          </div>
         </Card>
 
-        {/* Recent Violations */}
-        <Card>
-          <Card.Header>
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-900">Recent Violations</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate(ROUTES.STUDENTS)}
-                className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
-              >
-                View All <ArrowRight size={16} />
-              </Button>
-            </div>
-          </Card.Header>
-          <Card.Body>
-            {statistics?.recent_violations && statistics.recent_violations.length > 0 ? (
-              <div className="space-y-3">
-                {statistics.recent_violations.slice(0, 5).map((violation) => (
-                  <div key={violation.id} className="flex items-start justify-between p-4 bg-slate-50 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors">
-                    <div className="flex-1">
-                      <p className="font-semibold text-slate-900">{violation.student?.name || 'Student'}</p>
-                      <p className="text-sm text-slate-600 mt-1">{violation.description || 'Violation'}</p>
-                      <p className="text-xs text-slate-400 mt-2">{violation.created_at || 'Date'}</p>
-                    </div>
-                    <AlertTriangle size={20} className="text-rose-500 flex-shrink-0 ml-3" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <AlertTriangle size={24} className="text-emerald-600" />
-                </div>
-                <p className="text-slate-500 font-medium">No recent violations</p>
-                <p className="text-xs text-slate-400 mt-1">Great behavior from all students</p>
-              </div>
-            )}
-          </Card.Body>
+        {/* Quick Actions */}
+        <Card className="p-6">
+          <h2 className="text-[16px] font-medium leading-6 text-slate-950">Aksi Cepat</h2>
+          <div className="mt-6 grid grid-cols-3 gap-4">
+            {[
+              { icon: Users, label: 'Tambah Siswa', tone: 'text-blue-600' },
+              { icon: AlertTriangle, label: 'Catat Pelanggaran', tone: 'text-rose-600' },
+              { icon: BookOpen, label: 'Input Nilai', tone: 'text-emerald-600' },
+              { icon: Users, label: 'Buat Kelas', tone: 'text-violet-600' },
+              { icon: Calendar, label: 'Tambah Semester', tone: 'text-blue-600' },
+              { icon: TrendingUp, label: 'Laporan Risiko', tone: 'text-orange-600' },
+            ].map((action) => {
+              const Icon = action.icon;
+              return (
+                <button
+                  key={action.label}
+                  className="flex h-20 items-center gap-4 rounded-lg border border-slate-200 bg-[#FAFBFD] px-5 text-left text-[14px] font-medium text-slate-700 transition hover:bg-slate-50"
+                >
+                  <Icon size={25} className={action.tone} strokeWidth={2} />
+                  {action.label}
+                </button>
+              );
+            })}
+          </div>
         </Card>
       </div>
 
