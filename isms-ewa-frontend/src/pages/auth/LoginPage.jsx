@@ -11,19 +11,27 @@ export const LoginPage = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
+      console.log('[LOGIN PAGE] Already authenticated, redirecting to dashboard');
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
 
   const handleSubmit = async (formData) => {
     try {
+      console.log('[LOGIN PAGE] Form submitted:', { email: formData.email });
       const result = await login(formData.email, formData.password);
+      
+      console.log('[LOGIN PAGE] Login result:', { success: result.success });
+      
       if (result.success) {
+        console.log('[LOGIN PAGE] Login successful, redirecting to dashboard');
         // Navigate after successful login
         navigate('/dashboard', { replace: true });
+      } else {
+        console.error('[LOGIN PAGE] Login failed:', result.error);
       }
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('[LOGIN PAGE] Unexpected error:', err);
     }
   };
 

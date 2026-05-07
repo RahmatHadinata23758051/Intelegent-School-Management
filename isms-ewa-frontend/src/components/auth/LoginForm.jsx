@@ -53,6 +53,7 @@ export const LoginForm = ({ onSubmit, loading = false, error = null }) => {
       return;
     }
 
+    console.log('[LOGIN] Submitting form:', { email: formData.email });
     onSubmit(formData);
   };
 

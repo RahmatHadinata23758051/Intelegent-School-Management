@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuthStore } from '../store/authStore';
 
 export const useAuth = () => {
@@ -17,9 +17,14 @@ export const useAuth = () => {
     hasAnyRole,
   } = useAuthStore();
 
-  // Initialize auth on mount
+  const initRef = useRef(false);
+
+  // Initialize auth on mount only (not on every render)
   useEffect(() => {
-    initializeAuth();
+    if (!initRef.current) {
+      initRef.current = true;
+      initializeAuth();
+    }
   }, [initializeAuth]);
 
   return {

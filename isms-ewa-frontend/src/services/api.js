@@ -29,8 +29,19 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Log all errors for debugging
+    console.error('[API] Response error:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      url: error.config?.url,
+      method: error.config?.method,
+      message: error.message,
+    });
+
     // Handle 401 - Unauthorized
     if (error.response?.status === 401) {
+      console.warn('[API] Unauthorized (401) - clearing auth');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       window.location.href = '/login';
@@ -38,7 +49,12 @@ api.interceptors.response.use(
 
     // Handle 403 - Forbidden
     if (error.response?.status === 403) {
-      console.error('Access denied:', error.response.data);
+      console.error('[API] Forbidden (403):', error.response.data);
+    }
+
+    // Handle 500 - Server Error
+    if (error.response?.status >= 500) {
+      console.error('[API] Server error (5xx):', error.response.data);
     }
 
     return Promise.reject(error);
