@@ -25,14 +25,14 @@ class TeacherProfileSearchFilterTest extends TestCase
         $admin = User::where('role', 'admin')->first();
 
         $response = $this->actingAs($admin)
-            ->getJson('/api/teachers?search=Budi');
+            ->getJson('/api/teachers?search=Guru');
 
         $response->assertStatus(200)
             ->assertJson(['success' => true]);
 
         $data = $response->json('data');
         $this->assertTrue(count($data) > 0);
-        $this->assertStringContainsString('Budi', $data[0]['user']['name']);
+        $this->assertStringContainsString('Guru', $data[0]['user']['name']);
     }
 
     /**
