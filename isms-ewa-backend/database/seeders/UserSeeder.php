@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Admin user
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'admin@isms-ewa.local'],
             [
                 'name' => 'Admin ISMS-EWA',
@@ -25,22 +25,32 @@ class UserSeeder extends Seeder
         );
 
         // Teacher user
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'teacher@isms-ewa.local'],
             [
-                'name' => 'Teacher ISMS-EWA',
+                'name' => 'Budi Santoso',
                 'password' => Hash::make('password'),
                 'role' => 'teacher',
             ]
         );
 
-        // Homeroom teacher user
-        User::firstOrCreate(
+        // Homeroom teacher user 1
+        User::updateOrCreate(
             ['email' => 'homeroom@isms-ewa.local'],
             [
-                'name' => 'Homeroom Teacher ISMS-EWA',
+                'name' => 'Siti Nurhaliza',
                 'password' => Hash::make('password'),
-                'role' => 'homeroom',
+                'role' => 'homeroom_teacher',
+            ]
+        );
+
+        // Homeroom teacher user 2
+        User::updateOrCreate(
+            ['email' => 'homeroom2@isms-ewa.local'],
+            [
+                'name' => 'Ahmad Wijaya',
+                'password' => Hash::make('password'),
+                'role' => 'homeroom_teacher',
             ]
         );
     }

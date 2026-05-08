@@ -29,6 +29,7 @@ class RouteServiceProvider extends ServiceProvider
         // Explicit route model bindings
         Route::model('academic_year', \App\Models\AcademicYear::class);
         Route::model('semester', \App\Models\Semester::class);
+        Route::model('teacher', \App\Models\TeacherProfile::class);
 
         $this->routes(function () {
             Route::middleware('api')
