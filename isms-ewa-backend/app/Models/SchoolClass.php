@@ -32,4 +32,23 @@ class SchoolClass extends Model
     {
         return $this->hasMany(Student::class, 'school_class_id');
     }
+
+    /**
+     * Relasi: Mata pelajaran dalam kelas
+     */
+    public function classSubjects()
+    {
+        return $this->hasMany(ClassSubject::class, 'school_class_id');
+    }
+
+    /**
+     * Relasi: Mata pelajaran melalui class_subjects
+     */
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'class_subjects', 'school_class_id', 'subject_id')
+            ->withTimestamps()
+            ->withPivot('is_active')
+            ->wherePivot('deleted_at', null);
+    }
 }

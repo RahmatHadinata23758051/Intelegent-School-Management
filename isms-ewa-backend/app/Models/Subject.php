@@ -51,4 +51,18 @@ class Subject extends Model
                 ->orWhere('description', 'like', "%{$search}%");
         });
     }
+
+    // Relationships
+    public function classSubjects()
+    {
+        return $this->hasMany(ClassSubject::class, 'subject_id');
+    }
+
+    public function schoolClasses()
+    {
+        return $this->belongsToMany(SchoolClass::class, 'class_subjects', 'subject_id', 'school_class_id')
+            ->withTimestamps()
+            ->withPivot('is_active')
+            ->wherePivot('deleted_at', null);
+    }
 }
