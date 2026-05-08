@@ -58,4 +58,36 @@ class User extends Authenticatable
     {
         return $this->hasMany(Violation::class, 'reported_by');
     }
+
+    /**
+     * Relasi: Profil guru
+     */
+    public function teacherProfile()
+    {
+        return $this->hasOne(TeacherProfile::class);
+    }
+
+    /**
+     * Helper: Cek apakah user adalah guru
+     */
+    public function isTeacher()
+    {
+        return $this->role === 'teacher';
+    }
+
+    /**
+     * Helper: Cek apakah user adalah wali kelas
+     */
+    public function isHomeroomTeacher()
+    {
+        return $this->role === 'homeroom_teacher';
+    }
+
+    /**
+     * Helper: Cek apakah user bisa punya teacher profile
+     */
+    public function canHaveTeacherProfile()
+    {
+        return $this->isTeacher() || $this->isHomeroomTeacher();
+    }
 }
