@@ -10,6 +10,7 @@ import { AcademicYearsPage } from './pages/academic/AcademicYearsPage';
 import { SemestersPage } from './pages/academic/SemestersPage';
 import { TeachersPage } from './pages/teachers/TeachersPage';
 import { SubjectsPage } from './pages/subjects/SubjectsPage';
+import { ClassSubjectsPage } from './pages/class-subjects/ClassSubjectsPage';
 import { LoadingScreen } from './components/common/LoadingScreen';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ROUTES } from './constants/routes';
@@ -119,6 +120,16 @@ function App() {
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
                 <SubjectsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Class Subjects Routes - Protected */}
+          <Route
+            path="/class-subjects"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+                <ClassSubjectsPage />
               </ProtectedRoute>
             }
           />

@@ -60,6 +60,7 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
       children: [
         { id: 'tahun-ajaran', icon: Calendar, label: 'Tahun Ajaran', route: ROUTES.ACADEMIC_YEARS },
         { id: 'semester', icon: BookOpen, label: 'Semester', route: ROUTES.SEMESTERS },
+        { id: 'class-subjects', icon: BookOpen, label: 'Assignment Mapel Kelas', route: '/class-subjects' },
       ]
     },
     { 
