@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\RiskScoreController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\SemesterController;
+use App\Http\Controllers\Api\TeacherProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('semesters/by-academic-year', [SemesterController::class, 'getByAcademicYear']);
     Route::apiResource('semesters', SemesterController::class);
     Route::post('semesters/{semester}/activate', [SemesterController::class, 'activate']);
+
+    // Teacher Profiles CRUD
+    Route::get('teachers/dropdown', [TeacherProfileController::class, 'dropdown']);
+    Route::get('users/teacher-candidates', [TeacherProfileController::class, 'candidates']);
+    Route::apiResource('teachers', TeacherProfileController::class);
 
     // School Classes CRUD
     Route::apiResource('school-classes', SchoolClassController::class);
