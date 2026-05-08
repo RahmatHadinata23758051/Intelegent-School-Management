@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\SemesterController;
 use App\Http\Controllers\Api\TeacherProfileController;
 use App\Http\Controllers\Api\SubjectController;
+use App\Http\Controllers\Api\ClassSubjectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Subjects CRUD
     Route::get('subjects/dropdown', [SubjectController::class, 'dropdown']);
     Route::apiResource('subjects', SubjectController::class);
+
+    // Class Subjects CRUD
+    Route::apiResource('class-subjects', ClassSubjectController::class);
+    Route::get('classes/{schoolClass}/subjects', [ClassSubjectController::class, 'subjectsByClass']);
+    Route::get('subjects/{subject}/classes', [ClassSubjectController::class, 'classesBySubject']);
+    Route::post('classes/{schoolClass}/subjects/{subject}', [ClassSubjectController::class, 'assignSubject']);
+    Route::delete('classes/{schoolClass}/subjects/{subject}', [ClassSubjectController::class, 'removeSubject']);
 
     // School Classes CRUD
     Route::apiResource('school-classes', SchoolClassController::class);
