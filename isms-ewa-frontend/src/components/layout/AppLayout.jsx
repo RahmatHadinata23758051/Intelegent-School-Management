@@ -70,6 +70,7 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
       children: [
         { id: 'students', icon: Users, label: 'Students', route: ROUTES.STUDENTS },
         { id: 'classes', icon: BookOpen, label: 'Classes', route: ROUTES.CLASSES },
+        { id: 'teachers', icon: Users, label: 'Teachers', route: '/teachers' },
       ]
     },
     { id: 'staff-directory', icon: Users, label: 'Staff Directory', route: null, disabled: true },
@@ -81,6 +82,7 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
     dashboard: 'Dashboard',
     students: 'Students',
     classes: 'Classes',
+    teachers: 'Teachers',
     'student-detail': 'Student Details',
     'class-detail': 'Class Details',
     'tahun-ajaran': 'Tahun Ajaran',

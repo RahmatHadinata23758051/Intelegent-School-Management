@@ -8,6 +8,7 @@ import { ClassesPage } from './pages/classes/ClassesPage';
 import { ClassDetailPage } from './pages/classes/ClassDetailPage';
 import { AcademicYearsPage } from './pages/academic/AcademicYearsPage';
 import { SemestersPage } from './pages/academic/SemestersPage';
+import { TeachersPage } from './pages/teachers/TeachersPage';
 import { LoadingScreen } from './components/common/LoadingScreen';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ROUTES } from './constants/routes';
@@ -97,6 +98,16 @@ function App() {
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
                 <SemestersPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Teachers Routes - Protected */}
+          <Route
+            path="/teachers"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+                <TeachersPage />
               </ProtectedRoute>
             }
           />
