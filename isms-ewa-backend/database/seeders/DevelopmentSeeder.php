@@ -10,7 +10,6 @@ use App\Models\Violation;
 use App\Services\ScoringService;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DevelopmentSeeder extends Seeder
 {
@@ -19,45 +18,11 @@ class DevelopmentSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create admin user
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@isms-ewa.local'],
-            [
-                'name' => 'Admin ISMS-EWA',
-                'password' => Hash::make('password'),
-                'role' => 'admin',
-            ]
-        );
-
-        // Create teacher user
-        $teacher = User::firstOrCreate(
-            ['email' => 'teacher@isms-ewa.local'],
-            [
-                'name' => 'Guru Matematika',
-                'password' => Hash::make('password'),
-                'role' => 'teacher',
-            ]
-        );
-
-        // Create homeroom teacher user
-        $homeroomTeacher = User::firstOrCreate(
-            ['email' => 'homeroom@isms-ewa.local'],
-            [
-                'name' => 'Wali Kelas X IPA 1',
-                'password' => Hash::make('password'),
-                'role' => 'homeroom_teacher',
-            ]
-        );
-
-        // Create second homeroom teacher user
-        $homeroomTeacher2 = User::firstOrCreate(
-            ['email' => 'homeroom2@isms-ewa.local'],
-            [
-                'name' => 'Wali Kelas X IPA 2',
-                'password' => Hash::make('password'),
-                'role' => 'homeroom_teacher',
-            ]
-        );
+        // Get existing users created by UserSeeder
+        $admin = User::where('email', 'admin@isms-ewa.local')->first();
+        $teacher = User::where('email', 'teacher@isms-ewa.local')->first();
+        $homeroomTeacher = User::where('email', 'homeroom@isms-ewa.local')->first();
+        $homeroomTeacher2 = User::where('email', 'homeroom2@isms-ewa.local')->first();
 
         // Create school classes
         $class1 = SchoolClass::firstOrCreate(
