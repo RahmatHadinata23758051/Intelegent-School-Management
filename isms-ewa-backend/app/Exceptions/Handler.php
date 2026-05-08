@@ -45,6 +45,16 @@ class Handler extends ExceptionHandler
             //
         });
 
+        // Handle unauthenticated requests
+        $this->renderable(function (\Illuminate\Auth\AuthenticationException $e, $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+        });
+
         // Handle validation exceptions
         $this->renderable(function (\Illuminate\Validation\ValidationException $e, $request) {
             if ($request->expectsJson()) {
@@ -62,16 +72,6 @@ class Handler extends ExceptionHandler
                     'message' => $firstError ?: 'Validasi gagal.',
                     'errors' => $errors,
                 ], 422);
-            }
-        });
-
-        // Handle authentication exceptions
-        $this->renderable(function (\Illuminate\Auth\AuthenticationException $e, $request) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthenticated.',
-                ], 401);
             }
         });
 
