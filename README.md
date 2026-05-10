@@ -41,7 +41,8 @@ isms-ewa/
 ### Prerequisites
 - PHP 8.1+
 - Composer
-- SQLite (built-in)
+- PostgreSQL 12+
+- Node.js 16+ (untuk frontend)
 
 ### Setup Backend
 
@@ -55,10 +56,8 @@ composer install
 cp .env.example .env
 php artisan key:generate
 
-# Setup database
-touch database/database.sqlite
+# Setup database (auto-seeded on first request)
 php artisan migrate
-php artisan db:seed
 
 # Run server
 php artisan serve
@@ -66,15 +65,39 @@ php artisan serve
 
 Server akan berjalan di `http://localhost:8000`
 
+### Setup Frontend
+
+```bash
+cd isms-ewa-frontend
+
+# Install dependencies
+npm install
+
+# Run dev server
+npm run dev
+```
+
+Frontend akan berjalan di `http://localhost:5173`
+
 ---
 
 ## 🔐 Default Credentials
 
 ```
-Email: admin@isms.test
-Password: password
-Role: admin
+Admin:
+  Email: admin@isms-ewa.local
+  Password: password
+
+Teacher:
+  Email: teacher@isms-ewa.local
+  Password: password
+
+Homeroom Teacher:
+  Email: homeroom@isms-ewa.local
+  Password: password
 ```
+
+**Note:** Database otomatis ter-seed saat request pertama di development environment.
 
 ---
 
@@ -151,35 +174,62 @@ php artisan test
 ```
 
 **Test Coverage:**
-- 31 tests — ALL PASSING ✅
-- Feature tests (13)
-- Unit tests (8)
-- Smoke tests (10)
+- 183 tests — ALL PASSING ✅
+- Feature tests (comprehensive)
+- Unit tests
+- Smoke tests
+- Authorization tests
+- CRUD operation tests
 
 ---
 
 ## 📖 Development Phases
 
 ### Phase 1 ✅ — Backend Foundation (COMPLETED)
-- ✅ Laravel 10 setup + SQLite
+- ✅ Laravel 10 setup + PostgreSQL
 - ✅ Authentication (Sanctum)
-- ✅ Database schema (6 tables)
+- ✅ Database schema (11 tables)
 - ✅ Eloquent Models
 - ✅ API endpoints (login, logout, me)
-- ✅ Tests (31 passing)
+- ✅ Tests (183 passing)
 - ✅ Documentation
 
-### Phase 2 (Planned)
-- Risk scoring calculation
-- Grade analysis service
-- Violation tracking service
-- Early warning alerts
+### Phase 2 ✅ — Core CRUD API (COMPLETED)
+- ✅ Academic Years CRUD
+- ✅ Semesters CRUD
+- ✅ School Classes CRUD
+- ✅ Students CRUD
+- ✅ Subjects CRUD
+- ✅ Teacher Profiles CRUD
+- ✅ Class Subjects Assignment CRUD
+- ✅ Grades & Violations CRUD
+- ✅ Risk Scoring System
+- ✅ Authorization Policies
 
-### Phase 3 (Planned)
-- Dashboard & reporting
-- Admin panel
-- Teacher interface
-- Student portal
+### Phase 3 ✅ — Frontend Foundation (COMPLETED)
+- ✅ React setup + Vite
+- ✅ Authentication UI
+- ✅ Layout components
+- ✅ API integration
+- ✅ State management (Zustand)
+
+### Phase 4 ✅ — Dashboard & CRUD UI (IN PROGRESS)
+- ✅ Dashboard page
+- ✅ Academic Years management
+- ✅ Semesters management
+- ✅ School Classes management
+- ✅ Students management
+- ✅ Subjects management
+- ✅ Teacher Profiles management
+- ✅ Class Subjects Assignment management
+- ⏳ Grades & Violations management
+- ⏳ Risk Scoring dashboard
+
+### Phase 5 (Planned)
+- Advanced reporting
+- Analytics dashboard
+- Export functionality
+- Mobile app
 
 ---
 
@@ -188,15 +238,24 @@ php artisan test
 **Backend:**
 - Laravel 10
 - PHP 8.1+
-- SQLite
+- PostgreSQL 12+
 - Laravel Sanctum (authentication)
+- Eloquent ORM
+
+**Frontend:**
+- React 18
+- Vite
+- Tailwind CSS
+- Zustand (state management)
+- Axios (HTTP client)
 
 **Testing:**
 - PHPUnit
-- Pest PHP (optional)
+- Pest PHP
 
 **Tools:**
 - Composer
+- npm
 - Git
 
 ---
@@ -255,5 +314,6 @@ Project ini adalah proprietary software. Semua hak dilindungi.
 
 ---
 
-**Last Updated:** Januari 2024  
-**Version:** 1.0.0 (Phase 1 Complete)
+**Last Updated:** Mei 2026  
+**Version:** 2.4.0 (Phase 4 In Progress)  
+**Status:** Development 2.4 - Class Subjects Assignment Complete
