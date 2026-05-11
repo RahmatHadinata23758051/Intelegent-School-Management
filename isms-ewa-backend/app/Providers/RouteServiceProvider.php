@@ -30,6 +30,8 @@ class RouteServiceProvider extends ServiceProvider
         Route::model('academic_year', \App\Models\AcademicYear::class);
         Route::model('semester', \App\Models\Semester::class);
         Route::model('teacher', \App\Models\TeacherProfile::class);
+        Route::model('teacherProfile', \App\Models\TeacherProfile::class);
+        Route::model('classSubject', \App\Models\ClassSubject::class);
 
         $this->routes(function () {
             Route::middleware('api')

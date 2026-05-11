@@ -51,12 +51,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('users/teacher-candidates', [TeacherProfileController::class, 'candidates']);
     Route::apiResource('teachers', TeacherProfileController::class);
 
+    // Teacher Subject Assignments - Custom routes with explicit pattern
+    Route::get('teachers/{id}/subjects', [TeacherSubjectAssignmentController::class, 'getSubjectsByTeacher'])->where('id', '[0-9]+');
+    Route::get('teachers/{id}/classes', [TeacherSubjectAssignmentController::class, 'getClassesByTeacher'])->where('id', '[0-9]+');
+    Route::post('teachers/{id}/class-subjects/{classSubjectId}', [TeacherSubjectAssignmentController::class, 'assignTeacherToClassSubject'])->where(['id' => '[0-9]+', 'classSubjectId' => '[0-9]+']);
+    Route::delete('teachers/{id}/class-subjects/{classSubjectId}', [TeacherSubjectAssignmentController::class, 'removeTeacherFromClassSubject'])->where(['id' => '[0-9]+', 'classSubjectId' => '[0-9]+']);
+
     // Teacher Subject Assignments CRUD
     Route::apiResource('teacher-subject-assignments', TeacherSubjectAssignmentController::class);
-    Route::get('teachers/{teacher}/subjects', [TeacherSubjectAssignmentController::class, 'getSubjectsByTeacher']);
-    Route::get('teachers/{teacher}/classes', [TeacherSubjectAssignmentController::class, 'getClassesByTeacher']);
-    Route::post('teachers/{teacher}/class-subjects/{classSubject}', [TeacherSubjectAssignmentController::class, 'assignTeacherToClassSubject']);
-    Route::delete('teachers/{teacher}/class-subjects/{classSubject}', [TeacherSubjectAssignmentController::class, 'removeTeacherFromClassSubject']);
 
     // Subjects CRUD
     Route::get('subjects/dropdown', [SubjectController::class, 'dropdown']);

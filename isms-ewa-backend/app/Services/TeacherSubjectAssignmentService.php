@@ -7,6 +7,7 @@ use App\Models\ClassSubject;
 use App\Models\TeacherProfile;
 use App\Models\TeacherSubjectAssignment;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 
 class TeacherSubjectAssignmentService
 {
@@ -190,7 +191,7 @@ class TeacherSubjectAssignmentService
     /**
      * Get subjects taught by teacher.
      */
-    public function getSubjectsByTeacher(int $teacherProfileId, ?int $academicYearId = null): Collection
+    public function getSubjectsByTeacher(int $teacherProfileId, ?int $academicYearId = null): SupportCollection
     {
         $query = TeacherSubjectAssignment::whereHas('classSubject', function ($q) {
             $q->where('is_active', true);
@@ -219,7 +220,7 @@ class TeacherSubjectAssignmentService
     /**
      * Get classes taught by teacher.
      */
-    public function getClassesByTeacher(int $teacherProfileId, ?int $academicYearId = null): Collection
+    public function getClassesByTeacher(int $teacherProfileId, ?int $academicYearId = null): SupportCollection
     {
         $query = TeacherSubjectAssignment::whereHas('classSubject', function ($q) {
             $q->where('is_active', true);

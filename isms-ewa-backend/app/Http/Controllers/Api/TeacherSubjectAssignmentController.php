@@ -155,13 +155,14 @@ class TeacherSubjectAssignmentController extends Controller
     /**
      * Get subjects taught by teacher.
      */
-    public function getSubjectsByTeacher(TeacherProfile $teacher, Request $request)
+    public function getSubjectsByTeacher($id, Request $request)
     {
         $this->authorize('viewAny', TeacherSubjectAssignment::class);
 
         try {
+            $teacherProfile = TeacherProfile::findOrFail($id);
             $academicYearId = $request->get('academic_year_id');
-            $subjects = $this->service->getSubjectsByTeacher($teacher->id, $academicYearId);
+            $subjects = $this->service->getSubjectsByTeacher($teacherProfile->id, $academicYearId);
 
             return response()->json([
                 'success' => true,
@@ -185,13 +186,14 @@ class TeacherSubjectAssignmentController extends Controller
     /**
      * Get classes taught by teacher.
      */
-    public function getClassesByTeacher(TeacherProfile $teacher, Request $request)
+    public function getClassesByTeacher($id, Request $request)
     {
         $this->authorize('viewAny', TeacherSubjectAssignment::class);
 
         try {
+            $teacherProfile = TeacherProfile::findOrFail($id);
             $academicYearId = $request->get('academic_year_id');
-            $classes = $this->service->getClassesByTeacher($teacher->id, $academicYearId);
+            $classes = $this->service->getClassesByTeacher($teacherProfile->id, $academicYearId);
 
             return response()->json([
                 'success' => true,
@@ -216,13 +218,15 @@ class TeacherSubjectAssignmentController extends Controller
      * Assign teacher to class-subject.
      */
     public function assignTeacherToClassSubject(
-        TeacherProfile $teacher,
-        ClassSubject $classSubject,
+        $id,
+        $classSubjectId,
         Request $request
     ) {
         $this->authorize('create', TeacherSubjectAssignment::class);
 
         try {
+            $teacherProfile = TeacherProfile::findOrFail($id);
+            $classSubject = ClassSubject::findOrFail($classSubjectId);
             $academicYearId = $request->get('academic_year_id');
 
             if (!$academicYearId) {
@@ -233,7 +237,7 @@ class TeacherSubjectAssignmentController extends Controller
             }
 
             $assignment = $this->service->assignTeacherToClassSubject(
-                $teacher->id,
+                $teacherProfile->id,
                 $classSubject->id,
                 $academicYearId
             );
@@ -260,13 +264,13 @@ class TeacherSubjectAssignmentController extends Controller
      * Remove teacher from class-subject.
      */
     public function removeTeacherFromClassSubject(
-        TeacherProfile $teacher,
-        ClassSubject $classSubject,
+        $id,
+        $classSubjectId,
         Request $request
     ) {
-        $this->authorize('delete', TeacherSubjectAssignment::class);
-
         try {
+            $teacherProfile = TeacherProfile::findOrFail($id);
+            $classSubject = ClassSubject::findOrFail($classSubjectId);
             $academicYearId = $request->get('academic_year_id');
 
             if (!$academicYearId) {
@@ -276,8 +280,16 @@ class TeacherSubjectAssignmentController extends Controller
                 ], 422);
             }
 
+            // Find the assignment to authorize
+            $assignment = TeacherSubjectAssignment::where('teacher_profile_id', $teacherProfile->id)
+                ->where('class_subject_id', $classSubject->id)
+                ->where('academic_year_id', $academicYearId)
+                ->firstOrFail();
+
+            $this->authorize('delete', $assignment);
+
             $this->service->removeTeacherFromClassSubject(
-                $teacher->id,
+                $teacherProfile->id,
                 $classSubject->id,
                 $academicYearId
             );
