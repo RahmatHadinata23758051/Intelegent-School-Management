@@ -31,6 +31,11 @@ class ClassSubject extends Model
         return $this->belongsTo(Subject::class);
     }
 
+    public function teacherSubjectAssignments()
+    {
+        return $this->hasMany(TeacherSubjectAssignment::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {

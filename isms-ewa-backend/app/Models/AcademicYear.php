@@ -40,4 +40,12 @@ class AcademicYear extends Model
     {
         return $this->hasMany(Semester::class);
     }
+
+    /**
+     * Get the teacher subject assignments for this academic year.
+     */
+    public function teacherSubjectAssignments(): HasMany
+    {
+        return $this->hasMany(TeacherSubjectAssignment::class);
+    }
 }

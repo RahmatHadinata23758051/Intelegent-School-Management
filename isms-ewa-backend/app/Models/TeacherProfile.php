@@ -33,6 +33,11 @@ class TeacherProfile extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function teacherSubjectAssignments()
+    {
+        return $this->hasMany(TeacherSubjectAssignment::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {

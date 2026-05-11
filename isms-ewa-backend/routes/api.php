@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\SemesterController;
 use App\Http\Controllers\Api\TeacherProfileController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\ClassSubjectController;
+use App\Http\Controllers\Api\TeacherSubjectAssignmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +50,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('teachers/dropdown', [TeacherProfileController::class, 'dropdown']);
     Route::get('users/teacher-candidates', [TeacherProfileController::class, 'candidates']);
     Route::apiResource('teachers', TeacherProfileController::class);
+
+    // Teacher Subject Assignments CRUD
+    Route::apiResource('teacher-subject-assignments', TeacherSubjectAssignmentController::class);
+    Route::get('teachers/{teacher}/subjects', [TeacherSubjectAssignmentController::class, 'getSubjectsByTeacher']);
+    Route::get('teachers/{teacher}/classes', [TeacherSubjectAssignmentController::class, 'getClassesByTeacher']);
+    Route::post('teachers/{teacher}/class-subjects/{classSubject}', [TeacherSubjectAssignmentController::class, 'assignTeacherToClassSubject']);
+    Route::delete('teachers/{teacher}/class-subjects/{classSubject}', [TeacherSubjectAssignmentController::class, 'removeTeacherFromClassSubject']);
 
     // Subjects CRUD
     Route::get('subjects/dropdown', [SubjectController::class, 'dropdown']);
