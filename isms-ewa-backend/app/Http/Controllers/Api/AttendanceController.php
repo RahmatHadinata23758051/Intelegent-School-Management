@@ -89,16 +89,16 @@ class AttendanceController extends Controller
         $attendances = $query->paginate($perPage);
 
         return $this->successResponse(
-            AttendanceResource::collection($attendances),
-            'Data absensi berhasil diambil',
             [
-                'pagination' => [
+                'data' => AttendanceResource::collection($attendances),
+                'meta' => [
                     'total' => $attendances->total(),
                     'per_page' => $attendances->perPage(),
                     'current_page' => $attendances->currentPage(),
                     'last_page' => $attendances->lastPage(),
                 ]
-            ]
+            ],
+            'Data absensi berhasil diambil'
         );
     }
 
