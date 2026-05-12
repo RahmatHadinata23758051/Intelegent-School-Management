@@ -107,7 +107,6 @@ class GradeComponentController extends Controller
         return $this->successResponse(
             new GradeComponentResource($gradeComponent),
             'Komponen nilai berhasil dibuat',
-            [],
             201
         );
     }

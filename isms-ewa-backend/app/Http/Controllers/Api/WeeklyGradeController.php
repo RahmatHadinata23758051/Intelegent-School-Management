@@ -142,7 +142,6 @@ class WeeklyGradeController extends Controller
         return $this->successResponse(
             new WeeklyGradeResource($weeklyGrade),
             'Nilai mingguan berhasil disimpan',
-            [],
             201
         );
     }
@@ -182,9 +181,11 @@ class WeeklyGradeController extends Controller
             ->get();
 
         return $this->successResponse(
-            WeeklyGradeResource::collection($weeklyGrades),
-            "Nilai mingguan berhasil disimpan. {$results['created']} dibuat, {$results['updated']} diperbarui.",
-            $results
+            [
+                'data' => WeeklyGradeResource::collection($weeklyGrades),
+                'meta' => $results,
+            ],
+            "Nilai mingguan berhasil disimpan. {$results['created']} dibuat, {$results['updated']} diperbarui."
         );
     }
 
