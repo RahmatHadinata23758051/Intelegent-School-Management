@@ -9,7 +9,7 @@ import { LoadingScreen } from '../../components/common/LoadingScreen';
 import { ErrorState } from '../../components/common/ErrorState';
 import { StatusPill } from '../../components/design-system';
 import { ClassSubjectForm } from '../../components/class-subjects/ClassSubjectForm';
-import { Plus, Edit2, Trash2, Search, X, RotateCcw } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, X, RotateCcw, BookOpen, CheckCircle2, Layers, Grid3x3 } from 'lucide-react';
 
 export const ClassSubjectsPage = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -139,61 +139,77 @@ export const ClassSubjectsPage = () => {
   return (
     <AppLayout currentPage="class-subjects">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-950">Assignment Mapel Kelas</h1>
-          <p className="mt-1 text-sm text-slate-500">Kelola penugasan mata pelajaran ke kelas</p>
+          <h1 className="text-4xl font-bold text-slate-900">Assignment Mapel Kelas</h1>
+          <p className="mt-2 text-slate-600">Kelola penugasan mata pelajaran ke kelas</p>
         </div>
         {isAdmin && (
           <button
             onClick={() => handleOpenModal()}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg whitespace-nowrap"
           >
-            <Plus size={18} />
+            <Plus size={20} strokeWidth={2.5} />
             Tambah Assignment
           </button>
         )}
       </div>
 
       {/* Summary Cards */}
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <div className="flex items-center justify-between">
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="border-l-4 border-l-blue-500">
+          <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Total Assignment</p>
-              <p className="mt-2 text-2xl font-semibold text-slate-950">{totalAssignments}</p>
+              <p className="mt-2 text-3xl font-bold text-slate-900">{totalAssignments}</p>
+              <p className="text-xs text-slate-500 mt-1">Semua penugasan</p>
+            </div>
+            <div className="p-3 rounded-lg bg-blue-100">
+              <BookOpen size={24} className="text-blue-600" strokeWidth={1.5} />
             </div>
           </div>
         </Card>
-        <Card>
-          <div className="flex items-center justify-between">
+        <Card className="border-l-4 border-l-green-500">
+          <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Assignment Aktif</p>
-              <p className="mt-2 text-2xl font-semibold text-green-600">{activeAssignments}</p>
+              <p className="mt-2 text-3xl font-bold text-green-600">{activeAssignments}</p>
+              <p className="text-xs text-slate-500 mt-1">Sedang berlangsung</p>
+            </div>
+            <div className="p-3 rounded-lg bg-green-100">
+              <CheckCircle2 size={24} className="text-green-600" strokeWidth={1.5} />
             </div>
           </div>
         </Card>
-        <Card>
-          <div className="flex items-center justify-between">
+        <Card className="border-l-4 border-l-purple-500">
+          <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Total Kelas dengan Mapel</p>
-              <p className="mt-2 text-2xl font-semibold text-slate-950">{uniqueClasses}</p>
+              <p className="mt-2 text-3xl font-bold text-purple-600">{uniqueClasses}</p>
+              <p className="text-xs text-slate-500 mt-1">Kelas terisi</p>
+            </div>
+            <div className="p-3 rounded-lg bg-purple-100">
+              <Grid3x3 size={24} className="text-purple-600" strokeWidth={1.5} />
             </div>
           </div>
         </Card>
-        <Card>
-          <div className="flex items-center justify-between">
+        <Card className="border-l-4 border-l-orange-500">
+          <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Total Mapel Terpakai</p>
-              <p className="mt-2 text-2xl font-semibold text-slate-950">{uniqueSubjects}</p>
+              <p className="mt-2 text-3xl font-bold text-orange-600">{uniqueSubjects}</p>
+              <p className="text-xs text-slate-500 mt-1">Mapel aktif</p>
+            </div>
+            <div className="p-3 rounded-lg bg-orange-100">
+              <Layers size={24} className="text-orange-600" strokeWidth={1.5} />
             </div>
           </div>
         </Card>
       </div>
 
       {/* Filters */}
-      <Card className="mb-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+      <Card className="mb-8">
+        <div className="flex flex-col sm:flex-row gap-3 items-end">
           {/* Search */}
           <div className="flex-1">
             <div className="relative">
@@ -255,7 +271,7 @@ export const ClassSubjectsPage = () => {
               className="p-2.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
               title="Refresh data"
             >
-              <RotateCcw size={18} />
+              <RotateCcw size={20} strokeWidth={1.5} />
             </button>
 
             {/* Clear Filters */}

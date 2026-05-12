@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Search, Edit2, Trash2, RotateCcw } from 'lucide-react';
+import { Plus, Users, Search, Edit2, Trash2, RotateCcw, RefreshCw, TrendingUp, AlertCircle, BookOpen } from 'lucide-react';
 import clsx from 'clsx';
 import { useStudents } from '../../hooks/useStudents';
 import { useClasses } from '../../hooks/useClasses';
@@ -204,59 +204,110 @@ export const StudentsPage = () => {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-start justify-between mb-8 gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900">Students</h2>
-          <p className="text-slate-500 mt-1">Manage and monitor student information and risk levels</p>
+          <h1 className="text-4xl font-bold text-slate-900">Students</h1>
+          <p className="text-slate-600 mt-2">Manage and monitor student information and risk levels</p>
         </div>
         {canCreateStudent && (
-          <Button
-            variant="primary"
-            size="lg"
-            className="flex items-center gap-2"
+          <button
             onClick={handleAddStudent}
+            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg whitespace-nowrap"
           >
-            <Plus size={20} />
+            <Plus size={20} strokeWidth={2.5} />
             Add Student
-          </Button>
+          </button>
         )}
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className="border-l-4 border-l-blue-500">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600">Total Students</p>
+              <p className="text-3xl font-bold text-slate-900 mt-2">{studentsData?.meta?.total || 0}</p>
+              <p className="text-xs text-slate-500 mt-1">All registered students</p>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <Users size={24} className="text-blue-600" strokeWidth={1.5} />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="border-l-4 border-l-green-500">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600">Safe</p>
+              <p className="text-3xl font-bold text-green-600 mt-2">{studentsData?.data?.filter(s => s.risk_score?.risk_level === 'safe').length || 0}</p>
+              <p className="text-xs text-slate-500 mt-1">Low risk students</p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-lg">
+              <TrendingUp size={24} className="text-green-600" strokeWidth={1.5} />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="border-l-4 border-l-yellow-500">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600">Warning</p>
+              <p className="text-3xl font-bold text-yellow-600 mt-2">{studentsData?.data?.filter(s => s.risk_score?.risk_level === 'warning').length || 0}</p>
+              <p className="text-xs text-slate-500 mt-1">Medium risk students</p>
+            </div>
+            <div className="p-3 bg-yellow-100 rounded-lg">
+              <AlertCircle size={24} className="text-yellow-600" strokeWidth={1.5} />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="border-l-4 border-l-red-500">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600">High Risk</p>
+              <p className="text-3xl font-bold text-red-600 mt-2">{studentsData?.data?.filter(s => s.risk_score?.risk_level === 'high_risk').length || 0}</p>
+              <p className="text-xs text-slate-500 mt-1">High risk students</p>
+            </div>
+            <div className="p-3 bg-red-100 rounded-lg">
+              <AlertCircle size={24} className="text-red-600" strokeWidth={1.5} />
+            </div>
+          </div>
+        </Card>
       </div>
 
       {/* Filters Card */}
       <Card className="mb-8">
-        <Card.Body>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+        <div className="flex flex-col sm:flex-row gap-3 items-end">
+          <div className="flex-1">
             <SearchInput
               value={search}
               onChange={handleSearch}
               onClear={handleClearSearch}
               placeholder="Search by name, ID, or email..."
             />
-            <SelectFilter
-              label="Class"
-              value={selectedClass}
-              onChange={handleClassFilter}
-              options={classOptions}
-              placeholder="All Classes"
-            />
-            <SelectFilter
-              label="Risk Level"
-              value={selectedRisk}
-              onChange={handleRiskFilter}
-              options={riskOptions}
-              placeholder="All Levels"
-            />
-            <div className="flex items-center justify-end gap-2">
-              <button
-                onClick={refetch}
-                className="p-2.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
-                title="Refresh data"
-              >
-                <RotateCcw size={18} />
-              </button>
-            </div>
           </div>
-        </Card.Body>
+          <SelectFilter
+            label="Class"
+            value={selectedClass}
+            onChange={handleClassFilter}
+            options={classOptions}
+            placeholder="All Classes"
+          />
+          <SelectFilter
+            label="Risk Level"
+            value={selectedRisk}
+            onChange={handleRiskFilter}
+            options={riskOptions}
+            placeholder="All Levels"
+          />
+          <button
+            onClick={refetch}
+            className="p-2.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
+            title="Refresh data"
+          >
+            <RotateCcw size={20} strokeWidth={1.5} />
+          </button>
+        </div>
       </Card>
 
       {/* Error State */}
