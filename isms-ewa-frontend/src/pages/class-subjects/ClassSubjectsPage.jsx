@@ -9,7 +9,7 @@ import { LoadingScreen } from '../../components/common/LoadingScreen';
 import { ErrorState } from '../../components/common/ErrorState';
 import { StatusPill } from '../../components/design-system';
 import { ClassSubjectForm } from '../../components/class-subjects/ClassSubjectForm';
-import { Plus, Edit2, Trash2, Search, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, X, RotateCcw } from 'lucide-react';
 
 export const ClassSubjectsPage = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -193,60 +193,70 @@ export const ClassSubjectsPage = () => {
 
       {/* Filters */}
       <Card className="mb-6">
-        <div className="space-y-4">
-          <div className="flex flex-col gap-4 sm:flex-row">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Cari kelas atau mapel..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+          {/* Search */}
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Cari kelas atau mapel..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
             </div>
+          </div>
 
-            {/* Filter Class */}
-            <select
-              value={filterClass}
-              onChange={(e) => setFilterClass(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            >
-              <option value="">Semua Kelas</option>
-              {schoolClasses.map((cls) => (
-                <option key={cls.id} value={cls.id}>
-                  {cls.name}
-                </option>
-              ))}
-            </select>
+          {/* Filter Class */}
+          <select
+            value={filterClass}
+            onChange={(e) => setFilterClass(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">Semua Kelas</option>
+            {schoolClasses.map((cls) => (
+              <option key={cls.id} value={cls.id}>
+                {cls.name}
+              </option>
+            ))}
+          </select>
 
-            {/* Filter Subject */}
-            <select
-              value={filterSubject}
-              onChange={(e) => setFilterSubject(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            >
-              <option value="">Semua Mapel</option>
-              {subjects.map((subj) => (
-                <option key={subj.id} value={subj.id}>
-                  {subj.code} - {subj.name}
-                </option>
-              ))}
-            </select>
+          {/* Filter Subject */}
+          <select
+            value={filterSubject}
+            onChange={(e) => setFilterSubject(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">Semua Mapel</option>
+            {subjects.map((subj) => (
+              <option key={subj.id} value={subj.id}>
+                {subj.code} - {subj.name}
+              </option>
+            ))}
+          </select>
 
-            {/* Filter Status */}
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          {/* Filter Status */}
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="all">Semua Status</option>
+            <option value="active">Aktif</option>
+            <option value="inactive">Nonaktif</option>
+          </select>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            {/* Refresh Button */}
+            <button
+              onClick={() => fetchClassSubjects()}
+              className="p-2.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
+              title="Refresh data"
             >
-              <option value="all">Semua Status</option>
-              <option value="active">Aktif</option>
-              <option value="inactive">Nonaktif</option>
-            </select>
+              <RotateCcw size={18} />
+            </button>
 
             {/* Clear Filters */}
             {(searchTerm || filterClass || filterSubject || filterStatus !== 'all') && (

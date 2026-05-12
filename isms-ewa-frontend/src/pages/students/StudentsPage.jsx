@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Search, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Users, Search, Edit2, Trash2, RotateCcw } from 'lucide-react';
 import clsx from 'clsx';
 import { useStudents } from '../../hooks/useStudents';
 import { useClasses } from '../../hooks/useClasses';
@@ -225,7 +225,7 @@ export const StudentsPage = () => {
       {/* Filters Card */}
       <Card className="mb-8">
         <Card.Body>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
             <SearchInput
               value={search}
               onChange={handleSearch}
@@ -246,15 +246,14 @@ export const StudentsPage = () => {
               options={riskOptions}
               placeholder="All Levels"
             />
-            <div className="flex items-end">
-              <Button
-                variant="outline"
-                size="md"
+            <div className="flex items-center justify-end gap-2">
+              <button
                 onClick={refetch}
-                className="w-full"
+                className="p-2.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
+                title="Refresh data"
               >
-                Refresh
-              </Button>
+                <RotateCcw size={18} />
+              </button>
             </div>
           </div>
         </Card.Body>
