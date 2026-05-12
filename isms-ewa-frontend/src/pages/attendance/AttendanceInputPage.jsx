@@ -49,6 +49,7 @@ export const AttendanceInputPage = () => {
           school_class_id: sessionResponse.data.school_class_id,
           per_page: 100,
         });
+        // studentService already returns response.data.data, so studentsResponse is the data array
         setStudents(studentsResponse.data || []);
 
         // Load existing attendances
@@ -58,8 +59,10 @@ export const AttendanceInputPage = () => {
         });
 
         // Map attendances by student_id
+        // Response format: { success, message, data: { data: [...], meta: {...} } }
         const attendanceMap = {};
-        (attendancesResponse.data || []).forEach((att) => {
+        const attendanceList = attendancesResponse.data?.data || [];
+        attendanceList.forEach((att) => {
           attendanceMap[att.student_id] = {
             id: att.id,
             status: att.status,
