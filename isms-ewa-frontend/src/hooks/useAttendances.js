@@ -34,13 +34,16 @@ export const useAttendances = (sessionId = null) => {
       const mergedParams = { ...params, ...customParams };
       const response = await attendanceService.getAttendances(mergedParams);
       
-      setData(response.data || []);
-      if (response.meta) {
+      // Response format: { success, message, data: { data: [...], meta: {...} } }
+      const responseData = response.data || {};
+      setData(responseData.data || []);
+      
+      if (responseData.meta) {
         setPagination({
-          current_page: response.meta.current_page,
-          last_page: response.meta.last_page,
-          per_page: response.meta.per_page,
-          total: response.meta.total,
+          current_page: responseData.meta.current_page,
+          last_page: responseData.meta.last_page,
+          per_page: responseData.meta.per_page,
+          total: responseData.meta.total,
         });
       }
     } catch (err) {

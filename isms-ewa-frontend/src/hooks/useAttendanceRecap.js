@@ -21,9 +21,11 @@ export const useAttendanceRecap = () => {
       setError(null);
       
       const response = await attendanceService.getClassAttendanceRecap(classId, params);
-      setClassRecap(response.data || null);
+      // Response format: { success, message, data: {...} }
+      const responseData = response.data || null;
+      setClassRecap(responseData);
       
-      return response.data;
+      return responseData;
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || 'Gagal memuat rekap absensi kelas';
       setError(errorMessage);
@@ -43,9 +45,11 @@ export const useAttendanceRecap = () => {
       setError(null);
       
       const response = await attendanceService.getStudentAttendanceRecap(studentId, params);
-      setStudentRecap(response.data || null);
+      // Response format: { success, message, data: {...} }
+      const responseData = response.data || null;
+      setStudentRecap(responseData);
       
-      return response.data;
+      return responseData;
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || 'Gagal memuat rekap absensi siswa';
       setError(errorMessage);
@@ -65,9 +69,11 @@ export const useAttendanceRecap = () => {
       setError(null);
       
       const response = await attendanceService.getAttendanceSummary(params);
-      setSummary(response.data || null);
+      // Response format: { success, message, data: {...} }
+      const responseData = response.data || null;
+      setSummary(responseData);
       
-      return response.data;
+      return responseData;
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || 'Gagal memuat ringkasan absensi';
       setError(errorMessage);

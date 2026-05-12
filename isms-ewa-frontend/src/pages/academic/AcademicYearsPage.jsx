@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Calendar, Edit2, Trash2, CheckCircle2, AlertCircle, TrendingUp, Archive, MoreVertical, RefreshCw } from 'lucide-react';
+import { Plus, Calendar, Edit2, Trash2, CheckCircle2, TrendingUp, Archive, RefreshCw } from 'lucide-react';
 import { useAcademicYears } from '../../hooks/useAcademicYears';
 import { useAuth } from '../../hooks/useAuth';
 import { academicYearService } from '../../services/academicYearService';
@@ -16,7 +16,7 @@ import { Modal } from '../../components/common/Modal';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { Badge } from '../../components/common/Badge';
 import { AcademicYearForm } from '../../components/academic/AcademicYearForm';
-import { SummaryItem, StatusPill, SelectControl, DesignSearchInput } from '../../components/design-system';
+import { StatusPill } from '../../components/design-system';
 
 export const AcademicYearsPage = () => {
   const { user } = useAuth();
@@ -211,78 +211,83 @@ export const AcademicYearsPage = () => {
         </div>
       )}
 
-      {/* Header with Action Button */}
-      <div className="mb-6 flex items-center justify-between gap-4">
+      {/* Header */}
+      <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-[24px] font-semibold leading-8 tracking-[-0.02em] text-slate-950">
-            Tahun Ajaran
-          </h2>
-          <p className="mt-1 text-[14px] font-normal leading-6 text-slate-500">
-            Kelola tahun ajaran dan periode akademik.
-          </p>
+          <h1 className="text-3xl font-bold text-slate-900">Tahun Ajaran</h1>
+          <p className="mt-1 text-sm text-slate-600">Kelola tahun ajaran dan periode akademik</p>
         </div>
         {canManage && (
           <button
             onClick={handleAddAcademicYear}
-            className="inline-flex h-11 items-center gap-2 rounded-lg bg-blue-600 px-5 text-[14px] font-semibold text-white transition hover:bg-blue-700 hover:shadow-md whitespace-nowrap"
+            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
           >
-            <Plus size={18} strokeWidth={2.5} />
+            <Plus size={18} strokeWidth={2} />
             Tambah Tahun Ajaran
           </button>
         )}
       </div>
 
-      {/* Summary Cards - 3 column grid */}
-      <Card className="mb-6 grid grid-cols-3 divide-x divide-slate-200 p-6">
-        <SummaryItem 
-          icon={Calendar} 
-          label="Total Tahun Ajaran" 
-          value={academicYearsData?.meta?.total || '0'} 
-          meta="Semua tahun ajaran terdaftar" 
-          tone="blue" 
-        />
-        <SummaryItem 
-          icon={TrendingUp} 
-          label="Aktif" 
-          value={academicYearsData?.data?.filter(ay => ay.is_active).length || '0'} 
-          meta="Tahun ajaran sedang berjalan" 
-          tone="green" 
-        />
-        <SummaryItem 
-          icon={Archive} 
-          label="Arsip" 
-          value={academicYearsData?.data?.filter(ay => !ay.is_active).length || '0'} 
-          meta="Tahun ajaran telah diarsipkan" 
-          tone="orange" 
-        />
-      </Card>
+      {/* Summary Cards */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="border-l-4 border-l-blue-500 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Total Tahun Ajaran</p>
+              <p className="mt-2 text-2xl font-bold text-slate-900">{academicYearsData?.meta?.total || '0'}</p>
+              <p className="text-xs text-slate-500 mt-0.5">Semua tahun ajaran</p>
+            </div>
+            <div className="p-2.5 rounded-lg bg-blue-100">
+              <Calendar size={20} className="text-blue-600" strokeWidth={1.5} />
+            </div>
+          </div>
+        </Card>
+        <Card className="border-l-4 border-l-green-500 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Aktif</p>
+              <p className="mt-2 text-2xl font-bold text-green-600">{academicYearsData?.data?.filter(ay => ay.is_active).length || '0'}</p>
+              <p className="text-xs text-slate-500 mt-0.5">Sedang berjalan</p>
+            </div>
+            <div className="p-2.5 rounded-lg bg-green-100">
+              <TrendingUp size={20} className="text-green-600" strokeWidth={1.5} />
+            </div>
+          </div>
+        </Card>
+        <Card className="border-l-4 border-l-orange-500 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Arsip</p>
+              <p className="mt-2 text-2xl font-bold text-orange-600">{academicYearsData?.data?.filter(ay => !ay.is_active).length || '0'}</p>
+              <p className="text-xs text-slate-500 mt-0.5">Telah diarsipkan</p>
+            </div>
+            <div className="p-2.5 rounded-lg bg-orange-100">
+              <Archive size={20} className="text-orange-600" strokeWidth={1.5} />
+            </div>
+          </div>
+        </Card>
+      </div>
 
-      {/* Search and Filter Controls */}
-      <div className="mb-4 grid grid-cols-12 gap-4 items-end">
-        <div className="col-span-5">
-          <DesignSearchInput
-            placeholder="Cari tahun ajaran..."
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-        </div>
-        <div className="col-span-3 col-start-8">
-          <SelectControl value="Semua Status" />
-        </div>
-        <div className="col-span-2">
-          <SelectControl value="Urutkan: Terbaru" icon={TrendingUp} />
-        </div>
-        <div className="col-span-2 flex justify-end">
+      {/* Search and Filter */}
+      <Card className="mb-6 p-4">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1">
+            <SearchInput
+              value={search}
+              onChange={handleSearch}
+              onClear={handleClearSearch}
+              placeholder="Cari tahun ajaran..."
+            />
+          </div>
           <button
             onClick={() => refetch()}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all font-medium text-sm hover:shadow-sm"
+            className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
             title="Refresh data"
           >
-            <RefreshCw size={16} strokeWidth={2} />
-            <span>Refresh</span>
+            <RefreshCw size={18} strokeWidth={1.5} />
           </button>
         </div>
-      </div>
+      </Card>
 
       {/* Error State */}
       {error && (
@@ -298,77 +303,60 @@ export const AcademicYearsPage = () => {
         <>
           {academicYearsData?.data && academicYearsData.data.length > 0 ? (
             <>
-              <Card className="mb-8 overflow-hidden">
-                <table className="w-full border-collapse text-left">
-                  <thead className="border-b border-slate-200 text-[13px] font-medium text-slate-500">
-                    <tr>
-                      <th className="px-6 py-4">Tahun Ajaran</th>
-                      <th className="px-6 py-4">Periode</th>
-                      <th className="px-6 py-4">Semester</th>
-                      <th className="px-6 py-4">Status</th>
-                      <th className="px-6 py-4">Dibuat Oleh</th>
-                      {canManage && <th className="px-6 py-4 text-right">Aksi</th>}
+              <Card className="mb-6 overflow-hidden">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50">
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Tahun Ajaran</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Periode</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Semester</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Dibuat</th>
+                      {canManage && <th className="px-6 py-3 text-right text-xs font-semibold text-slate-700 uppercase tracking-wider">Aksi</th>}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 text-[14px] text-slate-700">
+                  <tbody className="bg-white divide-y divide-slate-200">
                     {academicYearsData.data.map((ay) => (
                       <tr key={ay.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-4">
-                            <div className="grid h-9 w-9 place-items-center rounded-lg bg-blue-50 text-blue-600">
-                              <Calendar size={18} />
-                            </div>
-                            <span className="text-[17px] font-medium tracking-[-0.01em] text-slate-950">
-                              {ay.year}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 text-sm font-medium text-slate-900">{ay.year}</td>
+                        <td className="px-6 py-4 text-sm text-slate-600">
                           {new Date(ay.start_date).toLocaleDateString('id-ID')} – {new Date(ay.end_date).toLocaleDateString('id-ID')}
                         </td>
-                        <td className="px-6 py-4">
-                          {ay.semesters?.length || 0} semester
-                        </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 text-sm text-slate-600">{ay.semesters?.length || 0} semester</td>
+                        <td className="px-6 py-4 text-sm">
                           <StatusPill status={ay.is_active ? 'Aktif' : 'Arsip'} />
                         </td>
-                        <td className="px-6 py-4">
-                          <div>Admin ISMS-EWA</div>
-                          <div className="text-[13px] text-slate-500">
-                            {new Date(ay.created_at).toLocaleDateString('id-ID')}
-                          </div>
+                        <td className="px-6 py-4 text-sm text-slate-600">
+                          {new Date(ay.created_at).toLocaleDateString('id-ID')}
                         </td>
                         {canManage && (
                           <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="flex items-center justify-end gap-1">
                               {!ay.is_active && (
                                 <button
                                   onClick={() => handleActivateAcademicYear(ay)}
-                                  className="rounded-lg p-2 text-green-600 transition hover:bg-green-100"
-                                  title="Aktifkan tahun ajaran"
+                                  className="p-2 hover:bg-green-50 rounded-lg transition-colors text-green-600"
+                                  title="Aktifkan"
                                 >
-                                  <CheckCircle2 size={16} />
+                                  <CheckCircle2 size={16} strokeWidth={1.5} />
                                 </button>
                               )}
                               <button
                                 onClick={() => handleEditAcademicYear(ay)}
-                                className="rounded-lg p-2 text-blue-600 transition hover:bg-blue-100"
-                                title="Edit tahun ajaran"
+                                className="p-2 hover:bg-blue-50 rounded-lg transition-colors text-blue-600"
+                                title="Edit"
                               >
-                                <Edit2 size={16} />
+                                <Edit2 size={16} strokeWidth={1.5} />
                               </button>
                               {!ay.is_active && (
                                 <button
                                   onClick={() => handleDeleteAcademicYear(ay)}
-                                  className="rounded-lg p-2 text-rose-600 transition hover:bg-rose-100"
-                                  title="Hapus tahun ajaran"
+                                  className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
+                                  title="Hapus"
                                 >
-                                  <Trash2 size={16} />
+                                  <Trash2 size={16} strokeWidth={1.5} />
                                 </button>
                               )}
-                              <button className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100">
-                                <MoreVertical size={16} />
-                              </button>
                             </div>
                           </td>
                         )}
@@ -376,20 +364,18 @@ export const AcademicYearsPage = () => {
                     ))}
                   </tbody>
                 </table>
-                {/* Table Footer with Pagination */}
-                <div className="flex h-16 items-center justify-between border-t border-slate-200 px-6">
-                  <div className="text-[13px] leading-5 text-slate-500">
-                    Menampilkan {academicYearsData.data.length} dari {academicYearsData?.meta?.total || 0} data
-                  </div>
-                  {academicYearsData?.meta && (
-                    <Pagination
-                      currentPage={academicYearsData.meta.current_page}
-                      totalPages={academicYearsData.meta.last_page}
-                      onPageChange={goToPage}
-                    />
-                  )}
-                </div>
               </Card>
+
+              {/* Pagination */}
+              {academicYearsData?.meta && academicYearsData.meta.last_page > 1 && (
+                <div className="flex justify-center">
+                  <Pagination
+                    currentPage={academicYearsData.meta.current_page}
+                    totalPages={academicYearsData.meta.last_page}
+                    onPageChange={goToPage}
+                  />
+                </div>
+              )}
             </>
           ) : (
             <EmptyState
