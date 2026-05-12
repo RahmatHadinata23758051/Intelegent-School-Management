@@ -78,6 +78,12 @@ export const Sidebar = ({
           label: 'Assignment Mapel Kelas',
           route: '/class-subjects',
         },
+        {
+          id: 'teacher-assignments',
+          icon: Users,
+          label: 'Assignment Guru Mapel',
+          route: '/teacher-assignments',
+        },
       ],
     },
     {

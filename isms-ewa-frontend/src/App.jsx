@@ -11,6 +11,7 @@ import { SemestersPage } from './pages/academic/SemestersPage';
 import { TeachersPage } from './pages/teachers/TeachersPage';
 import { SubjectsPage } from './pages/subjects/SubjectsPage';
 import { ClassSubjectsPage } from './pages/class-subjects/ClassSubjectsPage';
+import { TeacherSubjectAssignmentsPage } from './pages/teacher-assignments/TeacherSubjectAssignmentsPage';
 import { LoadingScreen } from './components/common/LoadingScreen';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ROUTES } from './constants/routes';
@@ -130,6 +131,16 @@ function App() {
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
                 <ClassSubjectsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Teacher Subject Assignments Routes - Protected */}
+          <Route
+            path="/teacher-assignments"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+                <TeacherSubjectAssignmentsPage />
               </ProtectedRoute>
             }
           />
