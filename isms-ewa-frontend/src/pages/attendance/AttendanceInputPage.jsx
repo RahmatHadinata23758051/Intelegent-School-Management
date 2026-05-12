@@ -61,7 +61,8 @@ export const AttendanceInputPage = () => {
         // Map attendances by student_id
         // Response format: { success, message, data: { data: [...], meta: {...} } }
         const attendanceMap = {};
-        const attendanceList = attendancesResponse.data?.data || [];
+        const attendanceData = attendancesResponse.data || {};
+        const attendanceList = attendanceData.data || [];
         attendanceList.forEach((att) => {
           attendanceMap[att.student_id] = {
             id: att.id,
