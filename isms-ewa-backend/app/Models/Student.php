@@ -55,4 +55,12 @@ class Student extends Model
     {
         return $this->hasMany(Attendance::class, 'student_id');
     }
+
+    /**
+     * Relasi: Nilai mingguan siswa
+     */
+    public function weeklyGrades()
+    {
+        return $this->hasMany(WeeklyGrade::class);
+    }
 }

@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\ClassSubjectController;
 use App\Http\Controllers\Api\TeacherSubjectAssignmentController;
 use App\Http\Controllers\Api\AttendanceSessionController;
 use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\GradeComponentController;
+use App\Http\Controllers\Api\WeeklyGradeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -115,4 +117,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('students/{student}/attendance', [AttendanceController::class, 'studentAttendance']);
     Route::post('attendance-sessions/{attendanceSession}/attendances/bulk', [AttendanceController::class, 'bulkStore']);
     Route::apiResource('attendances', AttendanceController::class);
+
+    // Grade Components
+    Route::get('grade-components/dropdown', [GradeComponentController::class, 'dropdown']);
+    Route::get('grade-components/active', [GradeComponentController::class, 'active']);
+    Route::apiResource('grade-components', GradeComponentController::class);
+
+    // Weekly Grades
+    Route::get('weekly-grades/summary', [WeeklyGradeController::class, 'summary']);
+    Route::post('weekly-grades/bulk', [WeeklyGradeController::class, 'bulkStore']);
+    Route::get('classes/{schoolClass}/weekly-grades', [WeeklyGradeController::class, 'classWeeklyGrades']);
+    Route::get('students/{student}/weekly-grades', [WeeklyGradeController::class, 'studentWeeklyGrades']);
+    Route::apiResource('weekly-grades', WeeklyGradeController::class);
 });

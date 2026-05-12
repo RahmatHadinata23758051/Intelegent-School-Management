@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             TeacherSubjectAssignmentSeeder::class,
             DevelopmentSeeder::class,
             AttendanceSeeder::class,
+            GradeComponentSeeder::class,
+            WeeklyGradeSeeder::class,
         ]);
     }
 }

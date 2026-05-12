@@ -48,6 +48,14 @@ class TeacherSubjectAssignment extends Model
         return $this->belongsTo(AcademicYear::class);
     }
 
+    /**
+     * Get weekly grades for this assignment.
+     */
+    public function weeklyGrades()
+    {
+        return $this->hasMany(WeeklyGrade::class);
+    }
+
     // ===== SCOPES =====
 
     /**
