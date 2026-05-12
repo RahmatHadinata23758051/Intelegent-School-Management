@@ -12,6 +12,8 @@ import { TeachersPage } from './pages/teachers/TeachersPage';
 import { SubjectsPage } from './pages/subjects/SubjectsPage';
 import { ClassSubjectsPage } from './pages/class-subjects/ClassSubjectsPage';
 import { TeacherSubjectAssignmentsPage } from './pages/teacher-assignments/TeacherSubjectAssignmentsPage';
+import { AttendanceSessionsPage } from './pages/attendance/AttendanceSessionsPage';
+import { AttendanceInputPage } from './pages/attendance/AttendanceInputPage';
 import { LoadingScreen } from './components/common/LoadingScreen';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ROUTES } from './constants/routes';
@@ -141,6 +143,24 @@ function App() {
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
                 <TeacherSubjectAssignmentsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Attendance Routes - Protected */}
+          <Route
+            path="/attendance/sessions"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+                <AttendanceSessionsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/attendance/sessions/:id/input"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+                <AttendanceInputPage />
               </ProtectedRoute>
             }
           />

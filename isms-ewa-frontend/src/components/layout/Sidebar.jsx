@@ -28,6 +28,7 @@ export const Sidebar = ({
   const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState({
     'academic-setup': true,
+    'attendance': true,
     'student-management': false,
     'financials': false,
     'system-settings': false,
@@ -83,6 +84,19 @@ export const Sidebar = ({
           icon: Users,
           label: 'Assignment Guru Mapel',
           route: '/teacher-assignments',
+        },
+      ],
+    },
+    {
+      id: 'attendance',
+      label: 'ABSENSI',
+      type: 'section',
+      children: [
+        {
+          id: 'attendance-sessions',
+          icon: Calendar,
+          label: 'Sesi Absensi',
+          route: '/attendance/sessions',
         },
       ],
     },
