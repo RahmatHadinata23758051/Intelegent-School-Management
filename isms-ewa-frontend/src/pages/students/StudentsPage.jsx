@@ -1,7 +1,6 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Search, Edit2, Trash2, RotateCcw, RefreshCw, TrendingUp, AlertCircle, BookOpen } from 'lucide-react';
-import clsx from 'clsx';
+import { Plus, Users, Search, Edit2, Trash2, RotateCcw, TrendingUp, AlertCircle } from 'lucide-react';
 import { useStudents } from '../../hooks/useStudents';
 import { useClasses } from '../../hooks/useClasses';
 import { useAuth } from '../../hooks/useAuth';
@@ -41,12 +40,12 @@ const useDebounce = (value, delay) => {
 
 export const StudentsPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [search, setSearch] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedRisk, setSelectedRisk] = useState('');
 
-  // Debounce search to avoid API calls on every keystroke
+  // Debounce search
   const debouncedSearch = useDebounce(search, 500);
 
   // Modal state
@@ -64,8 +63,15 @@ export const StudentsPage = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const { data: studentsData, loading: studentsLoading, error: studentsError, params, updateParams, goToPage, refetch } = useStudents();
-  const { data: classesData, loading: classesLoading } = useClasses({ per_page: 100 });
+  const { data: studentsData, loading: studentsLoading, error: studentsError, params, updateParams, goToPage, refetch, initialize, hasInitialized } = useStudents();
+  const { data: classesData } = useClasses({ per_page: 100 });
+
+  // Initialize data fetch when authenticated
+  useEffect(() => {
+    if (isAuthenticated && !authLoading && !hasInitialized) {
+      initialize();
+    }
+  }, [isAuthenticated, authLoading, hasInitialized, initialize]);
 
   // Optimized handlers with useCallback
   const handleSearch = useCallback((value) => {
@@ -89,10 +95,10 @@ export const StudentsPage = () => {
 
   // Update search params only when debounced value changes
   useEffect(() => {
-    if (debouncedSearch !== params.search) {
+    if (hasInitialized && debouncedSearch !== params.search) {
       updateParams({ search: debouncedSearch });
     }
-  }, [debouncedSearch, params.search, updateParams]);
+  }, [debouncedSearch, params.search, updateParams, hasInitialized]);
 
   /**
    * Handle add student
@@ -213,18 +219,18 @@ export const StudentsPage = () => {
     };
   }, [studentsData?.data, studentsData?.meta?.total]);
 
-  if (studentsLoading) {
-    return <LoadingScreen message="Loading students..." />;
+  if (studentsLoading && !studentsData) {
+    return <LoadingScreen message="Memuat data siswa..." />;
   }
 
   return (
     <AppLayout currentPage="students">
       {/* Success Message */}
       {successMessage && (
-        <div className="mb-6">
+        <div className="mb-4">
           <Alert
             type="success"
-            title="Sukses"
+            title="Berhasil"
             message={successMessage}
             onClose={() => setSuccessMessage('')}
           />
@@ -233,10 +239,10 @@ export const StudentsPage = () => {
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="mb-6">
+        <div className="mb-4">
           <Alert
             type="error"
-            title="Kesalahan"
+            title="Error"
             message={errorMessage}
             onClose={() => setErrorMessage('')}
           />
@@ -244,108 +250,108 @@ export const StudentsPage = () => {
       )}
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-8 gap-4">
+      <div className="flex items-start justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-4xl font-bold text-slate-900">Students</h1>
-          <p className="text-slate-600 mt-2">Manage and monitor student information and risk levels</p>
+          <h1 className="text-3xl font-bold text-slate-900">Students</h1>
+          <p className="text-sm text-slate-600 mt-1">Kelola data siswa dan monitor tingkat risiko</p>
         </div>
         {canCreateStudent && (
           <button
             onClick={handleAddStudent}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg whitespace-nowrap"
+            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
           >
-            <Plus size={20} strokeWidth={2.5} />
-            Add Student
+            <Plus size={18} strokeWidth={2} />
+            Tambah Siswa
           </button>
         )}
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="border-l-4 border-l-blue-500">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600">Total Students</p>
-              <p className="text-3xl font-bold text-slate-900 mt-2">{summaryStats.total}</p>
-              <p className="text-xs text-slate-500 mt-1">All registered students</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card className="border-l-4 border-l-blue-500 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Total Siswa</p>
+              <p className="text-2xl font-bold text-slate-900 mt-2">{summaryStats.total}</p>
+              <p className="text-xs text-slate-500 mt-0.5">Semua siswa terdaftar</p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Users size={24} className="text-blue-600" strokeWidth={1.5} />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="border-l-4 border-l-green-500">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600">Safe</p>
-              <p className="text-3xl font-bold text-green-600 mt-2">{summaryStats.safe}</p>
-              <p className="text-xs text-slate-500 mt-1">Low risk students</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-lg">
-              <TrendingUp size={24} className="text-green-600" strokeWidth={1.5} />
+            <div className="p-2.5 bg-blue-100 rounded-lg">
+              <Users size={20} className="text-blue-600" strokeWidth={1.5} />
             </div>
           </div>
         </Card>
 
-        <Card className="border-l-4 border-l-yellow-500">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600">Warning</p>
-              <p className="text-3xl font-bold text-yellow-600 mt-2">{summaryStats.warning}</p>
-              <p className="text-xs text-slate-500 mt-1">Medium risk students</p>
+        <Card className="border-l-4 border-l-green-500 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Aman</p>
+              <p className="text-2xl font-bold text-green-600 mt-2">{summaryStats.safe}</p>
+              <p className="text-xs text-slate-500 mt-0.5">Risiko rendah</p>
             </div>
-            <div className="p-3 bg-yellow-100 rounded-lg">
-              <AlertCircle size={24} className="text-yellow-600" strokeWidth={1.5} />
+            <div className="p-2.5 bg-green-100 rounded-lg">
+              <TrendingUp size={20} className="text-green-600" strokeWidth={1.5} />
             </div>
           </div>
         </Card>
 
-        <Card className="border-l-4 border-l-red-500">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600">High Risk</p>
-              <p className="text-3xl font-bold text-red-600 mt-2">{summaryStats.highRisk}</p>
-              <p className="text-xs text-slate-500 mt-1">High risk students</p>
+        <Card className="border-l-4 border-l-yellow-500 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Perhatian</p>
+              <p className="text-2xl font-bold text-yellow-600 mt-2">{summaryStats.warning}</p>
+              <p className="text-xs text-slate-500 mt-0.5">Risiko sedang</p>
             </div>
-            <div className="p-3 bg-red-100 rounded-lg">
-              <AlertCircle size={24} className="text-red-600" strokeWidth={1.5} />
+            <div className="p-2.5 bg-yellow-100 rounded-lg">
+              <AlertCircle size={20} className="text-yellow-600" strokeWidth={1.5} />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="border-l-4 border-l-red-500 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Risiko Tinggi</p>
+              <p className="text-2xl font-bold text-red-600 mt-2">{summaryStats.highRisk}</p>
+              <p className="text-xs text-slate-500 mt-0.5">Perlu perhatian khusus</p>
+            </div>
+            <div className="p-2.5 bg-red-100 rounded-lg">
+              <AlertCircle size={20} className="text-red-600" strokeWidth={1.5} />
             </div>
           </div>
         </Card>
       </div>
 
       {/* Filters Card */}
-      <Card className="mb-8">
-        <div className="flex flex-col sm:flex-row gap-3 items-end">
+      <Card className="mb-6 p-4">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
             <SearchInput
               value={search}
               onChange={handleSearch}
               onClear={handleClearSearch}
-              placeholder="Search by name, ID, or email..."
+              placeholder="Cari nama, NIS, atau email..."
             />
           </div>
           <SelectFilter
-            label="Class"
+            label="Kelas"
             value={selectedClass}
             onChange={handleClassFilter}
             options={classOptions}
-            placeholder="All Classes"
+            placeholder="Semua Kelas"
           />
           <SelectFilter
-            label="Risk Level"
+            label="Tingkat Risiko"
             value={selectedRisk}
             onChange={handleRiskFilter}
             options={riskOptions}
-            placeholder="All Levels"
+            placeholder="Semua Level"
           />
           <button
             onClick={refetch}
-            className="p-2.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
+            className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
             title="Refresh data"
           >
-            <RotateCcw size={20} strokeWidth={1.5} />
+            <RotateCcw size={18} strokeWidth={1.5} />
           </button>
         </div>
       </Card>
@@ -363,76 +369,74 @@ export const StudentsPage = () => {
       {!studentsError && (
         <>
           {studentsData?.data && studentsData.data.length > 0 ? (
-            <Card className="mb-8">
-              <Card.Body className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200 bg-slate-50">
-                        <th className="table-header">Name</th>
-                        <th className="table-header">Student ID</th>
-                        <th className="table-header">Class</th>
-                        <th className="table-header">Risk Level</th>
-                        <th className="table-header">Email</th>
-                        <th className="table-header">Action</th>
+            <Card className="mb-6 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50">
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Nama</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">NIS</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Kelas</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Tingkat Risiko</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-right text-xs font-semibold text-slate-700 uppercase tracking-wider">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-slate-200">
+                    {studentsData.data.map((student) => (
+                      <tr key={student.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-6 py-4 text-sm font-medium text-slate-900">{student.name}</td>
+                        <td className="px-6 py-4 text-sm text-slate-600">{student.student_id}</td>
+                        <td className="px-6 py-4 text-sm text-slate-600">{student.school_class?.name || '-'}</td>
+                        <td className="px-6 py-4 text-sm">
+                          <RiskBadge level={student.risk_score?.risk_level || 'safe'} />
+                        </td>
+                        <td className="px-6 py-4 text-sm text-slate-600">{student.email}</td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => navigate(getStudentDetailRoute(student.id))}
+                            >
+                              Lihat
+                            </Button>
+                            {canCreateStudent && (
+                              <>
+                                <button
+                                  onClick={() => handleEditStudent(student)}
+                                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors text-blue-600"
+                                  title="Edit siswa"
+                                >
+                                  <Edit2 size={16} strokeWidth={1.5} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteStudent(student)}
+                                  className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
+                                  title="Hapus siswa"
+                                >
+                                  <Trash2 size={16} strokeWidth={1.5} />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {studentsData.data.map((student) => (
-                        <tr key={student.id} className="table-row">
-                          <td className="table-cell font-semibold text-slate-900">{student.name}</td>
-                          <td className="table-cell text-slate-600">{student.student_id}</td>
-                          <td className="table-cell text-slate-600">{student.school_class?.name || '-'}</td>
-                          <td className="table-cell">
-                            <RiskBadge level={student.risk_score?.risk_level || 'safe'} />
-                          </td>
-                          <td className="table-cell text-slate-600">{student.email}</td>
-                          <td className="table-cell">
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => navigate(getStudentDetailRoute(student.id))}
-                              >
-                                View
-                              </Button>
-                              {canCreateStudent && (
-                                <>
-                                  <button
-                                    onClick={() => handleEditStudent(student)}
-                                    className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-blue-600"
-                                    title="Edit student"
-                                  >
-                                    <Edit2 size={16} />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteStudent(student)}
-                                    className="p-2 hover:bg-rose-100 rounded-lg transition-colors text-rose-600"
-                                    title="Delete student"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card.Body>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </Card>
           ) : (
             <EmptyState
               icon={Users}
-              title="No students found"
-              description="Try adjusting your search or filter criteria"
+              title="Tidak ada siswa ditemukan"
+              description="Coba sesuaikan pencarian atau filter Anda"
             />
           )}
 
           {/* Pagination */}
-          {studentsData?.meta && (
+          {studentsData?.meta && studentsData.meta.last_page > 1 && (
             <div className="flex justify-center">
               <Pagination
                 currentPage={studentsData.meta.current_page}
@@ -448,7 +452,7 @@ export const StudentsPage = () => {
       <Modal
         isOpen={showModal}
         onClose={handleCloseModal}
-        title={editingStudent ? 'Edit Student' : 'Add Student'}
+        title={editingStudent ? 'Edit Siswa' : 'Tambah Siswa'}
         size="lg"
       >
         <StudentForm
@@ -465,10 +469,10 @@ export const StudentsPage = () => {
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleConfirmDelete}
-        title="Delete Student"
-        message={`Are you sure you want to delete ${deletingStudent?.name}? This action cannot be undone.`}
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
+        title="Hapus Siswa"
+        message={`Apakah Anda yakin ingin menghapus ${deletingStudent?.name}? Tindakan ini tidak dapat dibatalkan.`}
+        confirmLabel="Hapus"
+        cancelLabel="Batal"
         variant="danger"
         loading={deleteLoading}
       />

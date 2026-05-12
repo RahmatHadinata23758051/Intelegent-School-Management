@@ -14,11 +14,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
+            AcademicYearSemesterSeeder::class,
             TeacherProfileSeeder::class,
             SubjectSeeder::class,
             ClassSubjectSeeder::class,
             TeacherSubjectAssignmentSeeder::class,
             DevelopmentSeeder::class,
+            AttendanceSeeder::class,
         ]);
     }
 }

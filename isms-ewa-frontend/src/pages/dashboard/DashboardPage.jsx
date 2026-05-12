@@ -12,6 +12,9 @@ import {
   ChevronDown,
   ChevronRight,
   FileText,
+  BarChart3,
+  Activity,
+  Award,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useDashboardStats } from '../../hooks/useDashboardStats';
@@ -130,7 +133,7 @@ export const DashboardPage = () => {
                     <span className={clsx('h-2.5 w-2.5 rounded-full', item.dot)} />
                     {item.label}
                   </div>
-                  <div className="mt-4 text-[24px] font-medium leading-7 tracking-[-0.02em] text-slate-950">
+                  <div className="mt-4 text-[28px] font-bold leading-7 tracking-[-0.02em] text-slate-950 tabular-nums">
                     {item.value}
                   </div>
                   <div className="mt-1 text-[13px] leading-5 text-slate-500">

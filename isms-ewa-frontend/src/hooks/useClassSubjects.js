@@ -1,9 +1,9 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import classSubjectService from '../services/classSubjectService';
 
 export const useClassSubjects = () => {
   const [classSubjects, setClassSubjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
     total: 0,
@@ -11,14 +11,27 @@ export const useClassSubjects = () => {
     current_page: 1,
     last_page: 1,
   });
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const abortControllerRef = useRef(null);
 
   /**
    * Fetch class subjects with filters and pagination
    */
-  const fetchClassSubjects = useCallback(async (params = {}) => {
-    setLoading(true);
-    setError(null);
+  const fetchClassSubjects = useCallback(async (params = {}, skipLoading = false) => {
     try {
+      // Cancel previous request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      // Create new abort controller
+      abortControllerRef.current = new AbortController();
+
+      if (!skipLoading) {
+        setLoading(true);
+      }
+      setError(null);
+      
       const response = await classSubjectService.getClassSubjects({
         per_page: pagination.per_page,
         ...params,
@@ -27,13 +40,27 @@ export const useClassSubjects = () => {
       setPagination(response.pagination);
       return response;
     } catch (err) {
-      const message = err.response?.data?.message || err.message || 'Failed to fetch class subjects';
-      setError(message);
-      throw err;
+      if (err.name !== 'AbortError') {
+        const message = err.response?.data?.message || err.message || 'Failed to fetch class subjects';
+        setError(message);
+        throw err;
+      }
     } finally {
-      setLoading(false);
+      if (!skipLoading) {
+        setLoading(false);
+      }
     }
   }, [pagination.per_page]);
+
+  /**
+   * Initialize fetch - only called once
+   */
+  const initialize = useCallback(async () => {
+    if (!hasInitialized) {
+      setHasInitialized(true);
+      await fetchClassSubjects();
+    }
+  }, [hasInitialized, fetchClassSubjects]);
 
   /**
    * Fetch subjects for a specific class
@@ -80,7 +107,7 @@ export const useClassSubjects = () => {
     try {
       const response = await classSubjectService.createClassSubject(data);
       // Refresh the list
-      await fetchClassSubjects();
+      await fetchClassSubjects({}, true);
       return response;
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Failed to create assignment';
@@ -100,7 +127,7 @@ export const useClassSubjects = () => {
     try {
       const response = await classSubjectService.updateClassSubject(id, data);
       // Refresh the list
-      await fetchClassSubjects();
+      await fetchClassSubjects({}, true);
       return response;
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Failed to update assignment';
@@ -120,7 +147,7 @@ export const useClassSubjects = () => {
     try {
       const response = await classSubjectService.deleteClassSubject(id);
       // Refresh the list
-      await fetchClassSubjects();
+      await fetchClassSubjects({}, true);
       return response;
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Failed to delete assignment';
@@ -140,7 +167,7 @@ export const useClassSubjects = () => {
     try {
       const response = await classSubjectService.assignSubjectToClass(classId, subjectId);
       // Refresh the list
-      await fetchClassSubjects();
+      await fetchClassSubjects({}, true);
       return response;
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Failed to assign subject';
@@ -160,7 +187,7 @@ export const useClassSubjects = () => {
     try {
       const response = await classSubjectService.removeSubjectFromClass(classId, subjectId);
       // Refresh the list
-      await fetchClassSubjects();
+      await fetchClassSubjects({}, true);
       return response;
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Failed to remove subject';
@@ -192,6 +219,8 @@ export const useClassSubjects = () => {
     assignSubjectToClass,
     removeSubjectFromClass,
     setPaginationParams,
+    initialize,
+    hasInitialized,
   };
 };
 

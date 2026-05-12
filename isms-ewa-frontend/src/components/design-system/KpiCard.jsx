@@ -30,40 +30,40 @@ export const KpiCard = ({
 
   return (
     <div className={clsx(
-      'rounded-xl border border-slate-200 bg-[#FAFBFD] p-6',
+      'rounded-xl border border-slate-200 bg-[#FAFBFD] p-6 hover:shadow-md transition-shadow',
       wide && 'col-span-2'
     )}>
       <div className="flex items-start justify-between gap-4">
-        <div>
+        <div className="flex-1">
           {/* Icon Container - 12px radius, colored background */}
           <div className={clsx(
-            'mb-5 grid h-12 w-12 place-items-center rounded-xl',
+            'mb-5 grid h-12 w-12 place-items-center rounded-xl shadow-sm',
             tones[tone]
           )}>
-            <Icon size={22} strokeWidth={2.2} />
+            <Icon size={24} strokeWidth={2} />
           </div>
 
           {/* Title & Meta */}
-          <div className="text-[14px] font-medium leading-5 text-slate-800">
+          <div className="text-[13px] font-medium leading-5 text-slate-600 uppercase tracking-wide">
             {title}
           </div>
-          <div className="text-[13px] leading-5 text-slate-500">
+          <div className="text-[12px] leading-4 text-slate-500 mt-0.5">
             {meta}
           </div>
 
-          {/* Value - Large, bold, tight tracking */}
-          <div className="mt-5 text-[28px] font-medium leading-8 tracking-[-0.03em] text-slate-950">
+          {/* Value - Large, bold, tight tracking with proper alignment */}
+          <div className="mt-6 text-[32px] font-bold leading-8 tracking-[-0.03em] text-slate-950 tabular-nums">
             {value}
           </div>
 
           {/* Change indicator */}
-          <div className={clsx('mt-2 text-[13px] leading-5', changeColor)}>
+          <div className={clsx('mt-3 text-[12px] leading-4 font-medium', changeColor)}>
             {change}
           </div>
         </div>
 
         {/* Sparkline - positioned to the right */}
-        <div className="mt-16">
+        <div className="mt-2 flex-shrink-0">
           <Sparkline tone={tone} />
         </div>
       </div>

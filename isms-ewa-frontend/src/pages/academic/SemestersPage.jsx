@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, BookOpen, Edit2, Trash2, CheckCircle2, Calendar, Users, TrendingUp, MoreVertical } from 'lucide-react';
+import { Plus, BookOpen, Edit2, Trash2, CheckCircle2, Calendar, Users, TrendingUp, MoreVertical, RefreshCw } from 'lucide-react';
 import { useSemesters } from '../../hooks/useSemesters';
 import { useAcademicYears } from '../../hooks/useAcademicYears';
 import { useAuth } from '../../hooks/useAuth';
@@ -225,7 +225,7 @@ export const SemestersPage = () => {
       )}
 
       {/* Header with Action Button */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <h2 className="text-[24px] font-semibold leading-8 tracking-[-0.02em] text-slate-950">
             Semester
@@ -237,28 +237,38 @@ export const SemestersPage = () => {
         {canManage && (
           <button
             onClick={handleAddSemester}
-            className="inline-flex h-11 items-center gap-2 rounded-lg bg-blue-600 px-5 text-[14px] font-medium text-white transition hover:bg-blue-700"
+            className="inline-flex h-11 items-center gap-2 rounded-lg bg-blue-600 px-5 text-[14px] font-semibold text-white transition hover:bg-blue-700 hover:shadow-md whitespace-nowrap"
           >
-            <Plus size={18} />
+            <Plus size={18} strokeWidth={2.5} />
             Tambah Semester
           </button>
         )}
       </div>
 
       {/* Search and Filter Controls */}
-      <Card className="mb-6 grid grid-cols-3 gap-4 p-4">
-        <div className="col-span-1">
+      <Card className="mb-6 grid grid-cols-12 gap-4 p-4 items-end">
+        <div className="col-span-3">
           <DesignSearchInput
             placeholder="Cari semester..."
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
-        <div className="col-span-1">
+        <div className="col-span-3">
           <SelectControl label="Filter Tahun Ajaran" value="Semua Tahun Ajaran" />
         </div>
-        <div className="col-span-1">
+        <div className="col-span-3">
           <SelectControl label="Filter Status" value="Semua Status" />
+        </div>
+        <div className="col-span-3 flex justify-end">
+          <button
+            onClick={() => refetch()}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all font-medium text-sm hover:shadow-sm"
+            title="Refresh data"
+          >
+            <RefreshCw size={16} strokeWidth={2} />
+            <span>Refresh</span>
+          </button>
         </div>
       </Card>
 

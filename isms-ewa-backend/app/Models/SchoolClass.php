@@ -51,4 +51,12 @@ class SchoolClass extends Model
             ->withPivot('is_active')
             ->wherePivot('deleted_at', null);
     }
+
+    /**
+     * Relasi: Sesi absensi kelas
+     */
+    public function attendanceSessions()
+    {
+        return $this->hasMany(AttendanceSession::class, 'school_class_id');
+    }
 }

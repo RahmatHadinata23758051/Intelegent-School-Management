@@ -9,6 +9,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
 });
 
 // Request interceptor - add auth token
@@ -29,7 +30,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Log all errors for debugging
+    // Don't log aborted requests
+    if (error.name === 'AbortError' || error.code === 'ERR_CANCELED') {
+      return Promise.reject(error);
+    }
+
+    // Log all other errors for debugging
     console.error('[API] Response error:', {
       status: error.response?.status,
       statusText: error.response?.statusText,

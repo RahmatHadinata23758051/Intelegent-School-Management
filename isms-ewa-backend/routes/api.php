@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\TeacherProfileController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\ClassSubjectController;
 use App\Http\Controllers\Api\TeacherSubjectAssignmentController;
+use App\Http\Controllers\Api\AttendanceSessionController;
+use App\Http\Controllers\Api\AttendanceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -101,4 +103,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('dashboard/statistics', [DashboardController::class, 'statistics']);
+
+    // Attendance Sessions
+    Route::post('attendance-sessions/{attendanceSession}/lock', [AttendanceSessionController::class, 'lock']);
+    Route::post('attendance-sessions/{attendanceSession}/unlock', [AttendanceSessionController::class, 'unlock']);
+    Route::apiResource('attendance-sessions', AttendanceSessionController::class);
+
+    // Attendances
+    Route::get('attendance/summary', [AttendanceController::class, 'summary']);
+    Route::get('classes/{schoolClass}/attendance', [AttendanceController::class, 'classAttendance']);
+    Route::get('students/{student}/attendance', [AttendanceController::class, 'studentAttendance']);
+    Route::post('attendance-sessions/{attendanceSession}/attendances/bulk', [AttendanceController::class, 'bulkStore']);
+    Route::apiResource('attendances', AttendanceController::class);
 });

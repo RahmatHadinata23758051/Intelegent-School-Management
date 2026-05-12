@@ -47,4 +47,12 @@ class Student extends Model
     {
         return $this->hasOne(RiskScore::class);
     }
+
+    /**
+     * Relasi: Absensi siswa
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'student_id');
+    }
 }

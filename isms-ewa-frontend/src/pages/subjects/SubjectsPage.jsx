@@ -7,7 +7,7 @@ import { LoadingScreen } from '../../components/common/LoadingScreen';
 import { ErrorState } from '../../components/common/ErrorState';
 import { StatusPill } from '../../components/design-system';
 import { SubjectForm } from '../../components/subjects/SubjectForm';
-import { ChevronRight, Plus, Edit2, Trash2, Search, Filter } from 'lucide-react';
+import { ChevronRight, Plus, Edit2, Trash2, Search, Filter, RefreshCw, BookOpen, CheckCircle2, Lightbulb } from 'lucide-react';
 
 export const SubjectsPage = () => {
   const { user } = useAuth();
@@ -82,7 +82,7 @@ export const SubjectsPage = () => {
   return (
     <AppLayout currentPage="subjects">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-slate-950">Manajemen Mata Pelajaran</h1>
           <p className="mt-1 text-sm text-slate-500">Kelola daftar mata pelajaran sekolah</p>
@@ -90,9 +90,9 @@ export const SubjectsPage = () => {
         {isAdmin && (
           <button
             onClick={() => handleOpenModal()}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 hover:shadow-md transition-all whitespace-nowrap"
           >
-            <Plus size={18} />
+            <Plus size={18} strokeWidth={2.5} />
             Tambah Mata Pelajaran
           </button>
         )}
@@ -101,25 +101,53 @@ export const SubjectsPage = () => {
       {/* Summary Cards */}
       <div className="mb-6 grid grid-cols-4 gap-4">
         <Card className="p-6">
-          <div className="text-sm font-medium text-slate-600">Total Mata Pelajaran</div>
-          <div className="mt-2 text-3xl font-semibold text-slate-950">{totalMapel}</div>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Mata Pelajaran</p>
+              <p className="mt-4 text-3xl font-bold text-slate-950 tabular-nums">{totalMapel}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-blue-50">
+              <BookOpen size={20} className="text-blue-600" strokeWidth={2} />
+            </div>
+          </div>
         </Card>
         <Card className="p-6">
-          <div className="text-sm font-medium text-slate-600">Mata Pelajaran Aktif</div>
-          <div className="mt-2 text-3xl font-semibold text-emerald-600">{mapelAktif}</div>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Mata Pelajaran Aktif</p>
+              <p className="mt-4 text-3xl font-bold text-emerald-600 tabular-nums">{mapelAktif}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-emerald-50">
+              <CheckCircle2 size={20} className="text-emerald-600" strokeWidth={2} />
+            </div>
+          </div>
         </Card>
         <Card className="p-6">
-          <div className="text-sm font-medium text-slate-600">Mata Pelajaran Nonaktif</div>
-          <div className="mt-2 text-3xl font-semibold text-slate-400">{mapelNonaktif}</div>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Mata Pelajaran Nonaktif</p>
+              <p className="mt-4 text-3xl font-bold text-slate-400 tabular-nums">{mapelNonaktif}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-slate-100">
+              <Filter size={20} className="text-slate-400" strokeWidth={2} />
+            </div>
+          </div>
         </Card>
         <Card className="p-6">
-          <div className="text-sm font-medium text-slate-600">Total SKS</div>
-          <div className="mt-2 text-3xl font-semibold text-blue-600">{totalSKS}</div>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total SKS</p>
+              <p className="mt-4 text-3xl font-bold text-blue-600 tabular-nums">{totalSKS}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-indigo-50">
+              <Lightbulb size={20} className="text-indigo-600" strokeWidth={2} />
+            </div>
+          </div>
         </Card>
       </div>
 
       {/* Toolbar */}
-      <div className="mb-6 flex gap-3">
+      <div className="mb-6 flex gap-3 items-end">
         <div className="flex-1">
           <div className="relative">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -150,6 +178,14 @@ export const SubjectsPage = () => {
           <option value="code">Kode</option>
           <option value="name">Nama</option>
         </select>
+        <button
+          onClick={() => refetch()}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all font-medium text-sm hover:shadow-sm"
+          title="Refresh data"
+        >
+          <RefreshCw size={16} strokeWidth={2} />
+          <span>Refresh</span>
+        </button>
       </div>
 
       {/* Error State */}

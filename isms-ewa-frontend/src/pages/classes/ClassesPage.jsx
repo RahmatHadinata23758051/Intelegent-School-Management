@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, BookOpen, Users, User, Edit2, Trash2 } from 'lucide-react';
+import { Plus, BookOpen, Users, User, Edit2, Trash2, RefreshCw } from 'lucide-react';
 import { useClasses } from '../../hooks/useClasses';
 import { useAuth } from '../../hooks/useAuth';
 import { classService } from '../../services/classService';
@@ -176,7 +176,7 @@ export const ClassesPage = () => {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 gap-4">
         <div>
           <h2 className="text-3xl font-bold text-slate-900">Classes</h2>
           <p className="text-slate-500 mt-1">Manage school classes and homeroom teachers</p>
@@ -185,10 +185,10 @@ export const ClassesPage = () => {
           <Button
             variant="primary"
             size="lg"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 whitespace-nowrap shadow-md"
             onClick={handleAddClass}
           >
-            <Plus size={20} />
+            <Plus size={20} strokeWidth={2.5} />
             Add Class
           </Button>
         )}
@@ -196,13 +196,23 @@ export const ClassesPage = () => {
 
       {/* Search Card */}
       <Card className="mb-8">
-        <Card.Body>
-          <SearchInput
-            value={search}
-            onChange={handleSearch}
-            onClear={handleClearSearch}
-            placeholder="Search by class name or grade level..."
-          />
+        <Card.Body className="flex items-end gap-3">
+          <div className="flex-1">
+            <SearchInput
+              value={search}
+              onChange={handleSearch}
+              onClear={handleClearSearch}
+              placeholder="Search by class name or grade level..."
+            />
+          </div>
+          <button
+            onClick={() => refetch()}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all font-medium text-sm hover:shadow-sm"
+            title="Refresh data"
+          >
+            <RefreshCw size={16} strokeWidth={2} />
+            <span>Refresh</span>
+          </button>
         </Card.Body>
       </Card>
 
