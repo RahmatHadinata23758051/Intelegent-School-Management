@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useClassSubjects } from '../../hooks/useClassSubjects';
 import { useClasses } from '../../hooks/useClasses';
@@ -10,6 +10,23 @@ import { ErrorState } from '../../components/common/ErrorState';
 import { StatusPill } from '../../components/design-system';
 import { ClassSubjectForm } from '../../components/class-subjects/ClassSubjectForm';
 import { Plus, Edit2, Trash2, Search, X, RotateCcw, BookOpen, CheckCircle2, Layers, Grid3x3 } from 'lucide-react';
+
+// Debounce hook
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 
 export const ClassSubjectsPage = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -28,9 +45,6 @@ export const ClassSubjectsPage = () => {
   const { data: classesData } = useClasses();
   const { data: subjectsData } = useSubjects();
 
-  const schoolClasses = classesData?.data || [];
-  const subjects = subjectsData || [];
-
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,13 +55,22 @@ export const ClassSubjectsPage = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [hasInitialized, setHasInitialized] = useState(false);
 
+  // Debounce search
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
   const isAdmin = user?.role === 'admin';
 
-  // Calculate summary stats
-  const totalAssignments = pagination.total;
-  const activeAssignments = classSubjects.filter((cs) => cs.is_active).length;
-  const uniqueClasses = new Set(classSubjects.map((cs) => cs.school_class_id)).size;
-  const uniqueSubjects = new Set(classSubjects.map((cs) => cs.subject_id)).size;
+  // Memoize expensive calculations
+  const schoolClasses = useMemo(() => classesData?.data || [], [classesData?.data]);
+  const subjects = useMemo(() => subjectsData || [], [subjectsData]);
+
+  // Memoize summary stats
+  const summaryStats = useMemo(() => ({
+    totalAssignments: pagination.total,
+    activeAssignments: classSubjects.filter((cs) => cs.is_active).length,
+    uniqueClasses: new Set(classSubjects.map((cs) => cs.school_class_id)).size,
+    uniqueSubjects: new Set(classSubjects.map((cs) => cs.subject_id)).size,
+  }), [pagination.total, classSubjects]);
 
   // Initialize fetch when authenticated
   useEffect(() => {
@@ -57,14 +80,14 @@ export const ClassSubjectsPage = () => {
     }
   }, [isAuthenticated, authLoading, hasInitialized, fetchClassSubjects]);
 
-  // Fetch data when filters change
+  // Update search params only when debounced value changes
   useEffect(() => {
     if (!hasInitialized || authLoading) return;
-
+    
     const params = {
       page: pagination.current_page,
       per_page: pagination.per_page,
-      search: searchTerm,
+      search: debouncedSearchTerm,
       school_class_id: filterClass ? parseInt(filterClass) : undefined,
       subject_id: filterSubject ? parseInt(filterSubject) : undefined,
       status: filterStatus,
@@ -74,7 +97,7 @@ export const ClassSubjectsPage = () => {
   }, [
     pagination.current_page,
     pagination.per_page,
-    searchTerm,
+    debouncedSearchTerm,
     filterClass,
     filterSubject,
     filterStatus,
@@ -83,17 +106,18 @@ export const ClassSubjectsPage = () => {
     authLoading,
   ]);
 
-  const handleOpenModal = (item = null) => {
+  // Optimized handlers with useCallback
+  const handleOpenModal = useCallback((item = null) => {
     setEditingItem(item);
     setShowModal(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setShowModal(false);
     setEditingItem(null);
-  };
+  }, []);
 
-  const handleSubmit = async (formData) => {
+  const handleSubmit = useCallback(async (formData) => {
     setIsSubmitting(true);
     try {
       if (editingItem) {
@@ -105,9 +129,9 @@ export const ClassSubjectsPage = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [editingItem, updateClassSubject, createClassSubject, handleCloseModal]);
 
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     setIsSubmitting(true);
     try {
       await deleteClassSubject(id);
@@ -115,14 +139,14 @@ export const ClassSubjectsPage = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [deleteClassSubject]);
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     setSearchTerm('');
     setFilterClass('');
     setFilterSubject('');
     setFilterStatus('all');
-  };
+  }, []);
 
   if (loading && classSubjects.length === 0) {
     return <LoadingScreen message="Memuat data assignment mapel kelas..." />;
@@ -161,7 +185,7 @@ export const ClassSubjectsPage = () => {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Total Assignment</p>
-              <p className="mt-2 text-3xl font-bold text-slate-900">{totalAssignments}</p>
+              <p className="mt-2 text-3xl font-bold text-slate-900">{summaryStats.totalAssignments}</p>
               <p className="text-xs text-slate-500 mt-1">Semua penugasan</p>
             </div>
             <div className="p-3 rounded-lg bg-blue-100">
@@ -173,7 +197,7 @@ export const ClassSubjectsPage = () => {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Assignment Aktif</p>
-              <p className="mt-2 text-3xl font-bold text-green-600">{activeAssignments}</p>
+              <p className="mt-2 text-3xl font-bold text-green-600">{summaryStats.activeAssignments}</p>
               <p className="text-xs text-slate-500 mt-1">Sedang berlangsung</p>
             </div>
             <div className="p-3 rounded-lg bg-green-100">
@@ -185,7 +209,7 @@ export const ClassSubjectsPage = () => {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Total Kelas dengan Mapel</p>
-              <p className="mt-2 text-3xl font-bold text-purple-600">{uniqueClasses}</p>
+              <p className="mt-2 text-3xl font-bold text-purple-600">{summaryStats.uniqueClasses}</p>
               <p className="text-xs text-slate-500 mt-1">Kelas terisi</p>
             </div>
             <div className="p-3 rounded-lg bg-purple-100">
@@ -197,7 +221,7 @@ export const ClassSubjectsPage = () => {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Total Mapel Terpakai</p>
-              <p className="mt-2 text-3xl font-bold text-orange-600">{uniqueSubjects}</p>
+              <p className="mt-2 text-3xl font-bold text-orange-600">{summaryStats.uniqueSubjects}</p>
               <p className="text-xs text-slate-500 mt-1">Mapel aktif</p>
             </div>
             <div className="p-3 rounded-lg bg-orange-100">

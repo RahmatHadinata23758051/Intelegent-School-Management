@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Users, Search, Edit2, Trash2, RotateCcw, RefreshCw, TrendingUp, AlertCircle, BookOpen } from 'lucide-react';
 import clsx from 'clsx';
@@ -22,12 +22,32 @@ import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { StudentForm } from '../../components/students/StudentForm';
 import { getStudentDetailRoute } from '../../constants/routes';
 
+// Debounce hook
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
 export const StudentsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [search, setSearch] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedRisk, setSelectedRisk] = useState('');
+
+  // Debounce search to avoid API calls on every keystroke
+  const debouncedSearch = useDebounce(search, 500);
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -47,25 +67,32 @@ export const StudentsPage = () => {
   const { data: studentsData, loading: studentsLoading, error: studentsError, params, updateParams, goToPage, refetch } = useStudents();
   const { data: classesData, loading: classesLoading } = useClasses({ per_page: 100 });
 
-  const handleSearch = (value) => {
+  // Optimized handlers with useCallback
+  const handleSearch = useCallback((value) => {
     setSearch(value);
-    updateParams({ search: value });
-  };
+  }, []);
 
-  const handleClassFilter = (value) => {
+  const handleClassFilter = useCallback((value) => {
     setSelectedClass(value);
     updateParams({ school_class_id: value || undefined });
-  };
+  }, [updateParams]);
 
-  const handleRiskFilter = (value) => {
+  const handleRiskFilter = useCallback((value) => {
     setSelectedRisk(value);
     updateParams({ risk_level: value || undefined });
-  };
+  }, [updateParams]);
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     setSearch('');
     updateParams({ search: '' });
-  };
+  }, [updateParams]);
+
+  // Update search params only when debounced value changes
+  useEffect(() => {
+    if (debouncedSearch !== params.search) {
+      updateParams({ search: debouncedSearch });
+    }
+  }, [debouncedSearch, params.search, updateParams]);
 
   /**
    * Handle add student
@@ -162,16 +189,29 @@ export const StudentsPage = () => {
 
   const canCreateStudent = user?.role === 'admin';
 
-  const classOptions = classesData?.data?.map((cls) => ({
-    value: cls.id,
-    label: cls.name,
-  })) || [];
+  // Memoize expensive calculations
+  const classOptions = useMemo(() => 
+    classesData?.data?.map((cls) => ({
+      value: cls.id,
+      label: cls.name,
+    })) || [], [classesData?.data]);
 
-  const riskOptions = [
+  const riskOptions = useMemo(() => [
     { value: 'safe', label: 'Safe' },
     { value: 'warning', label: 'Warning' },
     { value: 'high_risk', label: 'High Risk' },
-  ];
+  ], []);
+
+  // Memoize summary statistics
+  const summaryStats = useMemo(() => {
+    const data = studentsData?.data || [];
+    return {
+      total: studentsData?.meta?.total || 0,
+      safe: data.filter(s => s.risk_score?.risk_level === 'safe').length,
+      warning: data.filter(s => s.risk_score?.risk_level === 'warning').length,
+      highRisk: data.filter(s => s.risk_score?.risk_level === 'high_risk').length,
+    };
+  }, [studentsData?.data, studentsData?.meta?.total]);
 
   if (studentsLoading) {
     return <LoadingScreen message="Loading students..." />;
@@ -226,7 +266,7 @@ export const StudentsPage = () => {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Total Students</p>
-              <p className="text-3xl font-bold text-slate-900 mt-2">{studentsData?.meta?.total || 0}</p>
+              <p className="text-3xl font-bold text-slate-900 mt-2">{summaryStats.total}</p>
               <p className="text-xs text-slate-500 mt-1">All registered students</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
@@ -239,7 +279,7 @@ export const StudentsPage = () => {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Safe</p>
-              <p className="text-3xl font-bold text-green-600 mt-2">{studentsData?.data?.filter(s => s.risk_score?.risk_level === 'safe').length || 0}</p>
+              <p className="text-3xl font-bold text-green-600 mt-2">{summaryStats.safe}</p>
               <p className="text-xs text-slate-500 mt-1">Low risk students</p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
@@ -252,7 +292,7 @@ export const StudentsPage = () => {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Warning</p>
-              <p className="text-3xl font-bold text-yellow-600 mt-2">{studentsData?.data?.filter(s => s.risk_score?.risk_level === 'warning').length || 0}</p>
+              <p className="text-3xl font-bold text-yellow-600 mt-2">{summaryStats.warning}</p>
               <p className="text-xs text-slate-500 mt-1">Medium risk students</p>
             </div>
             <div className="p-3 bg-yellow-100 rounded-lg">
@@ -265,7 +305,7 @@ export const StudentsPage = () => {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">High Risk</p>
-              <p className="text-3xl font-bold text-red-600 mt-2">{studentsData?.data?.filter(s => s.risk_score?.risk_level === 'high_risk').length || 0}</p>
+              <p className="text-3xl font-bold text-red-600 mt-2">{summaryStats.highRisk}</p>
               <p className="text-xs text-slate-500 mt-1">High risk students</p>
             </div>
             <div className="p-3 bg-red-100 rounded-lg">
