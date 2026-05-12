@@ -12,7 +12,7 @@ import { ClassSubjectForm } from '../../components/class-subjects/ClassSubjectFo
 import { Plus, Edit2, Trash2, Search, X } from 'lucide-react';
 
 export const ClassSubjectsPage = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const {
     classSubjects,
     loading,
@@ -39,6 +39,7 @@ export const ClassSubjectsPage = () => {
   const [filterClass, setFilterClass] = useState('');
   const [filterSubject, setFilterSubject] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const isAdmin = user?.role === 'admin';
 
@@ -48,8 +49,18 @@ export const ClassSubjectsPage = () => {
   const uniqueClasses = new Set(classSubjects.map((cs) => cs.school_class_id)).size;
   const uniqueSubjects = new Set(classSubjects.map((cs) => cs.subject_id)).size;
 
+  // Initialize fetch when authenticated
+  useEffect(() => {
+    if (isAuthenticated && !authLoading && !hasInitialized) {
+      setHasInitialized(true);
+      fetchClassSubjects();
+    }
+  }, [isAuthenticated, authLoading, hasInitialized, fetchClassSubjects]);
+
   // Fetch data when filters change
   useEffect(() => {
+    if (!hasInitialized || authLoading) return;
+
     const params = {
       page: pagination.current_page,
       per_page: pagination.per_page,
@@ -67,6 +78,9 @@ export const ClassSubjectsPage = () => {
     filterClass,
     filterSubject,
     filterStatus,
+    fetchClassSubjects,
+    hasInitialized,
+    authLoading,
   ]);
 
   const handleOpenModal = (item = null) => {
