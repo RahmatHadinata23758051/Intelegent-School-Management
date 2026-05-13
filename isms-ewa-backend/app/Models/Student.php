@@ -63,4 +63,20 @@ class Student extends Model
     {
         return $this->hasMany(WeeklyGrade::class);
     }
+
+    /**
+     * Relasi: Rekap akademik siswa
+     */
+    public function academicSummaries()
+    {
+        return $this->hasMany(StudentAcademicSummary::class);
+    }
+
+    /**
+     * Relasi: Raport siswa
+     */
+    public function reportCards()
+    {
+        return $this->hasMany(ReportCard::class);
+    }
 }

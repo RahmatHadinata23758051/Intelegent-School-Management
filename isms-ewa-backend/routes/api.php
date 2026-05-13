@@ -17,6 +17,8 @@ use App\Http\Controllers\Api\AttendanceSessionController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\GradeComponentController;
 use App\Http\Controllers\Api\WeeklyGradeController;
+use App\Http\Controllers\Api\AcademicRecapController;
+use App\Http\Controllers\Api\ReportCardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -129,4 +131,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('classes/{schoolClass}/weekly-grades', [WeeklyGradeController::class, 'classWeeklyGrades']);
     Route::get('students/{student}/weekly-grades', [WeeklyGradeController::class, 'studentWeeklyGrades']);
     Route::apiResource('weekly-grades', WeeklyGradeController::class);
+
+    // Academic Summaries
+    Route::get('academic-summaries', [AcademicRecapController::class, 'index']);
+    Route::post('academic-summaries/generate', [AcademicRecapController::class, 'generateSummary']);
+    Route::get('academic-summaries/{studentAcademicSummary}', [AcademicRecapController::class, 'show']);
+    Route::get('students/{student}/academic-summary', [AcademicRecapController::class, 'getStudentSummary']);
+    Route::get('classes/{schoolClass}/academic-summaries', [AcademicRecapController::class, 'getClassSummaries']);
+    
+    // Supporting Preview
+    Route::get('students/{student}/subject-grade-breakdown', [AcademicRecapController::class, 'getSubjectBreakdown']);
+    Route::get('students/{student}/attendance-recap', [AcademicRecapController::class, 'getAttendanceRecap']);
+    Route::get('students/{student}/violation-recap', [AcademicRecapController::class, 'getViolationRecap']);
+
+    // Report Cards
+    Route::get('report-cards', [ReportCardController::class, 'index']);
+    Route::post('report-cards/generate', [ReportCardController::class, 'generateReportCard']);
+    Route::get('report-cards/{reportCard}', [ReportCardController::class, 'show']);
+    Route::put('report-cards/{reportCard}', [ReportCardController::class, 'update']);
+    Route::post('report-cards/{reportCard}/approve', [ReportCardController::class, 'approve']);
+    Route::get('students/{student}/report-card', [ReportCardController::class, 'getStudentReportCard']);
+    Route::get('classes/{schoolClass}/report-cards', [ReportCardController::class, 'getClassReportCards']);
 });

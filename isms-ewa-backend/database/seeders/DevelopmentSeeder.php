@@ -214,5 +214,11 @@ class DevelopmentSeeder extends Seeder
         foreach (Student::all() as $student) {
             $scoringService->updateStudentRiskScore($student);
         }
+
+        // Call additional seeders
+        $this->call([
+            AcademicSummarySeeder::class,
+            ReportCardSeeder::class,
+        ]);
     }
 }

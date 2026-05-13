@@ -27,6 +27,8 @@ class AuthServiceProvider extends ServiceProvider
         \App\Models\Attendance::class => \App\Policies\AttendancePolicy::class,
         \App\Models\GradeComponent::class => \App\Policies\GradeComponentPolicy::class,
         \App\Models\WeeklyGrade::class => \App\Policies\WeeklyGradePolicy::class,
+        \App\Models\StudentAcademicSummary::class => \App\Policies\StudentAcademicSummaryPolicy::class,
+        \App\Models\ReportCard::class => \App\Policies\ReportCardPolicy::class,
     ];
 
     /**
