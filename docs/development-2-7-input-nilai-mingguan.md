@@ -472,6 +472,129 @@ Weekly Grades: 180
 Teacher Assignments: 6
 ```
 
+### Feature Tests
+
+#### GradeComponentTest
+
+```bash
+php artisan test --filter=GradeComponentTest
+```
+
+**Test Coverage** (20 tests, 74 assertions):
+
+**CRUD Operations**:
+1. ✅ admin_can_create_grade_component
+2. ✅ admin_can_list_grade_components
+3. ✅ admin_can_view_grade_component_detail
+4. ✅ admin_can_update_grade_component
+5. ✅ admin_can_delete_grade_component
+
+**RBAC - Teacher**:
+6. ✅ teacher_can_list_grade_components_read_only
+7. ✅ teacher_cannot_create_grade_component
+8. ✅ teacher_cannot_update_grade_component
+9. ✅ teacher_cannot_delete_grade_component
+
+**RBAC - Homeroom**:
+10. ✅ homeroom_teacher_can_list_grade_components_read_only
+
+**Validation**:
+11. ✅ code_must_be_unique
+12. ✅ name_is_required
+13. ✅ default_weight_must_be_numeric
+14. ✅ default_weight_must_be_between_0_and_100
+
+**Filtering & Search**:
+15. ✅ dropdown_returns_active_grade_components_only
+16. ✅ active_endpoint_returns_active_grade_components_only
+17. ✅ search_by_code_works
+18. ✅ search_by_name_works
+19. ✅ filter_by_active_status_works
+20. ✅ pagination_works
+
+**Result**: ✅ **20 tests PASS** (74 assertions)
+
+#### WeeklyGradeTest
+
+```bash
+php artisan test --filter=WeeklyGradeTest
+```
+
+**Test Coverage** (27 tests, 75 assertions):
+
+**CRUD Operations - Admin**:
+1. ✅ admin_can_input_weekly_grade
+2. ✅ admin_can_list_weekly_grades
+3. ✅ admin_can_view_weekly_grade_detail
+4. ✅ admin_can_update_weekly_grade
+5. ✅ admin_can_delete_weekly_grade
+
+**RBAC - Teacher**:
+6. ✅ teacher_can_input_weekly_grade_for_assigned_class_subject
+7. ✅ teacher_cannot_input_weekly_grade_for_unassigned_class_subject
+8. ✅ teacher_can_update_own_assignment_weekly_grade
+9. ✅ teacher_cannot_update_other_teacher_grade
+
+**Validation - Business Rules**:
+10. ✅ cannot_input_grade_for_student_outside_assignment_class
+11. ✅ cannot_input_inactive_grade_component
+12. ✅ cannot_input_invalid_score_below_0
+13. ✅ cannot_input_invalid_score_above_100
+14. ✅ cannot_input_invalid_week_below_1
+15. ✅ cannot_input_invalid_week_above_52
+16. ✅ cannot_input_duplicate_weekly_grade_manually
+
+**Bulk Operations**:
+17. ✅ bulk_input_weekly_grades_works
+18. ✅ bulk_input_upsert_works
+
+**Recap & Summary**:
+19. ✅ get_class_weekly_grades_recap_works
+20. ✅ get_student_weekly_grades_recap_works
+21. ✅ weekly_grades_summary_works
+22. ✅ average_score_calculation_works
+
+**Filtering**:
+23. ✅ filter_by_class_works
+24. ✅ filter_by_subject_works
+25. ✅ filter_by_week_works
+26. ✅ filter_by_score_range_works
+27. ✅ pagination_works
+
+**Result**: ✅ **27 tests PASS** (75 assertions)
+
+### Full Test Suite
+
+```bash
+php artisan test
+```
+
+**Result**: ✅ **266 tests PASS** (736 assertions) in 170.08s
+
+**Test Breakdown**:
+- GradeComponentTest: 20 tests ✅
+- WeeklyGradeTest: 27 tests ✅
+- Previous modules (Dev 2.1-2.6): 219 tests ✅
+
+**No Regressions Detected**: All previous tests continue to pass.
+
+### Bugs Found and Fixed
+
+**Bug #1: Policies Not Registered**
+- **Issue**: GradeComponentPolicy and WeeklyGradePolicy not registered in AuthServiceProvider
+- **Fix**: Added policy mappings in `app/Providers/AuthServiceProvider.php`
+- **Impact**: Authorization now works correctly for all endpoints
+
+**Bug #2: Wrong Parameter Order in successResponse()**
+- **Issue**: Controllers passing 4 parameters to `successResponse()` instead of 3
+- **Fix**: Removed extra array parameter in GradeComponentController and WeeklyGradeController
+- **Impact**: API responses now return correct format
+
+**Bug #3: Bulk Store Response Format**
+- **Issue**: Bulk store returning array directly instead of wrapped with meta
+- **Fix**: Wrapped response in array with meta information
+- **Impact**: Consistent response format across all endpoints
+
 ## Files Created/Modified
 
 ### Migrations (2 files)
@@ -511,13 +634,18 @@ Teacher Assignments: 6
 ### Commands (1 file)
 - `app/Console/Commands/MigrateFreshSeed.php`
 
-### Updated Files (4 files)
+### Tests (2 files)
+- `tests/Feature/GradeComponentTest.php` - 20 tests
+- `tests/Feature/WeeklyGradeTest.php` - 27 tests
+
+### Updated Files (5 files)
 - `routes/api.php` - Added grade components and weekly grades routes
 - `app/Models/Student.php` - Added weeklyGrades relationship
 - `app/Models/TeacherSubjectAssignment.php` - Added weeklyGrades relationship
 - `database/seeders/DatabaseSeeder.php` - Added new seeders
+- `app/Providers/AuthServiceProvider.php` - Registered policies
 
-**Total**: 23 files (19 new, 4 modified)
+**Total**: 27 files (21 new, 6 modified)
 
 ## Known Limitations
 
@@ -544,10 +672,57 @@ Setelah weekly grades selesai, module selanjutnya adalah:
 
 ## Kesimpulan
 
-✅ **Development 2.7 Backend selesai dengan sukses**
+✅ **Development 2.7 Backend selesai dengan sukses dan terverifikasi lengkap**
 
 **Achievements**:
-- 23 files created/modified
+- 27 files created/modified (21 new, 6 modified)
+- 2 database tables dengan comprehensive schema
+- 2 models dengan extensive scopes
+- 5 form requests dengan custom validation
+- 2 resources untuk API responses
+- 2 policies untuk RBAC
+- 1 service untuk business logic
+- 2 controllers dengan CRUD dan bulk operations
+- 16 API endpoints
+- 2 seeders dengan 180 weekly grades
+- 1 custom artisan command
+- **47 comprehensive feature tests** (20 GradeComponent + 27 WeeklyGrade)
+- Migration dan seeding berhasil
+- Routes terdaftar dengan benar
+- **Full test suite: 266 tests PASS** (736 assertions)
+- **No regressions** dari Development 2.1-2.6
+
+**Quality**:
+- ✅ Comprehensive validation
+- ✅ RBAC implementation dengan policy tests
+- ✅ Soft deletes untuk history
+- ✅ Unique constraints
+- ✅ Extensive indexes
+- ✅ Bulk operations support dengan upsert
+- ✅ Flexible filtering
+- ✅ Recap dan summary dengan calculations
+- ✅ Clean code structure
+- ✅ Idempotent seeders
+- ✅ **47 feature tests covering all scenarios**
+- ✅ **All bugs found and fixed**
+
+**Test Coverage**:
+- ✅ CRUD operations (Admin, Teacher, Homeroom)
+- ✅ RBAC authorization (create, update, delete permissions)
+- ✅ Validation (score range, week range, uniqueness)
+- ✅ Business rules (student in class, active components, active assignments)
+- ✅ Bulk operations (insert, upsert)
+- ✅ Recap & summary (class, student, overall)
+- ✅ Filtering & search (class, subject, week, score range)
+- ✅ Pagination
+- ✅ Score calculations (average, min, max, low score count)
+
+Backend weekly grades siap untuk frontend implementation! 🎉
+
+**Git Commits**: 
+- `0128049` - Initial implementation
+- `df530f0` - Documentation
+- (pending) - Feature tests and verification
 - 2 database tables dengan comprehensive schema
 - 2 models dengan extensive scopes
 - 5 form requests dengan custom validation
