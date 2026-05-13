@@ -364,47 +364,47 @@ export const WeeklyGradeInputPage = () => {
       {/* Progress Cards */}
       {canInput && students.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <Card className="p-5 border-l-4 border-l-blue-500">
+          <Card className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 hover:shadow-lg transition-all duration-300 group">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600 mb-1">Total Siswa</p>
-                <p className="text-2xl font-bold text-slate-900">{totalStudents}</p>
+                <p className="text-sm font-medium text-blue-700 mb-1">Total Siswa</p>
+                <p className="text-3xl font-bold text-blue-900">{totalStudents}</p>
               </div>
-              <div className="p-2.5 rounded-xl bg-blue-50">
-                <Users className="text-blue-600" size={20} strokeWidth={2} />
+              <div className="p-3 rounded-xl bg-blue-100 group-hover:bg-blue-200 transition-colors duration-300">
+                <Users className="text-blue-700" size={22} strokeWidth={2} />
               </div>
             </div>
           </Card>
-          <Card className="p-5 border-l-4 border-l-emerald-500">
+          <Card className="p-5 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 hover:shadow-lg transition-all duration-300 group">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600 mb-1">Sudah Diisi</p>
-                <p className="text-2xl font-bold text-slate-900">{filledCount}</p>
+                <p className="text-sm font-medium text-emerald-700 mb-1">Sudah Diisi</p>
+                <p className="text-3xl font-bold text-emerald-900">{filledCount}</p>
               </div>
-              <div className="p-2.5 rounded-xl bg-emerald-50">
-                <CheckCircle2 className="text-emerald-600" size={20} strokeWidth={2} />
+              <div className="p-3 rounded-xl bg-emerald-100 group-hover:bg-emerald-200 transition-colors duration-300">
+                <CheckCircle2 className="text-emerald-700" size={22} strokeWidth={2} />
               </div>
             </div>
           </Card>
-          <Card className="p-5 border-l-4 border-l-amber-500">
+          <Card className="p-5 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 hover:shadow-lg transition-all duration-300 group">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600 mb-1">Rata-rata</p>
-                <p className="text-2xl font-bold text-slate-900">{averageScore}</p>
+                <p className="text-sm font-medium text-amber-700 mb-1">Rata-rata</p>
+                <p className="text-3xl font-bold text-amber-900">{averageScore}</p>
               </div>
-              <div className="p-2.5 rounded-xl bg-amber-50">
-                <TrendingUp className="text-amber-600" size={20} strokeWidth={2} />
+              <div className="p-3 rounded-xl bg-amber-100 group-hover:bg-amber-200 transition-colors duration-300">
+                <TrendingUp className="text-amber-700" size={22} strokeWidth={2} />
               </div>
             </div>
           </Card>
-          <Card className="p-5 border-l-4 border-l-rose-500">
+          <Card className="p-5 bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 hover:shadow-lg transition-all duration-300 group">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600 mb-1">Nilai Rendah</p>
-                <p className="text-2xl font-bold text-slate-900">{lowScoreCount}</p>
+                <p className="text-sm font-medium text-rose-700 mb-1">Nilai Rendah</p>
+                <p className="text-3xl font-bold text-rose-900">{lowScoreCount}</p>
               </div>
-              <div className="p-2.5 rounded-xl bg-rose-50">
-                <AlertCircle className="text-rose-600" size={20} strokeWidth={2} />
+              <div className="p-3 rounded-xl bg-rose-100 group-hover:bg-rose-200 transition-colors duration-300">
+                <AlertCircle className="text-rose-700" size={22} strokeWidth={2} />
               </div>
             </div>
           </Card>
@@ -413,35 +413,45 @@ export const WeeklyGradeInputPage = () => {
 
       {/* Bulk Actions */}
       {canInput && students.length > 0 && (
-        <Card className="mb-6 p-4">
+        <Card className="mb-6 p-4 bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={handleSetAllDefault}
-                className="px-4 py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors"
+                className="px-4 py-2 border-2 border-slate-300 text-slate-700 text-sm font-semibold rounded-lg hover:bg-white hover:border-slate-400 hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
               >
                 Isi Semua 75
               </button>
               <button
                 onClick={handleClearChanges}
-                className="px-4 py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors"
+                className="px-4 py-2 border-2 border-slate-300 text-slate-700 text-sm font-semibold rounded-lg hover:bg-white hover:border-slate-400 hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
               >
                 Kosongkan
               </button>
             </div>
             <div className="flex items-center gap-3">
               {hasChanges && (
-                <span className="text-sm text-amber-600 font-medium">
-                  Ada perubahan yang belum disimpan
-                </span>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-100 border border-amber-200">
+                  <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="text-sm text-amber-700 font-semibold">
+                    Ada perubahan yang belum disimpan
+                  </span>
+                </div>
               )}
               <button
                 onClick={handleSave}
                 disabled={saving || !hasChanges}
-                className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5"
               >
                 <Save size={18} strokeWidth={2} />
-                {saving ? 'Menyimpan...' : 'Simpan Nilai'}
+                {saving ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Menyimpan...
+                  </span>
+                ) : (
+                  'Simpan Nilai'
+                )}
               </button>
             </div>
           </div>
@@ -473,43 +483,47 @@ export const WeeklyGradeInputPage = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50">
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                    <tr className="border-b-2 border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         No
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         Nama Siswa
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         NIS
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         Nilai
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         Badge
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         Catatan
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-slate-200">
+                  <tbody className="bg-white divide-y divide-slate-100">
                     {students.map((student, index) => {
                       const grade = grades[student.id] || {};
                       const score = grade.score;
                       const hasScore = score !== '' && score !== null && score !== undefined;
                       
                       return (
-                        <tr key={student.id} className="hover:bg-slate-50 transition-colors">
-                          <td className="px-6 py-4 text-sm text-slate-600">
-                            {index + 1}
+                        <tr key={student.id} className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-transparent transition-all duration-200 group">
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-blue-100 text-slate-700 group-hover:text-blue-700 text-sm font-semibold transition-colors">
+                              {index + 1}
+                            </span>
                           </td>
-                          <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                          <td className="px-6 py-4 text-sm font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">
                             {student.name}
                           </td>
-                          <td className="px-6 py-4 text-sm text-slate-600">
-                            {student.student_id}
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
+                              {student.student_id}
+                            </span>
                           </td>
                           <td className="px-6 py-4">
                             <WeeklyGradeScoreInput
@@ -527,7 +541,7 @@ export const WeeklyGradeInputPage = () => {
                               value={grade.notes || ''}
                               onChange={(e) => handleNotesChange(student.id, e.target.value)}
                               placeholder="Catatan (opsional)"
-                              className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                             />
                           </td>
                         </tr>

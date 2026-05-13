@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Edit2, Trash2, Search, Filter as FilterIcon, RotateCcw, FileText } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, Filter as FilterIcon, RotateCcw, FileText, CheckCircle2, XCircle, TrendingUp } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useGradeComponents } from '../../hooks/useGradeComponents';
 import { AppLayout } from '../../components/layout/AppLayout';
@@ -173,21 +173,49 @@ export const GradeComponentsPage = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="p-5 border-l-4 border-l-blue-500">
-          <p className="text-sm font-medium text-slate-600 mb-1">Total Komponen</p>
-          <p className="text-2xl font-bold text-slate-900">{summary.total}</p>
+        <Card className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 hover:shadow-lg transition-all duration-300 group">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-blue-700 mb-1">Total Komponen</p>
+              <p className="text-3xl font-bold text-blue-900">{summary.total}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-blue-100 group-hover:bg-blue-200 transition-colors duration-300">
+              <FileText className="text-blue-700" size={22} strokeWidth={2} />
+            </div>
+          </div>
         </Card>
-        <Card className="p-5 border-l-4 border-l-emerald-500">
-          <p className="text-sm font-medium text-slate-600 mb-1">Komponen Aktif</p>
-          <p className="text-2xl font-bold text-slate-900">{summary.active}</p>
+        <Card className="p-5 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 hover:shadow-lg transition-all duration-300 group">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-emerald-700 mb-1">Komponen Aktif</p>
+              <p className="text-3xl font-bold text-emerald-900">{summary.active}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-emerald-100 group-hover:bg-emerald-200 transition-colors duration-300">
+              <CheckCircle2 className="text-emerald-700" size={22} strokeWidth={2} />
+            </div>
+          </div>
         </Card>
-        <Card className="p-5 border-l-4 border-l-slate-500">
-          <p className="text-sm font-medium text-slate-600 mb-1">Komponen Nonaktif</p>
-          <p className="text-2xl font-bold text-slate-900">{summary.inactive}</p>
+        <Card className="p-5 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 hover:shadow-lg transition-all duration-300 group">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-700 mb-1">Komponen Nonaktif</p>
+              <p className="text-3xl font-bold text-slate-900">{summary.inactive}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-200 group-hover:bg-slate-300 transition-colors duration-300">
+              <XCircle className="text-slate-700" size={22} strokeWidth={2} />
+            </div>
+          </div>
         </Card>
-        <Card className="p-5 border-l-4 border-l-amber-500">
-          <p className="text-sm font-medium text-slate-600 mb-1">Total Bobot Default</p>
-          <p className="text-2xl font-bold text-slate-900">{summary.total_weight}%</p>
+        <Card className="p-5 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 hover:shadow-lg transition-all duration-300 group">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-amber-700 mb-1">Total Bobot Default</p>
+              <p className="text-3xl font-bold text-amber-900">{summary.total_weight}%</p>
+            </div>
+            <div className="p-3 rounded-xl bg-amber-100 group-hover:bg-amber-200 transition-colors duration-300">
+              <TrendingUp className="text-amber-700" size={22} strokeWidth={2} />
+            </div>
+          </div>
         </Card>
       </div>
 
@@ -256,76 +284,86 @@ export const GradeComponentsPage = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50">
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                    <tr className="border-b-2 border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         Kode
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         Nama
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         Bobot Default
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 tracking-wide">
                         Urutan
                       </th>
                       {isAdmin && (
-                        <th className="px-6 py-3 text-right text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                        <th className="px-6 py-4 text-right text-xs font-bold text-slate-700 tracking-wide">
                           Aksi
                         </th>
                       )}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-slate-200">
+                  <tbody className="bg-white divide-y divide-slate-100">
                     {components.map((component) => (
-                      <tr key={component.id} className="hover:bg-slate-50 transition-colors">
+                      <tr key={component.id} className="hover:bg-gradient-to-r hover:from-slate-50 hover:to-transparent transition-all duration-200 group">
                         <td className="px-6 py-4">
                           <GradeComponentBadge code={component.code} name={component.name} />
                         </td>
                         <td className="px-6 py-4">
                           <div>
-                            <p className="text-sm font-medium text-slate-900">{component.name}</p>
+                            <p className="text-sm font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">{component.name}</p>
                             {component.description && (
-                              <p className="text-xs text-slate-500 mt-0.5">{component.description}</p>
+                              <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{component.description}</p>
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-slate-700">
-                          {component.default_weight ? `${component.default_weight}%` : '-'}
+                        <td className="px-6 py-4">
+                          {component.default_weight ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 text-sm font-semibold">
+                              {component.default_weight}%
+                            </span>
+                          ) : (
+                            <span className="text-sm text-slate-400">-</span>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           {component.is_active ? (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-medium bg-emerald-50 text-emerald-700">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 border border-emerald-200">
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                               Aktif
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-600">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                              <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                               Nonaktif
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-sm text-slate-600">
-                          {component.sort_order}
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-700 text-sm font-semibold">
+                            {component.sort_order}
+                          </span>
                         </td>
                         {isAdmin && (
                           <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-1">
+                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                               <button
                                 onClick={() => handleEdit(component)}
-                                className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600"
+                                className="p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 text-slate-600 hover:text-blue-600 hover:scale-110"
                                 title="Edit"
                               >
-                                <Edit2 size={16} strokeWidth={1.5} />
+                                <Edit2 size={16} strokeWidth={2} />
                               </button>
                               <button
                                 onClick={() => setShowDeleteConfirm(component)}
-                                className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
+                                className="p-2 hover:bg-red-50 rounded-lg transition-all duration-200 text-slate-600 hover:text-red-600 hover:scale-110"
                                 title="Hapus"
                               >
-                                <Trash2 size={16} strokeWidth={1.5} />
+                                <Trash2 size={16} strokeWidth={2} />
                               </button>
                             </div>
                           </td>
