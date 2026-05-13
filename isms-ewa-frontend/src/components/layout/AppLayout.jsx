@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import { ChevronDown, LogOut } from 'lucide-react';
+import { ChevronDown, LogOut, Bell, User, Settings, Lock } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { ROUTES } from '../../constants/routes';
 import { Sidebar } from './Sidebar';
@@ -63,88 +63,121 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
             </p>
           </div>
           
-          {/* User Profile - Top Right - PREMIUM DESIGN */}
-          <div className="relative">
-            <button
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="group flex items-center gap-3 rounded-xl px-4 py-2.5 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-blue-50 hover:to-indigo-50 border border-slate-200 hover:border-blue-200 transition-all duration-300 shadow-sm hover:shadow-md"
-            >
-              <div className="text-right">
-                <p className="text-sm font-bold text-slate-900 group-hover:text-blue-700 transition-colors">{user?.name}</p>
-                <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
-              </div>
-              <div className="relative">
-                {/* Glow effect */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-300" />
-                {/* Avatar */}
-                <div className="relative grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-lg shadow-blue-500/30 ring-2 ring-white group-hover:scale-110 transition-transform duration-300">
-                  {user?.name?.charAt(0).toUpperCase()}
-                </div>
-              </div>
-              <ChevronDown 
-                size={16} 
-                className={clsx(
-                  "text-slate-500 group-hover:text-blue-600 transition-all duration-300",
-                  userMenuOpen && "rotate-180"
-                )} 
-              />
+          {/* User Profile - Top Right - CLEAN DESIGN LIKE IMAGE */}
+          <div className="flex items-center gap-4">
+            {/* Bell Notification */}
+            <button className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+              <Bell size={20} strokeWidth={2} />
+              {/* Notification badge */}
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
 
-            {/* User Menu Dropdown - PREMIUM */}
-            {userMenuOpen && (
-              <>
-                {/* Backdrop */}
-                <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => setUserMenuOpen(false)}
-                />
-                
-                {/* Dropdown */}
-                <div className="absolute right-0 z-50 mt-3 w-72 rounded-2xl border border-slate-200 bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
-                  {/* Gradient Header */}
-                  <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 px-6 py-5">
-                    {/* Decorative circles */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12" />
-                    
-                    <div className="relative flex items-center gap-4">
-                      {/* Large Avatar */}
-                      <div className="relative">
-                        <div className="absolute inset-0 rounded-full bg-white/30 blur-md" />
-                        <div className="relative grid h-14 w-14 place-items-center rounded-full bg-white text-lg font-bold text-blue-600 shadow-lg">
-                          {user?.name?.charAt(0).toUpperCase()}
-                        </div>
-                      </div>
-                      
-                      <div className="flex-1">
-                        <p className="text-base font-bold text-white">{user?.name}</p>
-                        <p className="text-sm text-blue-100 capitalize mt-0.5">{user?.role}</p>
-                        <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span className="text-xs font-medium text-white">Online</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Menu Items */}
-                  <div className="p-2">
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        setUserMenuOpen(false);
-                      }}
-                      className="flex w-full items-center gap-3 px-4 py-3 text-left rounded-xl text-sm font-medium text-slate-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 hover:text-red-600 transition-all duration-200 group"
-                    >
-                      <div className="p-2 rounded-lg bg-slate-100 group-hover:bg-red-100 transition-colors">
-                        <LogOut size={16} className="group-hover:scale-110 transition-transform" />
-                      </div>
-                      <span className="font-semibold">Logout</span>
-                    </button>
+            {/* User Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-3 hover:bg-slate-50 rounded-lg px-3 py-2 transition-colors"
+              >
+                {/* Avatar with photo placeholder */}
+                <div className="relative h-12 w-12 rounded-full bg-slate-200 overflow-hidden ring-2 ring-white shadow-sm">
+                  {/* Placeholder - nanti bisa diganti foto real */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-300 to-slate-400 text-slate-600 font-semibold text-lg">
+                    {user?.name?.charAt(0).toUpperCase()}
                   </div>
                 </div>
-              </>
-            )}
+                
+                {/* User Info */}
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
+                  <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+                </div>
+                
+                {/* Chevron */}
+                <ChevronDown 
+                  size={18} 
+                  className={clsx(
+                    "text-slate-400 transition-transform duration-200",
+                    userMenuOpen && "rotate-180"
+                  )} 
+                />
+              </button>
+
+              {/* Dropdown Menu - CLEAN DESIGN */}
+              {userMenuOpen && (
+                <>
+                  {/* Backdrop */}
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setUserMenuOpen(false)}
+                  />
+                  
+                  {/* Menu */}
+                  <div className="absolute right-0 z-50 mt-2 w-64 rounded-2xl bg-white shadow-xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    {/* Menu Items */}
+                    <div className="py-2">
+                      {/* Profil Saya */}
+                      <button
+                        onClick={() => {
+                          // Navigate to profile
+                          setUserMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors group"
+                      >
+                        <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                          <User size={18} strokeWidth={2} />
+                        </div>
+                        <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Profil Saya</span>
+                      </button>
+
+                      {/* Pengaturan Akun */}
+                      <button
+                        onClick={() => {
+                          // Navigate to settings
+                          setUserMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors group"
+                      >
+                        <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                          <Settings size={18} strokeWidth={2} />
+                        </div>
+                        <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Pengaturan Akun</span>
+                      </button>
+
+                      {/* Ganti Password */}
+                      <button
+                        onClick={() => {
+                          // Navigate to change password
+                          setUserMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors group"
+                      >
+                        <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                          <Lock size={18} strokeWidth={2} />
+                        </div>
+                        <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Ganti Password</span>
+                      </button>
+
+                      {/* Divider */}
+                      <div className="my-2 border-t border-slate-200"></div>
+
+                      {/* Keluar / Logout */}
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setUserMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-red-50 transition-colors group"
+                      >
+                        <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-red-100 group-hover:text-red-600 transition-colors">
+                          <LogOut size={18} strokeWidth={2} />
+                        </div>
+                        <span className="text-sm font-medium text-slate-700 group-hover:text-red-600">Keluar</span>
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </header>
 
