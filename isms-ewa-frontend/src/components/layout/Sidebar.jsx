@@ -101,6 +101,37 @@ export const Sidebar = ({
       ],
     },
     {
+      id: 'grades',
+      label: 'NILAI',
+      type: 'section',
+      children: [
+        {
+          id: 'grade-components',
+          icon: BookOpen,
+          label: 'Komponen Nilai',
+          route: '/grades/components',
+        },
+        {
+          id: 'weekly-grades',
+          icon: BookOpen,
+          label: 'Nilai Mingguan',
+          route: '/grades/weekly',
+        },
+        {
+          id: 'weekly-grade-input',
+          icon: BookOpen,
+          label: 'Input Nilai',
+          route: '/grades/weekly/input',
+        },
+        {
+          id: 'grade-recap',
+          icon: BarChart3,
+          label: 'Rekap Nilai',
+          route: '/grades/recap',
+        },
+      ],
+    },
+    {
       id: 'student-management',
       label: 'STUDENT MANAGEMENT',
       type: 'section',

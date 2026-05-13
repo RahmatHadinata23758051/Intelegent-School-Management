@@ -14,6 +14,10 @@ import { ClassSubjectsPage } from './pages/class-subjects/ClassSubjectsPage';
 import { TeacherSubjectAssignmentsPage } from './pages/teacher-assignments/TeacherSubjectAssignmentsPage';
 import { AttendanceSessionsPage } from './pages/attendance/AttendanceSessionsPage';
 import { AttendanceInputPage } from './pages/attendance/AttendanceInputPage';
+import { GradeComponentsPage } from './pages/grades/GradeComponentsPage';
+import { WeeklyGradesPage } from './pages/grades/WeeklyGradesPage';
+import { WeeklyGradeInputPage } from './pages/grades/WeeklyGradeInputPage';
+import { ClassWeeklyGradeRecapPage } from './pages/grades/ClassWeeklyGradeRecapPage';
 import { LoadingScreen } from './components/common/LoadingScreen';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ROUTES } from './constants/routes';
@@ -161,6 +165,40 @@ function App() {
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
                 <AttendanceInputPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Grades Routes - Protected */}
+          <Route
+            path="/grades/components"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+                <GradeComponentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/grades/weekly"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+                <WeeklyGradesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/grades/weekly/input"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+                <WeeklyGradeInputPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/grades/recap"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated} isLoading={isLoading}>
+                <ClassWeeklyGradeRecapPage />
               </ProtectedRoute>
             }
           />
