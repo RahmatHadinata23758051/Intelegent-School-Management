@@ -11,8 +11,8 @@ import { ScoreBadge } from '../../components/grades/ScoreBadge';
 import weeklyGradeService from '../../services/weeklyGradeService';
 import teacherSubjectAssignmentService from '../../services/teacherSubjectAssignmentService';
 import gradeComponentService from '../../services/gradeComponentService';
-import academicYearService from '../../services/academicYearService';
-import semesterService from '../../services/semesterService';
+import { academicYearService } from '../../services/academicYearService';
+import { semesterService } from '../../services/semesterService';
 import { studentService } from '../../services/studentService';
 import { useAuth } from '../../hooks/useAuth';
 import clsx from 'clsx';
@@ -65,12 +65,12 @@ export const WeeklyGradeInputPage = () => {
         setGradeComponents(componentsResponse.data || []);
 
         // Load active academic year
-        const yearResponse = await academicYearService.getCurrentAcademicYear();
-        setAcademicYear(yearResponse.data);
+        const yearResponse = await academicYearService.getActiveAcademicYear();
+        setAcademicYear(yearResponse);
 
         // Load active semester
-        const semesterResponse = await semesterService.getCurrentSemester();
-        setSemester(semesterResponse.data);
+        const semesterResponse = await semesterService.getActiveSemester();
+        setSemester(semesterResponse);
       } catch (err) {
         setError(err.response?.data?.message || err.message || 'Gagal memuat data');
       } finally {
