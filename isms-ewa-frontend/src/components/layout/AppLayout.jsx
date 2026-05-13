@@ -63,40 +63,87 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
             </p>
           </div>
           
-          {/* User Profile - Top Right */}
+          {/* User Profile - Top Right - PREMIUM DESIGN */}
           <div className="relative">
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-3 rounded-lg px-4 py-2 hover:bg-slate-100 transition-colors"
+              className="group flex items-center gap-3 rounded-xl px-4 py-2.5 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-blue-50 hover:to-indigo-50 border border-slate-200 hover:border-blue-200 transition-all duration-300 shadow-sm hover:shadow-md"
             >
               <div className="text-right">
-                <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
+                <p className="text-sm font-bold text-slate-900 group-hover:text-blue-700 transition-colors">{user?.name}</p>
                 <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
               </div>
-              <div className="grid h-9 w-9 place-items-center rounded-full bg-blue-600 text-xs font-bold text-white">
-                {user?.name?.charAt(0).toUpperCase()}
+              <div className="relative">
+                {/* Glow effect */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-300" />
+                {/* Avatar */}
+                <div className="relative grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-lg shadow-blue-500/30 ring-2 ring-white group-hover:scale-110 transition-transform duration-300">
+                  {user?.name?.charAt(0).toUpperCase()}
+                </div>
               </div>
-              <ChevronDown size={16} className="text-slate-500" />
+              <ChevronDown 
+                size={16} 
+                className={clsx(
+                  "text-slate-500 group-hover:text-blue-600 transition-all duration-300",
+                  userMenuOpen && "rotate-180"
+                )} 
+              />
             </button>
 
-            {/* User Menu Dropdown */}
+            {/* User Menu Dropdown - PREMIUM */}
             {userMenuOpen && (
-              <div className="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-slate-200 bg-white py-2 shadow-lg">
-                <div className="border-b border-slate-100 px-4 py-2">
-                  <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
-                  <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+              <>
+                {/* Backdrop */}
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setUserMenuOpen(false)}
+                />
+                
+                {/* Dropdown */}
+                <div className="absolute right-0 z-50 mt-3 w-72 rounded-2xl border border-slate-200 bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+                  {/* Gradient Header */}
+                  <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 px-6 py-5">
+                    {/* Decorative circles */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12" />
+                    
+                    <div className="relative flex items-center gap-4">
+                      {/* Large Avatar */}
+                      <div className="relative">
+                        <div className="absolute inset-0 rounded-full bg-white/30 blur-md" />
+                        <div className="relative grid h-14 w-14 place-items-center rounded-full bg-white text-lg font-bold text-blue-600 shadow-lg">
+                          {user?.name?.charAt(0).toUpperCase()}
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <p className="text-base font-bold text-white">{user?.name}</p>
+                        <p className="text-sm text-blue-100 capitalize mt-0.5">{user?.role}</p>
+                        <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="text-xs font-medium text-white">Online</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="p-2">
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setUserMenuOpen(false);
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left rounded-xl text-sm font-medium text-slate-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 hover:text-red-600 transition-all duration-200 group"
+                    >
+                      <div className="p-2 rounded-lg bg-slate-100 group-hover:bg-red-100 transition-colors">
+                        <LogOut size={16} className="group-hover:scale-110 transition-transform" />
+                      </div>
+                      <span className="font-semibold">Logout</span>
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setUserMenuOpen(false);
-                  }}
-                  className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 transition-colors"
-                >
-                  <LogOut size={16} />
-                  Logout
-                </button>
-              </div>
+              </>
             )}
           </div>
         </header>
