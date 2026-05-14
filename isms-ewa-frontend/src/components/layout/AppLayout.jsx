@@ -1,25 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import { ChevronDown, LogOut, Bell, User, Settings, Lock } from 'lucide-react';
+import {
+  ChevronDown,
+  LogOut,
+  Bell,
+  User,
+  Settings,
+  Lock,
+} from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { ROUTES } from '../../constants/routes';
 import { Sidebar } from './Sidebar';
 
 /**
- * AppLayout - Modern application shell with clean sidebar
- * 
- * Design System:
- * - Sidebar: Dark navy blue with smooth collapse
- * - Header: Clean white with profile in top right
- * - Main: Light background with proper spacing
- * - Typography: Inter, 14px body, 24px headings
+ * AppLayout - Modern application shell
+ *
+ * Fokus redesign:
+ * - Profile top-right dibuat lebih natural dan tidak "AI slop"
+ * - Dropdown lebih clean dan realistis
+ * - Sidebar / logic utama tetap dipertahankan
  */
 export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
   const navigate = useNavigate();
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout } = useAuth();
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const userMenuRef = useRef(null);
 
   const handleLogout = async () => {
     await logout();
@@ -36,13 +45,35 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
     'class-detail': 'Class Details',
     'tahun-ajaran': 'Tahun Ajaran',
     'academic-years': 'Tahun Ajaran',
-    'semester': 'Semester',
-    'semesters': 'Semester',
+    semester: 'Semester',
+    semesters: 'Semester',
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 font-[Inter,Geist,system-ui,-apple-system,BlinkMacSystemFont,'Segoe_UI',sans-serif] text-slate-900">
-      {/* Sidebar Component */}
+      {/* Sidebar */}
       <Sidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
@@ -51,141 +82,178 @@ export const AppLayout = ({ children, currentPage = 'dashboard' }) => {
       />
 
       {/* Main Content */}
-      <main className={clsx('min-h-screen transition-all duration-300', sidebarOpen ? 'ml-64' : 'ml-20')}>
-        {/* Top Bar - Header */}
-        <header className="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-slate-200 bg-white px-8 shadow-sm">
+      <main
+        className={clsx(
+          'min-h-screen transition-all duration-300',
+          sidebarOpen ? 'ml-64' : 'ml-20'
+        )}
+      >
+        {/* Header */}
+        <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-6 shadow-sm backdrop-blur lg:px-8">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               {pageTitle[currentPage] || 'Dashboard'}
             </h1>
             <p className="mt-1 text-sm text-slate-500">
               Welcome back, {user?.name}!
             </p>
           </div>
-          
-          {/* User Profile - Top Right - CLEAN DESIGN LIKE IMAGE */}
-          <div className="flex items-center gap-4">
-            {/* Bell Notification */}
-            <button className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
-              <Bell size={20} strokeWidth={2} />
-              {/* Notification badge */}
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+
+          {/* Right side */}
+          <div className="flex items-center gap-3 lg:gap-4">
+            {/* Notification */}
+            <button
+              type="button"
+              className="relative flex h-10 w-10 items-center justify-center rounded-full border border-transparent text-slate-500 transition hover:border-slate-200 hover:bg-slate-50 hover:text-slate-800"
+            >
+              <Bell size={18} strokeWidth={2} />
+              <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-red-500" />
             </button>
 
-            {/* User Dropdown */}
-            <div className="relative">
+            {/* User Profile */}
+            <div className="relative" ref={userMenuRef}>
               <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-3 hover:bg-slate-50 rounded-lg px-3 py-2 transition-colors"
+                type="button"
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                aria-expanded={userMenuOpen}
+                className={clsx(
+                  'group flex items-center gap-3 rounded-full border px-2 py-1.5 transition-all',
+                  userMenuOpen
+                    ? 'border-slate-300 bg-white shadow-sm'
+                    : 'border-transparent bg-transparent hover:border-slate-200 hover:bg-slate-50'
+                )}
               >
-                {/* Avatar with photo placeholder */}
-                <div className="relative h-12 w-12 rounded-full bg-slate-200 overflow-hidden ring-2 ring-white shadow-sm">
-                  {/* Placeholder - nanti bisa diganti foto real */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-300 to-slate-400 text-slate-600 font-semibold text-lg">
-                    {user?.name?.charAt(0).toUpperCase()}
+                {/* User text */}
+                <div className="hidden text-right sm:block">
+                  <p className="text-sm font-semibold leading-5 text-slate-900">
+                    {user?.name || 'Admin ISMS-EWA'}
+                  </p>
+                  <div className="mt-0.5 flex items-center justify-end gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <p className="text-xs capitalize text-slate-500">
+                      {user?.role || 'admin'}
+                    </p>
                   </div>
                 </div>
-                
-                {/* User Info */}
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
-                  <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+
+                {/* Avatar */}
+                <div className="relative">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-800 shadow-sm">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                  </div>
                 </div>
-                
+
                 {/* Chevron */}
-                <ChevronDown 
-                  size={18} 
+                <ChevronDown
+                  size={16}
                   className={clsx(
-                    "text-slate-400 transition-transform duration-200",
-                    userMenuOpen && "rotate-180"
-                  )} 
+                    'text-slate-400 transition duration-200 group-hover:text-slate-600',
+                    userMenuOpen && 'rotate-180'
+                  )}
                 />
               </button>
 
-              {/* Dropdown Menu - CLEAN DESIGN */}
+              {/* Dropdown */}
               {userMenuOpen && (
-                <>
-                  {/* Backdrop */}
-                  <div 
-                    className="fixed inset-0 z-40" 
-                    onClick={() => setUserMenuOpen(false)}
-                  />
-                  
-                  {/* Menu */}
-                  <div className="absolute right-0 z-50 mt-2 w-64 rounded-2xl bg-white shadow-xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    {/* Menu Items */}
-                    <div className="py-2">
-                      {/* Profil Saya */}
-                      <button
-                        onClick={() => {
-                          // Navigate to profile
-                          setUserMenuOpen(false);
-                        }}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors group"
-                      >
-                        <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
-                          <User size={18} strokeWidth={2} />
-                        </div>
-                        <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Profil Saya</span>
-                      </button>
+                <div className="absolute right-0 z-50 mt-3 w-[280px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.10)]">
+                  {/* User summary */}
+                  <div className="border-b border-slate-100 px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-sm font-semibold text-slate-800">
+                        {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                      </div>
 
-                      {/* Pengaturan Akun */}
-                      <button
-                        onClick={() => {
-                          // Navigate to settings
-                          setUserMenuOpen(false);
-                        }}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors group"
-                      >
-                        <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
-                          <Settings size={18} strokeWidth={2} />
-                        </div>
-                        <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Pengaturan Akun</span>
-                      </button>
-
-                      {/* Ganti Password */}
-                      <button
-                        onClick={() => {
-                          // Navigate to change password
-                          setUserMenuOpen(false);
-                        }}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors group"
-                      >
-                        <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
-                          <Lock size={18} strokeWidth={2} />
-                        </div>
-                        <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Ganti Password</span>
-                      </button>
-
-                      {/* Divider */}
-                      <div className="my-2 border-t border-slate-200"></div>
-
-                      {/* Keluar / Logout */}
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          setUserMenuOpen(false);
-                        }}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-red-50 transition-colors group"
-                      >
-                        <div className="p-2 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-red-100 group-hover:text-red-600 transition-colors">
-                          <LogOut size={18} strokeWidth={2} />
-                        </div>
-                        <span className="text-sm font-medium text-slate-700 group-hover:text-red-600">Keluar</span>
-                      </button>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-slate-900">
+                          {user?.name || 'Admin ISMS-EWA'}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs capitalize text-slate-500">
+                          {user?.role || 'admin'}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </>
+
+                  {/* Menu Items */}
+                  <div className="py-2">
+                    <DropdownItem
+                      icon={<User size={17} strokeWidth={2} />}
+                      label="Profil Saya"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                      }}
+                    />
+
+                    <DropdownItem
+                      icon={<Settings size={17} strokeWidth={2} />}
+                      label="Pengaturan Akun"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                      }}
+                    />
+
+                    <DropdownItem
+                      icon={<Lock size={17} strokeWidth={2} />}
+                      label="Ganti Password"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                      }}
+                    />
+
+                    <div className="my-2 border-t border-slate-100" />
+
+                    <DropdownItem
+                      danger
+                      icon={<LogOut size={17} strokeWidth={2} />}
+                      label="Keluar"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        handleLogout();
+                      }}
+                    />
+                  </div>
+                </div>
               )}
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <section className="px-8 py-8">
-          {children}
-        </section>
+        <section className="px-6 py-8 lg:px-8">{children}</section>
       </main>
     </div>
   );
 };
+
+function DropdownItem({ icon, label, onClick, danger = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={clsx(
+        'mx-2 flex w-[calc(100%-16px)] items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors',
+        danger ? 'hover:bg-red-50' : 'hover:bg-slate-50'
+      )}
+    >
+      <div
+        className={clsx(
+          'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
+          danger
+            ? 'bg-slate-100 text-slate-600 group-hover:bg-red-100'
+            : 'bg-slate-100 text-slate-600'
+        )}
+      >
+        {icon}
+      </div>
+
+      <span
+        className={clsx(
+          'text-sm font-medium',
+          danger ? 'text-slate-700 hover:text-red-600' : 'text-slate-700'
+        )}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
