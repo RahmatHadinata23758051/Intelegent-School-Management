@@ -48,4 +48,20 @@ class AcademicYear extends Model
     {
         return $this->hasMany(TeacherSubjectAssignment::class);
     }
+
+    /**
+     * Get the academic summaries for this academic year.
+     */
+    public function academicSummaries(): HasMany
+    {
+        return $this->hasMany(StudentAcademicSummary::class);
+    }
+
+    /**
+     * Get the report cards for this academic year.
+     */
+    public function reportCards(): HasMany
+    {
+        return $this->hasMany(ReportCard::class);
+    }
 }

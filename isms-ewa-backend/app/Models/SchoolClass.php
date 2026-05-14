@@ -59,4 +59,20 @@ class SchoolClass extends Model
     {
         return $this->hasMany(AttendanceSession::class, 'school_class_id');
     }
+
+    /**
+     * Relasi: Rekap akademik kelas
+     */
+    public function academicSummaries()
+    {
+        return $this->hasMany(StudentAcademicSummary::class, 'school_class_id');
+    }
+
+    /**
+     * Relasi: Raport kelas
+     */
+    public function reportCards()
+    {
+        return $this->hasMany(ReportCard::class, 'school_class_id');
+    }
 }

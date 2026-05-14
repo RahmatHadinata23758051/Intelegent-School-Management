@@ -38,6 +38,11 @@ class TeacherProfile extends Model
         return $this->hasMany(TeacherSubjectAssignment::class);
     }
 
+    public function homeroomClass()
+    {
+        return $this->hasOne(SchoolClass::class, 'homeroom_teacher_id', 'user_id');
+    }
+
     // Scopes
     public function scopeActive($query)
     {
